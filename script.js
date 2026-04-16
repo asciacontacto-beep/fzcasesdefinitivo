@@ -9,7 +9,6 @@ async function loadProductsFromSupabase() {
     const { data, error } = await _supabase
         .from('products')
         .select('*')
-        .eq('activo', true)
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -17,8 +16,17 @@ async function loadProductsFromSupabase() {
         return;
     }
 
+    // Filtrar localmente para evitar problemas de tipos de datos en la DB (boolean vs string)
+    const activeData = data.filter(p => p.activo === true || p.activo === 'true');
+
+
+    if (error) {
+        console.error('Error cargando productos:', error);
+        return;
+    }
+
     // Mapear estructura de base de datos a estructura de UI
-    products = data.map(p => {
+    products = activeData.map(p => {
         const baseFeatures = [
             "Garantía oficial de FZCASES",
             "Retiro inmediato en Tandil / Necochea",
@@ -133,7 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="product-info">
                     <div onclick="openModal(${product.id})" style="cursor: pointer;">
                         <h3>${product.name}</h3>
-                        <p>Modelos: ${product.models.join(', ')}</p>
+                        <p style="color:var(--text-gray); font-size:0.9rem;">
+                            ${product.subcategory || ''} ${product.storage ? ' | ' + product.storage : ''} ${product.color ? ' | ' + product.color : ''}
+                        </p>
                     </div>
                     <a href="${waLink}" target="_blank" class="btn-wa-sm"><span>Consultar por WhatsApp</span></a>
                 </div>
