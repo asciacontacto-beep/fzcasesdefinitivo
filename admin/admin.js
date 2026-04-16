@@ -347,3 +347,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         modalProduct.classList.remove('hidden');
     };
+
+    // Inicializar carga de datos
+    fetchData();
+
+    // Fecha Header
+    const mainSubtitle = document.getElementById('main-subtitle');
+    if (mainSubtitle) mainSubtitle.textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+});
