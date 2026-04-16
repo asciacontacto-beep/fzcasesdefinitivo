@@ -170,15 +170,150 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!error) fetchData();
     };
 
-    window.logout = () => {
-        localStorage.removeItem('admin_logged');
-        window.location.href = '/admin';
+    // ==============================================================================
+    // 4. MODALES Y FORMULARIOS (CRUD)
+    // ==============================================================================
+    const modalProduct = document.getElementById('modal-product');
+    const formProduct = document.getElementById('form-product');
+    const modalSale = document.getElementById('modal-sale');
+    const formSale = document.getElementById('form-sale');
+
+    // -- Helpers de UI (Chips, Imágenes, Modelos) --
+    function initChipSelectors() {
+        document.querySelectorAll('.chip-container, .chip-container-pills').forEach(container => {
+            const chips = container.querySelectorAll('.chip, .chip-pill');
+            const hiddenInput = container.querySelector('input[type="hidden"]');
+            chips.forEach(chip => {
+                chip.onclick = () => {
+                    chips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    if (hiddenInput) {
+                        hiddenInput.value = chip.getAttribute('data-val');
+                        hiddenInput.dispatchEvent(new Event('change'));
+                    }
+                };
+            });
+        });
+    }
+
+    function initImageUpload() {
+        [1, 2, 3].forEach(slot => {
+            const fileInput = document.getElementById(`file-${slot}`);
+            const hiddenInput = document.getElementById(`prod-img-${slot}`);
+            const thumb = document.getElementById(`img-${slot}`);
+            if (!fileInput) return;
+            fileInput.onchange = e => {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    hiddenInput.value = ev.target.result;
+                    thumb.src = ev.target.result;
+                    thumb.classList.remove('hidden');
+                    if (thumb.previousElementSibling) thumb.previousElementSibling.classList.add('hidden');
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            };
+        });
+    }
+
+    const CATEGORY_MODELS = {
+        'iPhone': ['iPhone 13', 'iPhone 13 Pro', 'iPhone 14', 'iPhone 14 Pro', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 16', 'iPhone 16 Pro', 'iPhone 17 Pro Max'],
+        'MacBook': ['MacBook Air M1', 'MacBook Air M2', 'MacBook Pro 14"'],
+        'iPad': ['iPad Air', 'iPad Pro'],
+        'AirPods': ['AirPods 3', 'AirPods Pro 2'],
+        'Accesorios': ['Funda Silicone', 'Cargador Original']
     };
 
-    // Logout button manual link
-    document.getElementById('btn-logout').onclick = window.logout;
+    function updateModelDropdown(category) {
+        const select = document.getElementById('prod-name');
+        if (!select) return;
+        select.innerHTML = '';
+        (CATEGORY_MODELS[category] || CATEGORY_MODELS['iPhone']).forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m; opt.textContent = m;
+            select.appendChild(opt);
+        });
+    }
 
-    // Mobile menu helpers
+    // -- Listeners de Botones Abrir --
+    document.getElementById('btn-add-product').onclick = () => {
+        formProduct.reset();
+        document.getElementById('prod-id').value = '';
+        document.getElementById('modal-prod-title').textContent = 'Nuevo Producto';
+        // Reset chips
+        document.querySelectorAll('.chip, .chip-pill').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.chip-container, .chip-container-pills').forEach(container => {
+            const first = container.querySelector('.chip, .chip-pill');
+            if (first) first.click();
+        });
+        modalProduct.classList.remove('hidden');
+    };
+
+    document.getElementById('btn-add-sale').onclick = () => {
+        formSale.reset();
+        document.getElementById('preview-total').textContent = '$0';
+        modalSale.classList.remove('hidden');
+    };
+
+    // -- Handlers de Envío --
+    formProduct.onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('prod-id').value;
+        const prodData = {
+            nombre: document.getElementById('prod-name').value,
+            categoria: document.getElementById('prod-cat').value,
+            subcategoria: document.getElementById('prod-subcat').value,
+            almacenamiento: document.getElementById('prod-storage').value,
+            color: document.getElementById('prod-color-custom').value || document.getElementById('prod-color').value,
+            precio_venta: Number(document.getElementById('prod-sell').value),
+            precio_costo: Number(document.getElementById('prod-cost').value),
+            battery: document.getElementById('prod-battery').value,
+            imagen: document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
+            stock: 1,
+            activo: document.getElementById('prod-active').checked
+        };
+
+        const { error } = id 
+            ? await _supabase.from('products').update(prodData).eq('id', id)
+            : await _supabase.from('products').insert([prodData]);
+
+        if (!error) {
+            modalProduct.classList.add('hidden');
+            fetchData();
+        }
+    };
+
+    formSale.onsubmit = async (e) => {
+        e.preventDefault();
+        const sel = document.getElementById('sale-prod');
+        const opt = sel.options[sel.selectedIndex];
+        const saleData = {
+            producto_id: Number(sel.value),
+            producto_nombre: opt.text.split('] ')[1],
+            cantidad: Number(document.getElementById('sale-qty').value),
+            precio_final: Number(document.getElementById('sale-price').value),
+            precio_costo: Number(opt.dataset.cost),
+            cliente: document.getElementById('sale-client').value,
+            metodo_pago: document.getElementById('sale-method').value,
+            fecha: new Date().toISOString()
+        };
+
+        const { error } = await _supabase.from('sales').insert([saleData]);
+        if (!error) {
+            modalSale.classList.add('hidden');
+            fetchData();
+        }
+    };
+
+    // -- Inicializadores de Formulario --
+    initChipSelectors();
+    initImageUpload();
+    document.getElementById('prod-cat').onchange = (e) => updateModelDropdown(e.target.value);
+    document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => {
+        b.closest('.modal-overlay').classList.add('hidden');
+    });
+
+    // Logout y Mobile
+    document.getElementById('btn-logout').onclick = window.logout;
     document.getElementById('mobile-menu-open').onclick = () => {
         document.getElementById('admin-sidebar').classList.add('open');
         document.getElementById('sidebar-overlay').classList.add('show');
@@ -188,11 +323,27 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('sidebar-overlay').classList.remove('show');
     };
 
-    // Inicializar
-    fetchData();
+    window.editProduct = (id) => {
+        const p = memoryProducts.find(x => x.id === id);
+        if (!p) return;
+        document.getElementById('prod-id').value = p.id;
+        document.getElementById('modal-prod-title').textContent = 'Editar Producto';
+        document.getElementById('prod-name').value = p.nombre;
+        document.getElementById('prod-sell').value = p.precio_venta;
+        document.getElementById('prod-cost').value = p.precio_costo;
+        document.getElementById('prod-active').checked = p.activo;
+        document.getElementById('prod-battery').value = p.battery || '';
+        
+        // Chips
+        const fields = [
+            { id: 'container-category', val: p.categoria },
+            { id: 'container-condition', val: p.subcategoria },
+            { id: 'container-storage', val: p.almacenamiento }
+        ];
+        fields.forEach(f => {
+            const chip = document.getElementById(f.id).querySelector(`[data-val="${f.val}"]`);
+            if (chip) chip.click();
+        });
 
-    // Fecha Header
-    const mainSubtitle = document.getElementById('main-subtitle');
-    if (mainSubtitle) mainSubtitle.textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-});
+        modalProduct.classList.remove('hidden');
+    };
