@@ -178,6 +178,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalSale = document.getElementById('modal-sale');
     const formSale = document.getElementById('form-sale');
 
+    // ============== TOAST HELPER =================
+    function showToast(msg, type = 'success') {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
     // -- Helpers de UI (Chips, Imágenes, Modelos) --
     function initChipSelectors() {
         document.querySelectorAll('.chip-container, .chip-container-pills').forEach(container => {
@@ -267,6 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
             precio_venta: Number(document.getElementById('prod-sell').value),
             precio_costo: Number(document.getElementById('prod-cost').value),
             battery: document.getElementById('prod-battery').value,
+            ubicacion: document.getElementById('prod-location') ? document.getElementById('prod-location').value : null,
+            notas: document.getElementById('prod-features') ? document.getElementById('prod-features').value : null,
             imagen: document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
             stock: 1,
             activo: document.getElementById('prod-active').checked
@@ -278,7 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!error) {
             modalProduct.classList.add('hidden');
+            showToast(id ? 'Producto actualizado' : 'Producto agregado');
             fetchData();
+        } else {
+            console.error("Error BD:", error);
+            alert("Error de BD: " + error.message + "\nDetalle: " + error.details);
         }
     };
 
@@ -300,7 +321,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const { error } = await _supabase.from('sales').insert([saleData]);
         if (!error) {
             modalSale.classList.add('hidden');
+            showToast('Venta registrada');
             fetchData();
+        } else {
+            console.error("Error BD Ventas:", error);
+            alert("Error al registrar venta: " + error.message);
         }
     };
 
