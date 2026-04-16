@@ -1506,7 +1506,7 @@ a.contact-item:hover {
         letter-spacing: -0.2px;
     }
     
-    .catalog, .features, .about-section, .about-hero, .faq-section, .como-funciona, .testimonios, .highlight-banner, .bento-section, .canje-cta {
+    .catalog, .features, .about-section, .about-hero, .faq-section, .como-funciona, .testimonios, .bento-section, .canje-cta {
         padding-left: 1.25rem !important;
         padding-right: 1.25rem !important;
         padding-top: 2.5rem !important; /* Reducido drásticamente para no sentir zoom out */
@@ -1735,31 +1735,59 @@ a.contact-item:hover {
         position: fixed; /* Fixed within the modal */
     }
     
-    /* Highlight Banner Mobile */
+    /* Highlight Banner Mobile - Imagen de Fondo */
     .highlight-banner {
-        padding: 4rem 1.5rem;
+        padding: 0 !important;
         text-align: center;
+        min-height: 550px;
+        display: flex;
+        align-items: center;
     }
 
     .banner-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
+        display: block;
+        width: 100%;
+        margin: 0;
     }
 
     .banner-visual {
-        order: -1; /* Image on top */
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 0;
+        order: unset;
+        display: block;
+    }
+
+    .banner-product-mockup {
+        width: 100%; height: 100%;
+        min-height: 100%;
+        border-radius: 0;
+        border: none;
+    }
+
+    .banner-visual::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 100%);
+        z-index: 1;
+    }
+
+    .banner-content {
+        position: relative;
+        z-index: 2;
+        padding: 4rem 1.5rem;
     }
 
     .banner-content h2 {
-        font-size: 2.2rem;
+        font-size: 2.3rem;
     }
 
     .banner-bullets {
         align-items: center;
-    }
-
-    .banner-product-mockup {
-        height: 300px;
+        text-align: left;
     }
 
     /* Mega Footer Mobile */
