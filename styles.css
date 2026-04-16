@@ -18,6 +18,7 @@
 
 html {
     scroll-behavior: smooth;
+    font-size: 15px; /* Reduce escala global desde el 16px nativo */
 }
 
 body {
@@ -316,18 +317,18 @@ a {
     .hero-immersive {
         height: 100dvh;
         min-height: auto;
-        padding: 0 1.5rem;
+        padding: 0 1.25rem;
         justify-content: center;
     }
     
     .display-title {
-        font-size: 2.8rem;
+        font-size: 2.3rem; /* Más pequeño para móvil */
         letter-spacing: -1px;
     }
 
     .hero-lead {
-        margin: 0 auto 2.5rem;
-        font-size: 1.1rem;
+        margin: 0 auto 2rem;
+        font-size: 1rem; /* Disminuido */
     }
     
     .hero-cta-group {
@@ -1494,9 +1495,13 @@ a.contact-item:hover {
 }
 
 @media (max-width: 767px) {
+    html {
+        font-size: 13.5px; /* Achica todo componente basado en rem en un 15% */
+    }
+
     /* Base Mobile Tipography & Spacing */
     body {
-        font-size: 16px;
+        font-size: 1rem; /* Hereda del root para mantener la proporción */
         line-height: 1.6;
         letter-spacing: -0.2px;
     }
@@ -1504,8 +1509,8 @@ a.contact-item:hover {
     .catalog, .features, .about-section, .about-hero, .faq-section, .como-funciona, .testimonios, .highlight-banner, .bento-section, .canje-cta {
         padding-left: 1.25rem !important;
         padding-right: 1.25rem !important;
-        padding-top: 4rem !important;
-        padding-bottom: 4rem !important;
+        padding-top: 2.5rem !important; /* Reducido drásticamente para no sentir zoom out */
+        padding-bottom: 2.5rem !important;
         margin-top: 0 !important;
         margin-bottom: 0 !important;
     }
