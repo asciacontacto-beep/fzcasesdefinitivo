@@ -1,4 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+
+    // ==============================================================================
+    // CONFIGURACIÓN SUPABASE
+    // ==============================================================================
+    const SUPABASE_URL = 'https://sypleinfsemauzjcxxrx.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cGxlaW5mc2VtYXV6amN4eHJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMzExODYsImV4cCI6MjA5MTkwNzE4Nn0.p_EvcoFKwZ38HTvHK28NtlK573jVG2suR0OX17GA_IE';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // 1. FECHA Y HORA HEADER
     const mainSubtitle = document.getElementById('main-subtitle');
@@ -53,91 +60,34 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==============================================================================
-    // BASE DE DATOS TEMPORAL (Mocks & LocalStorage)
+    // CARGA DE DATOS DESDE SUPABASE
     // ==============================================================================
+    let memoryProducts = [];
+    let memorySales = [];
 
-    // Si no existen en localStorage las creamos las ventas y canjes (Productos se maneja abajo)
+    async function fetchData() {
+        // Cargar Productos
+        const { data: products, error: pError } = await _supabase
+            .from('products')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    if (!localStorage.getItem('admin_sales')) {
-        const defaultSale = [{
-            id: Date.now() + 1,
-            productoId: Date.now(),
-            productoNombre: "iPhone 15 Pro",
-            fecha: new Date().toISOString(),
-            cantidad: 1,
-            precioFinal: 1200000,
-            precioCosto: 950000,
-            metodoPago: "Efectivo",
-            cliente: "Juan"
-        }];
-        localStorage.setItem('admin_sales', JSON.stringify(defaultSale));
+        if (!pError) memoryProducts = products;
+
+        // Cargar Ventas
+        const { data: sales, error: sError } = await _supabase
+            .from('sales')
+            .select('*')
+            .order('fecha', { ascending: false });
+
+        if (!sError) memorySales = sales;
+
+        initRenders();
     }
 
-    if (!localStorage.getItem('admin_canjes')) {
-        localStorage.setItem('admin_canjes', JSON.stringify([]));
-        // Si hay data global 'fzcases_canje_data' (abandonada sin enviar wp) se podria chupar, pero por ahora array vacio.
-    }
-
-    // Cargar desde cache a RAM
-    let memoryProducts = JSON.parse(localStorage.getItem('fz_products')) || [];
-
-    // Función para precargar productos si está vacío (Seeding)
-    function seedInitialProducts() {
-        if (memoryProducts.length === 0) {
-            const initialMocks = [
-                {
-                    id: 1,
-                    nombre: "iPhone 15 Pro 256GB",
-                    categoria: "iPhone",
-                    subcategoria: "Nuevo",
-                    precioVenta: 1200,
-                    precioCosto: 950,
-                    ubicacion: "Tandil",
-                    almacenamiento: "256GB",
-                    color: "Titanio Negro",
-                    activo: true,
-                    imagen: "/assets/iphone_case.png",
-                    images: ["/assets/iphone_case.png"],
-                    notas: "Titanio aeroespacial, Chip A17 Pro",
-                    stock: 1
-                },
-                {
-                    id: 2,
-                    nombre: "MacBook Air M2 2023 256GB",
-                    categoria: "MacBook",
-                    subcategoria: "Nuevo",
-                    precioVenta: 1450,
-                    precioCosto: 1100,
-                    ubicacion: "Necochea",
-                    almacenamiento: "256GB",
-                    color: "Medianoche",
-                    activo: true,
-                    imagen: "assets/charger_cable.png",
-                    images: ["assets/charger_cable.png"],
-                    notas: "Chip M2, Pantalla Liquid Retina",
-                    stock: 1
-                },
-                {
-                    id: 3,
-                    nombre: "iPhone 13 Pro 128GB",
-                    categoria: "iPhone",
-                    subcategoria: "Usado",
-                    precioVenta: 650,
-                    precioCosto: 450,
-                    ubicacion: "Tandil",
-                    almacenamiento: "128GB",
-                    color: "Sierra Blue",
-                    battery: "89",
-                    activo: true,
-                    imagen: "/assets/iphone_case.png",
-                    images: ["/assets/iphone_case.png"],
-                    notas: "Pantalla ProMotion 120Hz",
-                    stock: 1
-                }
-            ];
-            
-            memoryProducts = initialMocks;
-            localStorage.setItem('fz_products', JSON.stringify(memoryProducts));
+    // Llamada inicial a la base de datos
+    fetchData();
+ucts));
         }
     }
 
@@ -597,47 +547,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const prodData = {
-            id: isEditing ? Number(isEditing) : Date.now(),
             nombre: name,
             categoria: document.getElementById('prod-cat').value,
-            subcategoria: document.getElementById('prod-subcat').value, // Sellado/Usado
+            subcategoria: document.getElementById('prod-subcat').value,
             ubicacion: document.getElementById('prod-location').value,
-            imei: document.getElementById('prod-imei').value,
-            serial: document.getElementById('prod-serial').value,
             almacenamiento: document.getElementById('prod-storage').value,
             color: document.getElementById('prod-color-custom').value || document.getElementById('prod-color').value,
-            precioVenta: Number(document.getElementById('prod-sell').value),
-            precioCosto: Number(document.getElementById('prod-cost').value),
+            precio_venta: Number(document.getElementById('prod-sell').value),
+            precio_costo: Number(document.getElementById('prod-cost').value),
             activo: document.getElementById('prod-active').checked,
             battery: document.getElementById('prod-battery').value,
-            warranty: document.getElementById('prod-warranty').value,
             notas: document.getElementById('prod-features').value,
-            images: [
-                document.getElementById('prod-img-1').value,
-                document.getElementById('prod-img-2').value,
-                document.getElementById('prod-img-3').value
-            ],
-            fecha: new Date().toISOString(),
+            imagen: document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
             stock: 1
         };
 
-        // Legacy field compatibility
-        prodData.imagen = prodData.images[0] || 'https://via.placeholder.com/150';
-
         if (isEditing) {
-            const index = memoryProducts.findIndex(p => p.id === prodData.id);
-            if (index !== -1) memoryProducts[index] = prodData;
-            showToast('Producto actualizado');
+            const { error } = await _supabase
+                .from('products')
+                .update(prodData)
+                .eq('id', isEditing);
+            
+            if (error) showToast('Error al actualizar', 'error');
+            else showToast('Producto actualizado');
         } else {
-            memoryProducts.push(prodData);
-            showToast('Producto agregado con éxito');
-            // Sincronizar con Google Sheets solo al crear nuevo
-            syncWithGoogleSheets(prodData);
+            const { error } = await _supabase
+                .from('products')
+                .insert([prodData]);
+            
+            if (error) showToast('Error al guardar', 'error');
+            else {
+                showToast('Producto agregado con éxito');
+                syncWithGoogleSheets(prodData);
+            }
         }
 
-        localStorage.setItem('fz_products', JSON.stringify(memoryProducts));
         modalProduct.classList.add('hidden');
-        initRenders();
+        fetchData(); // Recargar datos desde Supabase
     });
 
     searchProd.addEventListener('input', (e) => {
@@ -713,15 +659,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.deleteProduct = async (id) => {
-        const confirmDelete = await window.customConfirm({
-            title: 'Eliminar Producto',
-            message: '¿Estás seguro que deseas eliminar permanentemente este producto?',
-            btnOkClass: 'btn-danger'
+        const confirmed = await customConfirm({
+            title: "¿Eliminar producto?",
+            message: "Esta acción lo quitará permanentemente del catálogo.",
+            icon: "🗑️"
         });
-        if (confirmDelete) {
-            memoryProducts = memoryProducts.filter(p => p.id !== id);
-            localStorage.setItem('fz_products', JSON.stringify(memoryProducts));
-            initRenders();
+
+        if (confirmed) {
+            const { error } = await _supabase
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if (error) showToast('Error al eliminar', 'error');
+            else {
+                showToast('Producto eliminado');
+                fetchData();
+            }
         }
     };
 

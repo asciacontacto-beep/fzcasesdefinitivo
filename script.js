@@ -1,64 +1,53 @@
-// Fallback mock data
-const MOCK_PRODUCTS = [
-    {
-        id: 1,
-        name: "iPhone 15 Pro 256GB",
-        category: "iPhone",
-        subcategory: "Nuevo",
-        precio: 1200000,
-        variantes: {
-            colores: [
-                { nombre: "Negro Titanio", hex: "#1d1d1f" },
-                { nombre: "Blanco Titanio", hex: "#f5f5f7" }
-            ],
-            almacenamiento: ["256GB", "512GB"]
-        },
-        models: ["iPhone 15 Pro"],
-        image: "assets/iphone_case.png",
-        bestseller: true,
-        features: ["Titanio aeroespacial", "Chip A17 Pro", "Botón de Acción"]
-    }
-];
+// CONFIGURACIÓN SUPABASE
+const SUPABASE_URL = 'https://sypleinfsemauzjcxxrx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cGxlaW5mc2VtYXV6amN4eHJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMzExODYsImV4cCI6MjA5MTkwNzE4Nn0.p_EvcoFKwZ38HTvHK28NtlK573jVG2suR0OX17GA_IE';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Load from LocalStorage
-const storedProducts = localStorage.getItem('fz_products');
 let products = [];
 
-if (storedProducts === null) {
-    // Primera vez: Usar mocks
-    products = MOCK_PRODUCTS;
-    localStorage.setItem('fz_products', JSON.stringify(MOCK_PRODUCTS));
-} else {
-    products = JSON.parse(storedProducts);
+async function loadProductsFromSupabase() {
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('activo', true)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error cargando productos:', error);
+        return;
+    }
+
+    // Mapear estructura de base de datos a estructura de UI
+    products = data.map(p => {
+        const baseFeatures = [
+            "Garantía oficial de FZCASES",
+            "Retiro inmediato en Tandil / Necochea",
+            "Soporte técnico especializado"
+        ];
+        const customFeatures = p.notas ? [p.notas] : [];
+        const allFeatures = [...customFeatures, ...baseFeatures];
+
+        return {
+            id: p.id,
+            name: p.nombre,
+            category: p.categoria,
+            subcategory: p.subcategoria,
+            precio: p.precio_venta,
+            storage: p.almacenamiento,
+            color: p.color,
+            image: p.imagen || "assets/iphone_case.png",
+            features: allFeatures,
+            bestseller: p.bestseller || false
+        };
+    });
+
+    // Disparar renders iniciales
+    if (typeof renderFilters === 'function') renderFilters();
+    if (typeof renderCatalog === 'function') renderCatalog();
 }
 
-// Map admin structure to UI structure if needed
-products = products.map(p => {
-    // Generar características amigables para el cliente
-    const baseFeatures = [
-        "Garantía oficial de FZCASES",
-        "Retiro inmediato en Tandil / Necochea",
-        "Soporte técnico especializado"
-    ];
-
-    // Si hay notas en el admin, las agregamos como característica destacada
-    const customFeatures = p.notas ? [p.notas] : [];
-    const allFeatures = [...customFeatures, ...baseFeatures];
-
-    return {
-        id: p.id,
-        name: p.nombre || p.name,
-        category: p.categoria || p.category,
-        subcategory: p.subcategoria || p.subcategory,
-        precio: p.precioVenta || p.precio,
-        storage: p.almacenamiento,
-        color: p.color,
-        image: p.imagen || p.image || "assets/iphone_case.png",
-        models: [p.almacenamiento || 'Standard'].concat(p.color ? [p.color] : []),
-        features: allFeatures,
-        bestseller: p.bestseller || false
-    };
-});
+// Carga inicial
+loadProductsFromSupabase();
 
 
 const phoneNumber = "5491100000000";
