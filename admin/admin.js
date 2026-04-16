@@ -277,11 +277,15 @@ ucts));
     // CONTROLADOR DE TABS Y SIDEBAR (SPA)
     // ==============================================================================
 
-    const navItems = document.querySelectorAll('.nav-item');
-    const panels = document.querySelectorAll('.tab-content');
-    const mainTitle = document.getElementById('main-title');
+    // ==============================================================================
+    // CONTROLADOR DE TABS Y SIDEBAR (SPA)
+    // ==============================================================================
 
-    function switchTab(targetId, TitleName) {
+    window.switchTab = function(targetId, TitleName) {
+        const panels = document.querySelectorAll('.tab-content');
+        const navItems = document.querySelectorAll('.nav-item');
+        const mainTitle = document.getElementById('main-title');
+
         panels.forEach(p => {
             p.style.display = 'none';
             p.classList.remove('active');
@@ -295,19 +299,26 @@ ucts));
         }
 
         document.querySelectorAll(`.nav-item[data-target="${targetId}"]`).forEach(el => el.classList.add('active'));
-        if (mainTitle) mainTitle.textContent = TitleName;
+        if (mainTitle && TitleName) mainTitle.textContent = TitleName;
 
-        document.getElementById('admin-sidebar').classList.remove('open');
+        const sidebar = document.getElementById('admin-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
         if (overlay) overlay.classList.remove('show');
-    }
+    };
 
+    const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const navText = item.querySelector('.nav-text');
-            switchTab(item.dataset.target, navText ? navText.textContent : 'Panel');
+            window.switchTab(item.dataset.target, navText ? navText.textContent : 'Panel');
         });
     });
+
+    // Accesos directos desde las tarjetas KPI
+    document.querySelector('.icon-products')?.closest('.kpi-card')?.addEventListener('click', () => window.switchTab('view-productos', 'Productos'));
+    document.querySelector('.icon-sales')?.closest('.kpi-card')?.addEventListener('click', () => window.switchTab('view-ventas', 'Ventas'));
+    document.querySelector('.icon-revenue')?.closest('.kpi-card')?.addEventListener('click', () => window.switchTab('view-ventas', 'Ventas'));
 
     // tabBtns removed
 
