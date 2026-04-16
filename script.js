@@ -41,13 +41,12 @@ async function loadProductsFromSupabase() {
         };
     });
 
-    // Disparar renders iniciales
-    if (typeof renderFilters === 'function') renderFilters();
-    if (typeof renderCatalog === 'function') renderCatalog();
+    // Disparar renders iniciales si ya están listos
+    if (window.renderFilters) window.renderFilters();
+    if (window.renderCatalog) window.renderCatalog();
 }
 
-// Carga inicial
-loadProductsFromSupabase();
+// Se llamará en el DOMContentLoaded
 
 
 const phoneNumber = "5491100000000";
@@ -90,12 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Relleno de Filtros
     const filterContainer = document.getElementById('filter-container');
-    const allCategories = ['Todos', ...new Set(products.map(p => p.category))];
-    
     let activeFilter = 'Todos';
 
-    function renderFilters() {
+    window.renderFilters = function() {
         if (!filterContainer) return;
+        const allCategories = ['Todos', ...new Set(products.map(p => p.category))];
+        
         filterContainer.innerHTML = '';
         allCategories.forEach(cat => {
             const btn = document.createElement('button');
@@ -103,8 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = cat;
             btn.addEventListener('click', () => {
                 activeFilter = cat;
-                renderFilters();
-                renderCatalog();
+                window.renderFilters();
+                window.renderCatalog();
             });
             filterContainer.appendChild(btn);
         });
@@ -113,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Relleno de Catálogo
     const productGrid = document.getElementById('product-grid');
 
-    function renderCatalog() {
+    window.renderCatalog = function() {
         if (!productGrid) return;
         productGrid.innerHTML = '';
         const filteredProducts = activeFilter === 'Todos' 
@@ -776,7 +775,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Iniciar render globales
-    if (typeof renderFilters === 'function') renderFilters();
-    if (typeof renderCatalog === 'function') renderCatalog();
+    if (window.renderFilters) window.renderFilters();
+    if (window.renderCatalog) window.renderCatalog();
     if (window.attachObserver) window.attachObserver();
+
+    // === CARGAR DATOS FINALES SUPABASE ===
+    loadProductsFromSupabase();
 });
