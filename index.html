@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FZCASES | Accesorios Premium para iPhone</title>
+    <meta name="description"
+        content="Tienda de fundas y accesorios para iPhone. Stock real, envíos a todo el país y garantía asegurada.">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Menu Humburguesa / Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <img src="assets/logo.png" alt="FZ CASES Logo" loading="lazy">
+            </a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#hero">Inicio</a></li>
+                <li><a href="index.html#catalog">Catálogo</a></li>
+                <li><a href="index.html#plan-canje">Plan Canje</a></li>
+                <li><a href="nosotros.html">Nosotros</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Rediseñado Estilo Apple -->
+    <header id="hero" class="hero-immersive">
+        <div class="hero-background-wrapper">
+             <img src="assets/hero-fz.jpg" alt="Local FZCASES" class="hero-img-bg">
+             <div class="hero-overlay-mask"></div>
+        </div>
+        
+        <div class="container hero-main-container">
+            <div class="hero-content-stack scroll-animate fade-up">
+                <div class="hero-tagline">
+                    <span class="location-badge">Tandil · Necochea</span>
+                </div>
+                <h1 class="display-title">Tu próximo iPhone <br> empieza acá.</h1>
+                <p class="hero-lead">Equipos sellados y reacondicionados con el respaldo y servicio técnico que solo FZCASES te puede dar.</p>
+                
+                <div class="hero-cta-group">
+                    <a href="#catalog" class="btn-apple-primary">Ver Productos</a>
+                    <a href="#plan-canje" class="btn-apple-link">Cotizar Plan Canje <span class="chevron">›</span></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Catálogo de Productos -->
+    <section id="catalog" class="catalog">
+        <div class="catalog-header">
+            <h2 class="scroll-animate fade-down">Nuestro Catálogo</h2>
+            <div class="filters" id="filter-container">
+                <!-- Filtros generados por JS -->
+            </div>
+        </div>
+
+        <div class="product-grid" id="product-grid">
+            <!-- Productos renderizados por JS -->
+        </div>
+    </section>
+
+    <!-- Por qué elegirnos -->
+    <section id="features" class="features">
+        <div class="feature-box scroll-animate fade-up">
+            <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+            </div>
+            <h3>Envíos Rápidos</h3>
+            <p>A todo el país, sin demoras.</p>
+        </div>
+        <div class="feature-box scroll-animate fade-up">
+            <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+            </div>
+            <h3>Stock Permanente</h3>
+            <p>Si está publicado, lo tenemos.</p>
+        </div>
+        <div class="feature-box scroll-animate fade-up">
+            <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+            </div>
+            <h3>Garantía Asegurada</h3>
+            <p>Productos probados y respaldados.</p>
+        </div>
+    </section>
+
+    <!-- Cómo Funciona -->
+    <section id="como-funciona" class="como-funciona">
+      <div class="container">
+        <!-- Header -->
+        <div class="section-header">
+          <span class="badge" style="margin-bottom: 1rem; display: inline-block;">Simple y rápido</span>
+          <h2 class="section-title">¿Cómo funciona?</h2>
+          <p class="section-subtitle">Comprá tu iPhone o Mac en 3 simples pasos</p>
+        </div>
+
+        <!-- Steps Grid -->
+        <div class="steps-grid">
+          
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-icon">📱</div>
+            <h3 class="step-title">Elegís tu producto</h3>
+            <p class="step-description">Explorá nuestro catálogo de iPhones, MacBooks y AirPods nuevos y reacondicionados.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-icon">💬</div>
+            <h3 class="step-title">Consultás por WhatsApp</h3>
+            <p class="step-description">Te respondemos al instante con disponibilidad, precio final y detalles del producto.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-icon">📍</div>
+            <h3 class="step-title">Retirás en persona</h3>
+            <p class="step-description">Coordinamos una cita en Tandil o Necochea. ¡Y listo, ya tenés tu equipo Apple!</p>
+          </div>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="steps-cta">
+          <a href="#catalog" class="btn-primary">Ver Productos Disponibles</a>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Banner Reacondicionados -->
+    <section class="highlight-banner">
+        <div class="container banner-grid">
+            <div class="banner-content scroll-animate fade-up">
+                <span class="badge" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Exclusivo</span>
+                <h2>Elevá tu experiencia Apple</h2>
+                <p class="banner-subtitle">Equipos nuevos, sellados y con garantía oficial.</p>
+                
+                <ul class="banner-bullets">
+                    <li><span class="bullet-check">✓</span> 100% Originales y Sellados</li>
+                    <li><span class="bullet-check">✓</span> Soporte Técnico Especializado</li>
+                    <li><span class="bullet-check">✓</span> Tu inversión 100% protegida</li>
+                </ul>
+
+                <a href="#catalog" class="banner-btn">Ver Modelos</a>
+            </div>
+            <div class="banner-visual scroll-animate fade-scale">
+                <!-- Imagen decorativa / Placeholder -->
+                <div class="banner-product-mockup">
+                    <img src="assets/iphone-sellados.jpg" alt="Equipos iPhones Sellados FZCASES" class="banner-img-static">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan Canje -->
+    <section id="plan-canje" class="plan-canje-section">
+        <!-- CTA Inicial -->
+        <div id="canje-cta" class="canje-cta">
+            <div class="canje-cta-content">
+                <div class="canje-icon">📱</div>
+                <h2>¿Querés cambiar tu iPhone?</h2>
+                <p class="canje-subtitle">Tasamos tu equipo usado al instante y te ayudamos a renovar</p>
+
+                <div class="canje-benefits">
+                    <div class="benefit-item">
+                        <span class="check">✓</span>
+                        <span>Tasación inmediata por WhatsApp</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check">✓</span>
+                        <span>Aceptamos todos los modelos</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check">✓</span>
+                        <span>Proceso simple y rápido</span>
+                    </div>
+                </div>
+
+                <button id="btn-abrir-formulario" class="btn-canje-cta">
+                    Cotizar mi equipo ahora
+                    <span class="arrow">→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulario (oculto inicialmente) -->
+        <div id="canje-formulario" class="canje-formulario" style="display: none;">
+            <div class="container canje-container">
+                <button id="btn-volver-cta" class="btn-ghost"
+                    style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Volver
+                </button>
+                <div class="canje-header scroll-animate fade-up">
+                    <h2>Cambiá tu iPhone usado</h2>
+                    <p>Completá 3 pasos y envianos la info por WhatsApp para recibir tu tasación</p>
+                </div>
+
+                <div class="wizard-container scroll-animate fade-up">
+                    <!-- Progress Bar -->
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                        <div class="progress-steps">
+                            <div class="step-circle active" data-step="1">1</div>
+                            <div class="step-circle" data-step="2">2</div>
+                            <div class="step-circle" data-step="3">3</div>
+                            <div class="step-circle" data-step="4">4</div>
+                        </div>
+                    </div>
+
+                    <!-- Formularios -->
+                    <div class="wizard-steps">
+
+                        <!-- PASO 1 -->
+                        <div class="wizard-step active" id="step-1">
+                            <h3>¿Qué modelo de iPhone tenés?</h3>
+                            <div class="model-options" id="model-options">
+                                <button type="button" class="pill-btn" data-value="iPhone 15 Pro Max">iPhone 15 Pro
+                                    Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 15 Pro">iPhone 15 Pro</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 15 Plus">iPhone 15
+                                    Plus</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 15">iPhone 15</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 14 Pro Max">iPhone 14 Pro
+                                    Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 14 Pro">iPhone 14 Pro</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 14 Plus">iPhone 14
+                                    Plus</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 14">iPhone 14</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 13 Pro Max">iPhone 13 Pro
+                                    Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 13 Pro">iPhone 13 Pro</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 13">iPhone 13</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 12 Pro Max">iPhone 12 Pro
+                                    Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 12">iPhone 12</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 11">iPhone 11</button>
+                                <button type="button" class="pill-btn" data-value="iPhone SE (2022)">iPhone SE
+                                    (2022)</button>
+                                <button type="button" class="pill-btn" data-value="Otro"
+                                    id="btn-otro-modelo">Otro</button>
+                            </div>
+                            <div class="other-model-container" id="other-model-container">
+                                <input type="text" id="input-other-model" placeholder="Escribí cual modelo tenés..."
+                                    class="custom-input">
+                            </div>
+                        </div>
+
+                        <!-- PASO 2 -->
+                        <div class="wizard-step" id="step-2">
+                            <h3>¿En qué estado físico está tu iPhone?</h3>
+                            <div class="state-options grid-2x2">
+                                <div class="state-card" data-value="Como nuevo">
+                                    <div class="state-icon">✨</div>
+                                    <h4>Como nuevo</h4>
+                                    <p>Sin rayones ni golpes visibles</p>
+                                </div>
+                                <div class="state-card" data-value="Muy bueno">
+                                    <div class="state-icon">🌟</div>
+                                    <h4>Muy bueno</h4>
+                                    <p>Detalles mínimos de uso</p>
+                                </div>
+                                <div class="state-card" data-value="Bueno">
+                                    <div class="state-icon">⭐</div>
+                                    <h4>Bueno</h4>
+                                    <p>Rayones leves, funciona perfecto</p>
+                                </div>
+                                <div class="state-card" data-value="Regular">
+                                    <div class="state-icon">💫</div>
+                                    <h4>Regular</h4>
+                                    <p>Golpes visibles, pantalla rota o similar</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PASO 3 -->
+                        <div class="wizard-step" id="step-3">
+                            <h3>¿Qué funciona correctamente?</h3>
+                            <div class="func-checks">
+                                <label class="custom-check-card">
+                                    <input type="checkbox" name="funcionalidad" value="Pantalla táctil">
+                                    <span class="checkmark"></span>
+                                    <span>Pantalla táctil</span>
+                                </label>
+                                <label class="custom-check-card">
+                                    <input type="checkbox" name="funcionalidad" value="Face ID / Touch ID">
+                                    <span class="checkmark"></span>
+                                    <span>Face ID / Touch ID</span>
+                                </label>
+                                <label class="custom-check-card">
+                                    <input type="checkbox" name="funcionalidad" value="Cámaras (frontal y trasera)">
+                                    <span class="checkmark"></span>
+                                    <span>Cámaras (frontal y trasera)</span>
+                                </label>
+                                <label class="custom-check-card">
+                                    <input type="checkbox" name="funcionalidad" value="Botones laterales">
+                                    <span class="checkmark"></span>
+                                    <span>Botones laterales</span>
+                                </label>
+                                <label class="custom-check-card">
+                                    <input type="checkbox" name="funcionalidad" value="Parlantes y micrófono">
+                                    <span class="checkmark"></span>
+                                    <span>Parlantes y micrófono</span>
+                                </label>
+                                <label class="custom-check-card">
+                                    <input type="checkbox" name="funcionalidad" value="Carga (puerto)">
+                                    <span class="checkmark"></span>
+                                    <span>Carga (puerto Lightning/USB-C)</span>
+                                </label>
+                            </div>
+                            <div class="battery-input-box">
+                                <label for="battery-health">Salud de la batería (%)</label>
+                                <div style="display:flex; align-items:center;">
+                                    <input type="number" id="battery-health" min="0" max="100" placeholder="Ej: 85"
+                                        class="custom-input small">
+                                    <span style="margin-left:8px; font-weight:bold;">%</span>
+                                </div>
+                                <small class="helper-text">Lo encontrás en Ajustes > Batería > Estado</small>
+                            </div>
+                        </div>
+
+                        <!-- PASO 4 -->
+                        <div class="wizard-step" id="step-4">
+                            <div class="summary-header">
+                                <h3>Revisá tu información</h3>
+                                <p>Tocá enviar y te contactamos al instante por WhatsApp</p>
+                            </div>
+
+                            <div class="summary-card" id="summary-card">
+                                <!-- JS inyectará cosas aquí -->
+                            </div>
+
+                            <div class="summary-actions">
+                                <button id="btn-submit-wa" class="btn-wa-large">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                                        </path>
+                                    </svg>
+                                    Enviar por WhatsApp
+                                </button>
+                                <button id="btn-edit-answers" class="btn-ghost">Editar respuestas</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controles -->
+                    <div class="wizard-controls" id="wizard-controls">
+                        <button class="btn-prev" id="btn-prev">Anterior</button>
+                        <button class="btn-next" id="btn-next" disabled>Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonios -->
+    <section id="testimonios" class="testimonios">
+      <div class="container">
+        <!-- Header -->
+        <div class="section-header">
+          <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+          <p class="section-subtitle">Cientos de personas ya confían en FZCASES</p>
+        </div>
+
+        <!-- Carrusel -->
+        <div class="testimonials-carousel">
+          <div class="testimonials-track">
+            
+            <!-- Testimonio 1 -->
+            <div class="testimonial-card">
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"Compré un iPhone 14 reacondicionado y llegó impecable. La atención fue excelente, me explicaron todo el proceso. 100% recomendable."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">M</div>
+                <div class="author-info">
+                  <div class="author-name">Martín López</div>
+                  <div class="author-location">Tandil</div>
+                </div>
+              </div>
+              <div class="testimonial-product">iPhone 14 · 128GB</div>
+            </div>
+
+            <!-- Testimonio 2 -->
+            <div class="testimonial-card">
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"Canjé mi iPhone viejo por un 15 Pro. El proceso fue súper rápido y transparente. Me dieron un precio justo y la atención increíble."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">L</div>
+                <div class="author-info">
+                  <div class="author-name">Lucía Fernández</div>
+                  <div class="author-location">Necochea</div>
+                </div>
+              </div>
+              <div class="testimonial-product">Plan Canje</div>
+            </div>
+
+            <!-- Testimonio 3 -->
+            <div class="testimonial-card">
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"Excelente atención y productos de calidad. Compré AirPods Pro y una funda, todo original. Muy recomendable si estás en Tandil."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">J</div>
+                <div class="author-info">
+                  <div class="author-name">Juan Martínez</div>
+                  <div class="author-location">Tandil</div>
+                </div>
+              </div>
+              <div class="testimonial-product">AirPods Pro 2</div>
+            </div>
+
+            <!-- Testimonio 4 -->
+            <div class="testimonial-card">
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"Mi MacBook Air llegó perfecto y funcionando impecable. La garantía me dio mucha tranquilidad. Volveré a comprar seguro."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">C</div>
+                <div class="author-info">
+                  <div class="author-name">Carolina Ruiz</div>
+                  <div class="author-location">Necochea</div>
+                </div>
+              </div>
+              <div class="testimonial-product">MacBook Air M2</div>
+            </div>
+
+            <!-- Testimonio 5 -->
+            <div class="testimonial-card">
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"Súper atentos por WhatsApp, me respondieron todas las dudas. El iPhone que compré es exactamente como me lo describieron."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">D</div>
+                <div class="author-info">
+                  <div class="author-name">Diego Sánchez</div>
+                  <div class="author-location">Tandil</div>
+                </div>
+              </div>
+              <div class="testimonial-product">iPhone 13 Pro</div>
+            </div>
+
+            <!-- Testimonio 6 -->
+            <div class="testimonial-card">
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"Primera vez que compro un producto reacondicionado y quedé sorprendida. Parece nuevo y ahorré un montón. Gracias FZCASES!"</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">V</div>
+                <div class="author-info">
+                  <div class="author-name">Valentina Torres</div>
+                  <div class="author-location">Necochea</div>
+                </div>
+              </div>
+              <div class="testimonial-product">iPhone 15 · 256GB</div>
+            </div>
+
+          </div>
+
+          <!-- Navegación -->
+          <button class="carousel-btn prev" aria-label="Anterior">‹</button>
+          <button class="carousel-btn next" aria-label="Siguiente">›</button>
+
+          <!-- Dots indicadores -->
+          <div class="carousel-dots"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section">
+        <div class="faq-container container">
+            <div class="faq-header scroll-animate fade-up">
+                <h2>Preguntas Frecuentes</h2>
+                <p>Todo lo que necesitás saber sobre FZCASES</p>
+            </div>
+
+            <div class="accordion-list">
+                <!-- Item 1 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-1" role="button">
+                        <span>¿Cómo compro los productos?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-1" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Todos los pedidos se coordinan por WhatsApp. Elegís el producto que te gusta, nos
+                                consultás por stock y precio, y coordinamos el retiro.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-2" role="button">
+                        <span>¿Dónde retiro mi pedido?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-2" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Trabajamos con retiro en Tandil y Necochea. Al confirmar tu pedido por WhatsApp,
+                                coordinamos día, horario y punto de encuentro.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-3" role="button">
+                        <span>¿Tienen local físico?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-3" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Trabajamos con punto de entrega. Una vez que confirmás tu pedido, te pasamos la dirección
+                                y coordinamos el mejor horario para que pases a retirar tus productos Apple.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-4" role="button">
+                        <span>¿Puedo ver los productos antes de comprar?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-4" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Sí, podés coordinar una cita por WhatsApp para ver los productos en persona antes de
+                                decidir.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 5 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-5" role="button">
+                        <span>¿Los productos tienen garantía?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-5" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Todos nuestros productos tienen garantía de 30 días contra defectos de fábrica. Si tenés
+                                algún problema, contactanos y te lo solucionamos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 6 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-6" role="button">
+                        <span>¿Cómo puedo pagar?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-6" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Aceptamos transferencia bancaria, MercadoPago y efectivo al momento del retiro. Todo se
+                                coordina por WhatsApp.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 7 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-7" role="button">
+                        <span>¿Los productos son originales?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-7" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Los equipos (iPhone, MacBook, AirPods) son siempre 100% originales Apple. Para los
+                                accesorios (fundas, cables) trabajamos con alternativas premium testeados y
+                                seleccionados. Siempre aclaramos en la descripción el tipo de producto.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 8 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-8" role="button">
+                        <span>¿Cómo sé si el producto es compatible con mi iPhone?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-8" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>En cada producto indicamos los modelos compatibles, ya sea para iPhone, MacBook o
+                                AirPods. Si tenés dudas, consultanos por WhatsApp con tu modelo específico y te
+                                confirmamos la compatibilidad al instante.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 9 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-9" role="button">
+                        <span>¿Puedo cambiar o devolver un producto?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-9" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Sí, aceptamos cambios dentro de los 7 días de retirado el producto, siempre que esté sin
+                                uso y en su empaque original.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 10 -->
+                <div class="accordion-item scroll-animate fade-up">
+                    <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-10" role="button">
+                        <span>¿Cómo funciona el Plan Canje?</span>
+                        <svg class="icon-plus" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div id="faq-ans-10" class="accordion-content">
+                        <div class="accordion-inner">
+                            <p>Completás el formulario en la web con los datos de tu iPhone usado, nos lo enviás por
+                                WhatsApp y te respondemos con una tasación al instante. Si te sirve, coordinamos el
+                                canje en Tandil o Necochea.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA final -->
+            <div class="faq-cta scroll-animate fade-up">
+                <h3>¿No encontraste tu respuesta?</h3>
+                <a href="https://wa.me/5491100000000?text=Hola,%20tengo%20una%20consulta%20que%20no%20está%20en%20las%20FAQ"
+                    target="_blank" rel="noopener" class="btn-wa-large">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                        </path>
+                    </svg>
+                    Hablá con nosotros por WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mega Footer Rediseñado -->
+    <footer class="mega-footer">
+        <div class="footer-grid container">
+            <!-- Columna 1 -->
+            <div class="footer-col brand-col">
+                <h3>FZCASES</h3>
+                <p class="tagline">Productos Apple premium en Tandil y Necochea</p>
+                <div class="social-links">
+                    <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+                        </svg>
+                    </a>
+                    <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.312h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
+                        </svg>
+                    </a>
+                    <a href="https://tiktok.com" target="_blank" rel="noopener" aria-label="TikTok">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 2.37-1.19 4.67-2.91 6.13-1.63 1.36-3.79 2.05-5.91 1.84-2.22-.22-4.22-1.35-5.55-3.08-1.3-1.69-1.83-3.9-1.52-5.98.24-1.72 1.05-3.34 2.27-4.57 1.4-1.37 3.33-2.23 5.31-2.31v4.21c-.83.05-1.68.32-2.37.81-.66.47-1.18 1.13-1.38 1.93-.2 0.81-.13 1.69.21 2.44.33.72.93 1.3 1.64 1.58.75.29 1.61.34 2.39.11.77-.22 1.43-.72 1.87-1.4.38-.6.58-1.33.56-2.06V.02h.01Z" />
+                        </svg>
+                    </a>
+                    <a href="https://wa.me/5491100000000" target="_blank" rel="noopener" aria-label="WhatsApp">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Columna 2 -->
+            <div class="footer-col">
+                <h4>Navegación</h4>
+                <div class="footer-links-list">
+                    <a href="index.html#hero">Inicio</a>
+                    <a href="index.html#catalog">Catálogo</a>
+                    <a href="index.html#plan-canje">Plan Canje</a>
+                    <a href="nosotros.html">Nosotros</a>
+                    <a href="index.html">Preguntas Frecuentes</a>
+                </div>
+            </div>
+
+            <!-- Columna 3 -->
+            <div class="footer-col">
+                <h4>Categorías</h4>
+                <div class="footer-links-list">
+                    <a href="index.html#catalog">iPhone</a>
+                    <a href="index.html#catalog">MacBook</a>
+                    <a href="index.html#catalog">AirPods</a>
+                    <a href="index.html#catalog">Accesorios</a>
+                </div>
+            </div>
+
+            <!-- Columna 4 -->
+            <div class="footer-col contact-col">
+                <h4>Contacto</h4>
+                <div class="contact-items">
+                    <a href="https://wa.me/5491100000000" target="_blank" rel="noopener" class="contact-item">
+                        <span>📱 WhatsApp: <br>+54 9 11 0000-0000</span>
+                    </a>
+                    <a href="mailto:info@fzcases.com" class="contact-item">
+                        <span>📧 Email: <br>info@fzcases.com</span>
+                    </a>
+                    <div class="contact-item">
+                        <span>🕐 Horarios: <br>Lun a Vie: 9 a 18hs <br>Sábados: 10 a 14hs</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>📍 Ubicaci&oacute;n: <br>Envíos a todo el país</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Separador y Bottom -->
+        <div class="footer-bottom-wrapper">
+            <div class="container">
+                <hr class="footer-divider">
+                <div class="footer-bottom">
+                    <div class="copyright">
+                        &copy; 2024 FZCASES. Todos los derechos reservados.
+                    </div>
+                    <div class="legal-links">
+                        <a href="index.html">Términos y Condiciones</a>
+                        <span class="pipe">|</span>
+                        <a href="index.html">Políticas de Privacidad</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón Whatsapp Flotante -->
+    <a href="https://wa.me/5491100000000?text=Hola!%20Vengo%20de%20la%20web,%20tengo%20una%20consulta." target="_blank"
+        class="floating-wa" aria-label="Consultar por WhatsApp">
+        <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none"
+            stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+            <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+            </path>
+        </svg>
+    </a>
+
+    <!-- Modal Producto -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="modal-body" id="modal-body">
+                <!-- Dinámico JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+
+</html>
