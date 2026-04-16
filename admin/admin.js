@@ -821,7 +821,7 @@ ucts));
 
     window.logout = () => {
         localStorage.removeItem('admin_logged');
-        window.location.href = '/admin/index.html';
+        window.location.href = '/admin';
     };
 
     // Boot
