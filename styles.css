@@ -309,9 +309,8 @@ a {
 /* Responsivo Hero */
 @media (max-width: 768px) {
     .hero-img-bg {
-        object-fit: contain;
-        background-color: #000;
-        object-position: center 20%;
+        object-fit: cover;
+        object-position: center;
     }
 
     .hero-immersive {
