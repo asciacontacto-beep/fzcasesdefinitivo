@@ -1796,15 +1796,28 @@ a.contact-item:hover {
         position: relative;
         z-index: 2;
         padding: 4rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
 
     .banner-content h2 {
         font-size: 2.3rem;
+        text-align: center;
     }
 
     .banner-bullets {
         align-items: center;
-        text-align: left;
+        text-align: center;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .banner-bullets li {
+        justify-content: center;
+        text-align: center;
     }
 
     /* Mega Footer Mobile */
