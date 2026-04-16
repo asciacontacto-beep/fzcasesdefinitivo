@@ -865,10 +865,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // LOGOUT
     // ==============================================================================
 
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.removeItem('fzcasesAuth');
-        window.location.href = 'login.html';
-    });
+    window.logout = () => {
+        localStorage.removeItem('admin_logged');
+        window.location.href = 'index.html';
+    };
 
     // Boot
     initRenders();
