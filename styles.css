@@ -1810,26 +1810,23 @@ a.contact-item:hover {
         margin: 0 auto;
     }
 
-    .banner-content * {
-        text-align: center;
-    }
-
     .banner-content h2 {
         font-size: 2.3rem;
         text-align: center;
     }
 
     .banner-bullets {
-        align-items: center;
-        text-align: center;
-        width: 100%;
+        align-items: flex-start;
+        text-align: left;
+        width: fit-content;
         margin-left: auto;
         margin-right: auto;
+        padding: 0;
     }
 
     .banner-bullets li {
-        justify-content: center;
-        text-align: center;
+        justify-content: flex-start;
+        text-align: left;
     }
 
     /* Mega Footer Mobile */
