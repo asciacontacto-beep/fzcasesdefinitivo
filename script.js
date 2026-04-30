@@ -630,6 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 canjeData.caja = checkCaja.checked;
                 canjeData.garantia = checkGarantia.checked;
                 saveData();
+                validateCurrentStep();
             });
         });
 
@@ -668,8 +669,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             else if (currentStep === 5) {
-                // All text inputs in step 5 are optional to make it fluid
-                isValid = true;
+                // Text inputs are optional, but Caja and Cable are strictly required
+                isValid = canjeData.cable && canjeData.caja;
             }
             else if (currentStep === 6) {
                 isValid = true;
