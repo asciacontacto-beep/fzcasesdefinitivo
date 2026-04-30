@@ -641,18 +641,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectedCap = document.querySelector('.pill-cap.selected');
                 const hasModel = selectedModel && (selectedModel.id !== 'btn-otro-modelo' || otherInput.value.trim().length > 2);
                 const hasCap = selectedCap !== null;
-                const hasColor = inputColor.value.trim().length > 2;
-                isValid = hasModel && hasCap && hasColor;
+                // Color is now optional for better fluidity
+                isValid = hasModel && hasCap;
             } 
             else if (currentStep === 2) {
                 const hasState = document.querySelector('.state-card.selected') !== null;
-                const hasDetalles = inputDetalles.value.trim().length > 1;
-                isValid = hasState && hasDetalles;
+                // Detalles is now optional
+                isValid = hasState;
             } 
             else if (currentStep === 3) {
                 const hasChecks = canjeData.todoFunciona || canjeData.fallas.length > 0;
-                const hasReparaciones = inputReparaciones.value.trim().length > 1;
-                isValid = hasChecks && hasReparaciones;
+                // Reparaciones is optional
+                isValid = hasChecks;
             } 
             else if (currentStep === 4) {
                 const batteryVal = parseInt(canjeData.bateria);
@@ -668,7 +668,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             else if (currentStep === 5) {
-                isValid = canjeData.sim !== '' && canjeData.antiguedad.length > 1 && canjeData.origen.length > 1;
+                // All text inputs in step 5 are optional to make it fluid
+                isValid = true;
             }
             else if (currentStep === 6) {
                 isValid = true;
