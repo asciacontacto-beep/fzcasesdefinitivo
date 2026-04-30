@@ -669,8 +669,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             else if (currentStep === 5) {
-                // Text inputs are optional, but Caja and Cable are strictly required
-                isValid = canjeData.cable && canjeData.caja;
+                // Text inputs are optional, but Caja, Cable, and Origen are strictly required
+                const hasOrigen = canjeData.origen.trim().length > 1;
+                isValid = canjeData.cable && canjeData.caja && hasOrigen;
             }
             else if (currentStep === 6) {
                 isValid = true;
