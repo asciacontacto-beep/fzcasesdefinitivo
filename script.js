@@ -43,6 +43,7 @@ async function loadProductsFromSupabase() {
             precio: p.precio_venta,
             storage: p.almacenamiento,
             color: p.color,
+            battery: p.battery,
             image: p.imagen || "assets/iphone_case.png",
             features: allFeatures,
             bestseller: p.bestseller || false
@@ -142,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div onclick="openModal(${product.id})" style="cursor: pointer;">
                         <h3>${product.name}</h3>
                         <p style="color:var(--text-gray); font-size:0.9rem;">
-                            ${product.subcategory || ''} ${product.storage ? ' | ' + product.storage : ''} ${product.color ? ' | ' + product.color : ''}
+                            ${product.subcategory || ''} ${product.storage ? ' | ' + product.storage : ''} ${product.color ? ' | ' + product.color : ''} ${product.battery ? ' | Bat: ' + product.battery + '%' : ''}
                         </p>
                     </div>
                     <a href="${waLink}" target="_blank" class="btn-wa-sm"><span>Consultar por WhatsApp</span></a>
@@ -209,6 +210,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="meta-label">Condición:</span>
                             <span class="meta-badge">${product.subcategory}</span>
                         </div>
+                        ${product.battery ? `
+                        <div class="meta-item">
+                            <span class="meta-label">Batería:</span>
+                            <span class="meta-badge">${product.battery}%</span>
+                        </div>` : ''}
                     </div>
 
                     ${product.precio ? `<div class="modal-price">$${product.precio.toLocaleString('es-AR')}</div>` : ''}

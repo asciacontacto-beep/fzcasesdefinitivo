@@ -365,6 +365,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -- Inicializadores de Formulario --
     initChipSelectors();
+
+    // Lógica para mostrar/ocultar Condición de Batería
+    const subcatInput = document.getElementById('prod-subcat');
+    const batteryGroup = document.getElementById('group-battery');
+    if (subcatInput && batteryGroup) {
+        subcatInput.addEventListener('change', (e) => {
+            if (e.target.value === 'Usado') {
+                batteryGroup.classList.remove('hidden');
+            } else {
+                batteryGroup.classList.add('hidden');
+            }
+        });
+    }
+
     initImageUpload();
     document.getElementById('prod-cat').onchange = (e) => updateModelDropdown(e.target.value);
     document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => {
@@ -398,6 +412,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('prod-sell').value = p.precio_venta;
         document.getElementById('prod-cost').value = p.precio_costo;
         document.getElementById('prod-active').checked = p.activo;
+        
+        const subcatInputEdit = document.getElementById('prod-subcat');
+        if (subcatInputEdit) {
+            subcatInputEdit.value = p.subcategoria || 'Nuevo';
+            subcatInputEdit.dispatchEvent(new Event('change'));
+        }
+        
         document.getElementById('prod-battery').value = p.battery || '';
         
         // Chips
