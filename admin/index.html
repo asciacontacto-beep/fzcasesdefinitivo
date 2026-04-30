@@ -14,6 +14,8 @@
 
     <!-- Archivos CSS -->
     <link rel="stylesheet" href="/admin/admin.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body class="admin-login-body">
@@ -39,14 +41,14 @@
 
         <form id="login-form">
             <div class="form-group">
-                <label for="username">Usuario</label>
+                <label for="username">Email</label>
                 <div class="input-wrapper">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" class="input-icon">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
                     </svg>
-                    <input type="text" id="username" name="username" placeholder="admin" required autofocus
+                    <input type="email" id="username" name="username" placeholder="admin@fzcases.com" required autofocus
                         autocomplete="username">
                 </div>
             </div>
@@ -92,9 +94,9 @@
     <!-- Script de Autenticación -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // TODO: Conectar con Supabase Auth más adelante
-            const validUser = "admin";
-            const validPass = "fzcases2024";
+            const SUPABASE_URL = 'https://sypleinfsemauzjcxxrx.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cGxlaW5mc2VtYXV6amN4eHJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMzExODYsImV4cCI6MjA5MTkwNzE4Nn0.p_EvcoFKwZ38HTvHK28NtlK573jVG2suR0OX17GA_IE';
+            const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
             const loginForm = document.getElementById('login-form');
             const usernameInput = document.getElementById('username');
@@ -142,9 +144,31 @@
                 btnSpinner.style.display = "inline-block";
                 errorMessage.style.display = 'none';
 
-                // Simular red (delay)
-                setTimeout(() => {
-                    if (userVal === validUser && passVal === validPass) {
+                // Autenticación con Supabase
+                _supabase.auth.signInWithPassword({
+                    email: userVal,
+                    password: passVal
+                }).then(({ data, error }) => {
+                    if (error) {
+                        // Fracaso
+                        btnLogin.disabled = false;
+                        btnLogin.classList.remove('loading');
+                        btnText.textContent = "Ingresar al Panel";
+                        btnSpinner.style.display = "none";
+
+                        // Show Error
+                        errorMessage.querySelector('span').textContent = "Credenciales incorrectas";
+                        errorMessage.style.display = 'flex';
+                        errorMessage.classList.add('fade-in');
+
+                        // Shake card
+                        loginContainer.classList.add('shake');
+                        setTimeout(() => loginContainer.classList.remove('shake'), 500);
+
+                        // Clear pass
+                        passwordInput.value = "";
+                        passwordInput.focus();
+                    } else {
                         // Éxito
                         localStorage.setItem('admin_logged', 'true');
                         localStorage.setItem('fzcasesAuthTimestamp', Date.now());
@@ -160,29 +184,10 @@
                         btnLogin.style.background = "var(--admin-success)";
 
                         setTimeout(() => {
-                            window.location.href = "/admin/dashboard";
+                            window.location.href = "/admin/dashboard.html";
                         }, 500);
-
-                    } else {
-                        // Fracaso
-                        btnLogin.disabled = false;
-                        btnLogin.classList.remove('loading');
-                        btnText.textContent = "Ingresar al Panel";
-                        btnSpinner.style.display = "none";
-
-                        // Show Error
-                        errorMessage.style.display = 'flex';
-                        errorMessage.classList.add('fade-in');
-
-                        // Shake card
-                        loginContainer.classList.add('shake');
-                        setTimeout(() => loginContainer.classList.remove('shake'), 500);
-
-                        // Clear pass
-                        passwordInput.value = "";
-                        passwordInput.focus();
                     }
-                }, 1200); // 1.2s de simulación segura de red
+                });
             });
         });
     </script>

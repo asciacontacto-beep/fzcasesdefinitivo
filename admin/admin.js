@@ -49,6 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
         _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Verificación real de sesión de Supabase
+        _supabase.auth.getSession().then(({ data, error }) => {
+            if (error || !data.session) {
+                console.warn("No hay sesión válida en Supabase, redirigiendo...");
+                localStorage.removeItem('admin_logged');
+                window.location.href = '/admin/index.html';
+            }
+        });
     } catch (e) {
         console.error("Error inicializando Supabase:", e);
     }
@@ -363,6 +372,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Logout y Mobile
+    window.logout = async () => {
+        if (_supabase) {
+            await _supabase.auth.signOut();
+        }
+        localStorage.removeItem('admin_logged');
+        window.location.href = '/admin/index.html';
+    };
     document.getElementById('btn-logout').onclick = window.logout;
     document.getElementById('mobile-menu-open').onclick = () => {
         document.getElementById('admin-sidebar').classList.add('open');

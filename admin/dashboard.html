@@ -10,8 +10,9 @@
     
     <!-- Autenticación Bloqueadora -->
     <script>
+        // Mantenemos la verificación rápida para que no parpadee
         if (localStorage.getItem('admin_logged') !== 'true') {
-            window.location.href = '/admin';
+            window.location.href = '/admin/index.html';
         }
     </script>
     
