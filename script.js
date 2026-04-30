@@ -424,12 +424,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // --- Wizard Logic ---
         let currentStep = 1;
-        const totalSteps = 4;
+        const totalSteps = 6;
         let canjeData = {
             modelo: '',
+            capacidad: '',
+            color: '',
             estado: '',
-            funcionalidad: [],
-            bateria: ''
+            detalles: '',
+            todoFunciona: false,
+            fallas: [],
+            reparaciones: '',
+            bateria: '',
+            ciclos: '',
+            cable: false,
+            caja: false,
+            garantia: false,
+            sim: '',
+            antiguedad: '',
+            origen: ''
         };
 
         // Try load from local storage
@@ -437,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const savedData = localStorage.getItem('fzcases_canje_data');
             if (savedData) {
                 const parsed = JSON.parse(savedData);
-                if (parsed.modelo) canjeData = parsed;
+                if (parsed.modelo) canjeData = { ...canjeData, ...parsed };
             }
         } catch(e) {}
 
@@ -447,21 +459,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const circles = document.querySelectorAll('.step-circle');
         const stepsBoxes = document.querySelectorAll('.wizard-step');
         
-        // Paso 1
-        const pillBtns = document.querySelectorAll('.pill-btn');
+        // Elementos Paso 1
+        const pillBtns = document.querySelectorAll('.pill-btn:not(.pill-cap)');
+        const pillCaps = document.querySelectorAll('.pill-cap');
         const btnOtro = document.getElementById('btn-otro-modelo');
         const otherContainer = document.getElementById('other-model-container');
         const otherInput = document.getElementById('input-other-model');
+        const inputColor = document.getElementById('input-color');
 
-        // Paso 2
+        // Elementos Paso 2
         const stateCards = document.querySelectorAll('.state-card');
+        const inputDetalles = document.getElementById('input-detalles');
 
-        // Paso 3
-        const funcChecks = document.querySelectorAll('input[name="funcionalidad"]');
+        // Elementos Paso 3
+        const checkTodoFunciona = document.getElementById('check-todo-funciona');
+        const funcChecks = document.querySelectorAll('input[name="no-funciona"]');
+        const inputReparaciones = document.getElementById('input-reparaciones');
+
+        // Elementos Paso 4
         const batteryInput = document.getElementById('battery-health');
+        const boxCiclos = document.getElementById('box-ciclos');
+        const inputCiclos = document.getElementById('input-ciclos');
 
-        // Restore UI state from cached data if available
+        // Elementos Paso 5
+        const checkCable = document.getElementById('check-cable');
+        const checkCaja = document.getElementById('check-caja');
+        const checkGarantia = document.getElementById('check-garantia');
+        const selectSim = document.getElementById('select-sim');
+        const inputAntiguedad = document.getElementById('input-antiguedad');
+        const inputOrigen = document.getElementById('input-origen');
+
+        // Restore UI state from cached data
         function restoreCachedData() {
+            // Step 1
             if (canjeData.modelo) {
                 let foundPill = Array.from(pillBtns).find(btn => btn.dataset.value === canjeData.modelo);
                 if (foundPill) {
@@ -472,16 +502,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     otherInput.value = canjeData.modelo;
                 }
             }
+            if (canjeData.capacidad) {
+                let foundCap = Array.from(pillCaps).find(btn => btn.dataset.value === canjeData.capacidad);
+                if (foundCap) foundCap.classList.add('selected');
+            }
+            if (canjeData.color) inputColor.value = canjeData.color;
+
+            // Step 2
             if (canjeData.estado) {
                 let foundCard = Array.from(stateCards).find(card => card.dataset.value === canjeData.estado);
                 if (foundCard) foundCard.classList.add('selected');
             }
-            if (canjeData.funcionalidad.length > 0) {
+            if (canjeData.detalles) inputDetalles.value = canjeData.detalles;
+
+            // Step 3
+            if (canjeData.todoFunciona) checkTodoFunciona.checked = true;
+            if (canjeData.fallas && canjeData.fallas.length > 0) {
                 funcChecks.forEach(chk => {
-                    if (canjeData.funcionalidad.includes(chk.value)) chk.checked = true;
+                    if (canjeData.fallas.includes(chk.value)) chk.checked = true;
                 });
             }
+            if (canjeData.reparaciones) inputReparaciones.value = canjeData.reparaciones;
+
+            // Step 4
             if (canjeData.bateria) batteryInput.value = canjeData.bateria;
+            if (canjeData.ciclos) inputCiclos.value = canjeData.ciclos;
+
+            // Step 5
+            checkCable.checked = canjeData.cable;
+            checkCaja.checked = canjeData.caja;
+            checkGarantia.checked = canjeData.garantia;
+            if (canjeData.sim) selectSim.value = canjeData.sim;
+            if (canjeData.antiguedad) inputAntiguedad.value = canjeData.antiguedad;
+            if (canjeData.origen) inputOrigen.value = canjeData.origen;
         }
 
         function saveData() {
@@ -507,12 +560,33 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        otherInput.addEventListener('input', () => {
-            if (btnOtro.classList.contains('selected')) {
-                canjeData.modelo = otherInput.value.trim();
+        pillCaps.forEach(btn => {
+            btn.addEventListener('click', () => {
+                pillCaps.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                canjeData.capacidad = btn.dataset.value;
                 saveData();
                 validateCurrentStep();
-            }
+            });
+        });
+
+        const inputHandlers = [otherInput, inputColor, inputDetalles, inputReparaciones, batteryInput, inputCiclos, selectSim, inputAntiguedad, inputOrigen];
+        inputHandlers.forEach(input => {
+            if (!input) return;
+            input.addEventListener('input', () => {
+                if (input === otherInput && btnOtro.classList.contains('selected')) canjeData.modelo = input.value.trim();
+                if (input === inputColor) canjeData.color = input.value.trim();
+                if (input === inputDetalles) canjeData.detalles = input.value.trim();
+                if (input === inputReparaciones) canjeData.reparaciones = input.value.trim();
+                if (input === batteryInput) canjeData.bateria = input.value.trim();
+                if (input === inputCiclos) canjeData.ciclos = input.value.trim();
+                if (input === selectSim) canjeData.sim = input.value;
+                if (input === inputAntiguedad) canjeData.antiguedad = input.value.trim();
+                if (input === inputOrigen) canjeData.origen = input.value.trim();
+                
+                saveData();
+                validateCurrentStep();
+            });
         });
 
         // Logic UI Step 2
@@ -527,43 +601,76 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Logic UI Step 3
+        checkTodoFunciona.addEventListener('change', () => {
+            if (checkTodoFunciona.checked) {
+                funcChecks.forEach(c => c.checked = false);
+                canjeData.fallas = [];
+            }
+            canjeData.todoFunciona = checkTodoFunciona.checked;
+            saveData();
+            validateCurrentStep();
+        });
+
         funcChecks.forEach(chk => {
             chk.addEventListener('change', () => {
-                canjeData.funcionalidad = Array.from(funcChecks).filter(c => c.checked).map(c => c.value);
+                if (chk.checked) {
+                    checkTodoFunciona.checked = false;
+                    canjeData.todoFunciona = false;
+                }
+                canjeData.fallas = Array.from(funcChecks).filter(c => c.checked).map(c => c.value);
                 saveData();
                 validateCurrentStep();
             });
         });
 
-        batteryInput.addEventListener('input', () => {
-            canjeData.bateria = batteryInput.value;
-            saveData();
-            validateCurrentStep();
+        // Logic UI Step 5
+        [checkCable, checkCaja, checkGarantia].forEach(chk => {
+            chk.addEventListener('change', () => {
+                canjeData.cable = checkCable.checked;
+                canjeData.caja = checkCaja.checked;
+                canjeData.garantia = checkGarantia.checked;
+                saveData();
+            });
         });
 
         function validateCurrentStep() {
             let isValid = false;
             
             if (currentStep === 1) {
-                const selectedBtn = document.querySelector('.pill-btn.selected');
-                if (selectedBtn) {
-                    if (selectedBtn.id === 'btn-otro-modelo') {
-                        isValid = otherInput.value.trim().length > 2;
-                    } else {
-                        isValid = true;
-                    }
-                }
+                const selectedModel = document.querySelector('.pill-btn.selected:not(.pill-cap)');
+                const selectedCap = document.querySelector('.pill-cap.selected');
+                const hasModel = selectedModel && (selectedModel.id !== 'btn-otro-modelo' || otherInput.value.trim().length > 2);
+                const hasCap = selectedCap !== null;
+                const hasColor = inputColor.value.trim().length > 2;
+                isValid = hasModel && hasCap && hasColor;
             } 
             else if (currentStep === 2) {
-                isValid = document.querySelector('.state-card.selected') !== null;
+                const hasState = document.querySelector('.state-card.selected') !== null;
+                const hasDetalles = inputDetalles.value.trim().length > 1;
+                isValid = hasState && hasDetalles;
             } 
             else if (currentStep === 3) {
-                // Al menos 1 checkbox y algo ingresado en batería
-                const checkedCount = Array.from(funcChecks).filter(c => c.checked).length;
-                const batteryVal = parseInt(batteryInput.value);
-                isValid = checkedCount > 0 && !isNaN(batteryVal) && batteryVal >= 0 && batteryVal <= 100;
+                const hasChecks = canjeData.todoFunciona || canjeData.fallas.length > 0;
+                const hasReparaciones = inputReparaciones.value.trim().length > 1;
+                isValid = hasChecks && hasReparaciones;
             } 
             else if (currentStep === 4) {
+                const batteryVal = parseInt(canjeData.bateria);
+                let validBattery = !isNaN(batteryVal) && batteryVal >= 85 && batteryVal <= 100;
+                
+                let requiresCiclos = canjeData.modelo.toLowerCase().includes('15') || canjeData.modelo.toLowerCase().includes('16');
+                if (requiresCiclos) {
+                    boxCiclos.style.display = 'block';
+                    isValid = validBattery && canjeData.ciclos.trim().length > 0;
+                } else {
+                    boxCiclos.style.display = 'none';
+                    isValid = validBattery;
+                }
+            }
+            else if (currentStep === 5) {
+                isValid = canjeData.sim !== '' && canjeData.antiguedad.length > 1 && canjeData.origen.length > 1;
+            }
+            else if (currentStep === 6) {
                 isValid = true;
             }
 
@@ -596,10 +703,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Navigation Buttons
             btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-            btnNext.style.display = currentStep === 4 ? 'none' : 'block';
+            btnNext.style.display = currentStep === totalSteps ? 'none' : 'block';
 
-            if (currentStep === 4) {
+            if (currentStep === totalSteps) {
                 renderSummary();
+            }
+
+            // Check if we need to show cycles based on model selected before step 4
+            if (currentStep === 4) {
+                let requiresCiclos = canjeData.modelo.toLowerCase().includes('15') || canjeData.modelo.toLowerCase().includes('16');
+                boxCiclos.style.display = requiresCiclos ? 'block' : 'none';
             }
 
             validateCurrentStep();
@@ -608,15 +721,12 @@ document.addEventListener('DOMContentLoaded', () => {
         function renderSummary() {
             const summaryBox = document.getElementById('summary-card');
             
-            const funcListDOM = canjeData.funcionalidad.length > 0 
-                ? canjeData.funcionalidad.map(f => `<br> &nbsp;&nbsp;&nbsp;• ${f}`).join('')
-                : 'Ninguna';
-
             summaryBox.innerHTML = `
-                <p>📱 <b>Modelo:</b> ${canjeData.modelo}</p>
-                <p>⭐ <b>Estado físico:</b> ${canjeData.estado}</p>
-                <p>✅ <b>Funcionalidad:</b> ${funcListDOM}</p>
-                <p>🔋 <b>Batería:</b> ${canjeData.bateria}%</p>
+                <p>📱 <b>Modelo:</b> ${canjeData.modelo} - ${canjeData.capacidad} - ${canjeData.color}</p>
+                <p>⭐ <b>Estado:</b> ${canjeData.estado}</p>
+                <p>🔋 <b>Batería:</b> ${canjeData.bateria}% ${canjeData.ciclos ? `(${canjeData.ciclos} ciclos)` : ''}</p>
+                <p>✅ <b>Funcionalidad:</b> ${canjeData.todoFunciona ? 'Funciona todo correctamente' : canjeData.fallas.join(', ')}</p>
+                <p>📦 <b>Accesorios:</b> ${canjeData.caja ? 'Caja' : ''} ${canjeData.cable ? '- Cable' : ''}</p>
             `;
         }
 
@@ -643,11 +753,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('btn-submit-wa').addEventListener('click', () => {
-            const funcListWA = canjeData.funcionalidad.length > 0 
-                ? canjeData.funcionalidad.map(f => `- ${f}`).join('%0A')
-                : 'Ninguna';
+            const f = canjeData;
+            
+            const txtFallas = f.todoFunciona ? 'Funciona todo correctamente' : f.fallas.join(', ');
+            const txtCaja = f.caja ? 'Sí' : 'No';
+            const txtCable = f.cable ? 'Sí' : 'No';
+            const txtGarantia = f.garantia ? 'Sí' : 'No';
+            const txtCiclos = f.ciclos ? `%0A- *Ciclos:* ${f.ciclos}` : '';
 
-            const message = `*PLAN CANJE - Nueva Consulta*%0A%0A*Modelo:* ${canjeData.modelo}%0A*Estado fisico:* ${canjeData.estado}%0A%0A*Funcionalidad:*%0A${funcListWA}%0A*Bateria:* ${canjeData.bateria}%25%0A%0A_Solicito tasacion para plan canje_`;
+            const message = `*PLAN CANJE - Nueva Consulta*%0A%0A` +
+                `*Modelo:* ${f.modelo}%0A` +
+                `*Capacidad:* ${f.capacidad}%0A` +
+                `*Color:* ${f.color}%0A` +
+                `*Cable original:* ${txtCable}%0A` +
+                `*Caja:* ${txtCaja}%0A` +
+                `*Detalles esteticos:* ${f.detalles}%0A` +
+                `*Algo no funciona?* ${txtFallas}%0A` +
+                `*Reparaciones:* ${f.reparaciones}%0A` +
+                `*Antiguedad:* ${f.antiguedad}%0A` +
+                `*Bateria:* ${f.bateria}%25${txtCiclos}%0A` +
+                `*Garantia:* ${txtGarantia}%0A` +
+                `*Sellado/Usado:* ${f.origen}%0A` +
+                `*Chip o eSIM:* ${f.sim}%0A%0A` +
+                `_Solicito tasacion para plan canje_`;
             
             // WA Default test number
             const waNumber = '1123456789'; // Esto se deberá cambiar por global_W_NUMBER si existiera

@@ -243,6 +243,8 @@
                             <div class="step-circle" data-step="2">2</div>
                             <div class="step-circle" data-step="3">3</div>
                             <div class="step-circle" data-step="4">4</div>
+                            <div class="step-circle" data-step="5">5</div>
+                            <div class="step-circle" data-step="6">6</div>
                         </div>
                     </div>
 
@@ -253,61 +255,65 @@
                         <div class="wizard-step active" id="step-1">
                             <h3>¿Qué modelo de iPhone tenés?</h3>
                             <div class="model-options" id="model-options">
-                                <button type="button" class="pill-btn" data-value="iPhone 15 Pro Max">iPhone 15 Pro
-                                    Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 16 Pro Max">iPhone 16 Pro Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 16 Pro">iPhone 16 Pro</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 16">iPhone 16</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 15 Pro Max">iPhone 15 Pro Max</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 15 Pro">iPhone 15 Pro</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 15 Plus">iPhone 15
-                                    Plus</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 15">iPhone 15</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 14 Pro Max">iPhone 14 Pro
-                                    Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 14 Pro Max">iPhone 14 Pro Max</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 14 Pro">iPhone 14 Pro</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 14 Plus">iPhone 14
-                                    Plus</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 14">iPhone 14</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 13 Pro Max">iPhone 13 Pro
-                                    Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 13 Pro Max">iPhone 13 Pro Max</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 13 Pro">iPhone 13 Pro</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 13">iPhone 13</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 12 Pro Max">iPhone 12 Pro
-                                    Max</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 12">iPhone 12</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 11">iPhone 11</button>
-                                <button type="button" class="pill-btn" data-value="iPhone SE (2022)">iPhone SE
-                                    (2022)</button>
-                                <button type="button" class="pill-btn" data-value="Otro"
-                                    id="btn-otro-modelo">Otro</button>
+                                <button type="button" class="pill-btn" data-value="Otro" id="btn-otro-modelo">Otro</button>
                             </div>
                             <div class="other-model-container" id="other-model-container">
-                                <input type="text" id="input-other-model" placeholder="Escribí cual modelo tenés..."
-                                    class="custom-input">
+                                <input type="text" id="input-other-model" placeholder="Escribí cual modelo tenés..." class="custom-input">
                             </div>
+                            
+                            <h3 style="margin-top: 2rem;">Capacidad</h3>
+                            <div class="model-options" id="capacity-options" style="margin-bottom: 2rem;">
+                                <button type="button" class="pill-btn pill-cap" data-value="128GB">128GB</button>
+                                <button type="button" class="pill-btn pill-cap" data-value="256GB">256GB</button>
+                                <button type="button" class="pill-btn pill-cap" data-value="512GB">512GB</button>
+                                <button type="button" class="pill-btn pill-cap" data-value="1TB">1TB</button>
+                            </div>
+
+                            <h3>¿Qué color es?</h3>
+                            <input type="text" id="input-color" placeholder="Ej: Azul, Midnight, Blanco..." class="custom-input">
                         </div>
 
                         <!-- PASO 2 -->
                         <div class="wizard-step" id="step-2">
                             <h3>¿En qué estado físico está tu iPhone?</h3>
-                            <div class="state-options grid-2x2">
+                            <div class="state-options grid-2x2" id="state-options-container" style="grid-template-columns: 1fr 1fr 1fr;">
                                 <div class="state-card" data-value="Como nuevo">
                                     <div class="state-icon">✨</div>
                                     <h4>Como nuevo</h4>
-                                    <p>Sin rayones ni golpes visibles</p>
+                                    <p>Sin rayones ni golpes</p>
                                 </div>
                                 <div class="state-card" data-value="Muy bueno">
                                     <div class="state-icon">🌟</div>
                                     <h4>Muy bueno</h4>
-                                    <p>Detalles mínimos de uso</p>
+                                    <p>Detalles mínimos</p>
                                 </div>
                                 <div class="state-card" data-value="Bueno">
                                     <div class="state-icon">⭐</div>
                                     <h4>Bueno</h4>
-                                    <p>Rayones leves, funciona perfecto</p>
+                                    <p>Rayones leves</p>
                                 </div>
-                                <div class="state-card" data-value="Regular">
-                                    <div class="state-icon">💫</div>
-                                    <h4>Regular</h4>
-                                    <p>Golpes visibles, pantalla rota o similar</p>
-                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 2rem;">
+                                <label for="input-detalles" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">¿Detalles estéticos?</label>
+                                <small class="helper-text" style="display:block; margin-bottom: 1rem;">Incluye marcas en los costados o detrás (Por favor, mirarlo sin funda)</small>
+                                <textarea id="input-detalles" class="custom-input" placeholder="Describí los detalles aquí... si no tiene, escribí 'Ninguno'" rows="2"></textarea>
+                            </div>
+                            
+                            <div class="warning-box" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,59,48,0.1); border-left: 4px solid var(--apple-red); border-radius: 8px;">
+                                <p style="margin:0; font-size:0.85rem; color:var(--text-color);"><strong>Aviso importante:</strong> NO TOMAMOS CON ROTURAS NI RAYADURAS NI ARREGLOS (En caso de dudas enviar foto por WhatsApp).</p>
                             </div>
                         </div>
 
@@ -315,53 +321,114 @@
                         <div class="wizard-step" id="step-3">
                             <h3>¿Qué funciona correctamente?</h3>
                             <div class="func-checks">
+                                <label class="custom-check-card" style="border-color: var(--apple-blue); background: rgba(0, 122, 255, 0.05);">
+                                    <input type="checkbox" id="check-todo-funciona" value="Funciona todo correctamente">
+                                    <span class="checkmark" style="border-color: var(--apple-blue);"></span>
+                                    <span style="font-weight: 600; color: var(--apple-blue);">¡Funciona todo correctamente!</span>
+                                </label>
+                                <p style="font-size: 0.85rem; color: var(--text-gray); margin: 0.5rem 0 1rem 0;">O marcá qué es lo que <strong>NO</strong> funciona:</p>
                                 <label class="custom-check-card">
-                                    <input type="checkbox" name="funcionalidad" value="Pantalla táctil">
+                                    <input type="checkbox" name="no-funciona" value="Pantalla táctil">
                                     <span class="checkmark"></span>
-                                    <span>Pantalla táctil</span>
+                                    <span>Falla: Pantalla táctil</span>
                                 </label>
                                 <label class="custom-check-card">
-                                    <input type="checkbox" name="funcionalidad" value="Face ID / Touch ID">
+                                    <input type="checkbox" name="no-funciona" value="Face ID / Touch ID">
                                     <span class="checkmark"></span>
-                                    <span>Face ID / Touch ID</span>
+                                    <span>Falla: Face ID / Touch ID</span>
                                 </label>
                                 <label class="custom-check-card">
-                                    <input type="checkbox" name="funcionalidad" value="Cámaras (frontal y trasera)">
+                                    <input type="checkbox" name="no-funciona" value="Cámaras">
                                     <span class="checkmark"></span>
-                                    <span>Cámaras (frontal y trasera)</span>
+                                    <span>Falla: Cámaras (frontal o trasera)</span>
                                 </label>
                                 <label class="custom-check-card">
-                                    <input type="checkbox" name="funcionalidad" value="Botones laterales">
+                                    <input type="checkbox" name="no-funciona" value="Botones o Sonido">
                                     <span class="checkmark"></span>
-                                    <span>Botones laterales</span>
-                                </label>
-                                <label class="custom-check-card">
-                                    <input type="checkbox" name="funcionalidad" value="Parlantes y micrófono">
-                                    <span class="checkmark"></span>
-                                    <span>Parlantes y micrófono</span>
-                                </label>
-                                <label class="custom-check-card">
-                                    <input type="checkbox" name="funcionalidad" value="Carga (puerto)">
-                                    <span class="checkmark"></span>
-                                    <span>Carga (puerto Lightning/USB-C)</span>
+                                    <span>Falla: Botones, Parlantes o Micrófono</span>
                                 </label>
                             </div>
-                            <div class="battery-input-box">
-                                <label for="battery-health">Salud de la batería (%)</label>
-                                <div style="display:flex; align-items:center;">
-                                    <input type="number" id="battery-health" min="0" max="100" placeholder="Ej: 85"
-                                        class="custom-input small">
-                                    <span style="margin-left:8px; font-weight:bold;">%</span>
-                                </div>
-                                <small class="helper-text">Lo encontrás en Ajustes > Batería > Estado</small>
+
+                            <div style="margin-top: 2rem;">
+                                <label for="input-reparaciones" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">¿Tuvo reparaciones?</label>
+                                <small class="helper-text" style="display:block; margin-bottom: 1rem;">(INCLUYE cambio de batería, pantalla, etc.)</small>
+                                <textarea id="input-reparaciones" class="custom-input" placeholder="Ej: No, nunca se abrió / Sí, se le cambió la batería..." rows="2"></textarea>
                             </div>
                         </div>
 
                         <!-- PASO 4 -->
                         <div class="wizard-step" id="step-4">
+                            <h3>Batería</h3>
+                            <div class="battery-input-box">
+                                <label for="battery-health">Condición de la batería (%)</label>
+                                <div style="display:flex; align-items:center;">
+                                    <input type="number" id="battery-health" min="85" max="100" placeholder="Ej: 88" class="custom-input small">
+                                    <span style="margin-left:8px; font-weight:bold; font-size: 1.2rem;">%</span>
+                                </div>
+                                <small class="helper-text" style="color: var(--apple-red); display: block; margin-top: 0.5rem;">A partir de iPhone 13 tomamos equipos con más de 85% de batería.</small>
+                                <small class="helper-text" style="display: block; margin-top: 0.5rem; font-weight: 600;">Luego deberás enviar una captura de pantalla de Configuración > General > Información.</small>
+                            </div>
+
+                            <div class="battery-input-box" id="box-ciclos" style="margin-top: 2rem; display: none;">
+                                <label for="input-ciclos">¿Cuántos ciclos de carga tiene?</label>
+                                <input type="number" id="input-ciclos" min="0" placeholder="Ej: 150" class="custom-input small">
+                                <small class="helper-text" style="display: block; margin-top: 0.5rem;">(Solo para modelos iPhone 15 o superior).</small>
+                            </div>
+                        </div>
+
+                        <!-- PASO 5 -->
+                        <div class="wizard-step" id="step-5">
+                            <h3>Detalles de Compra y Accesorios</h3>
+                            
+                            <div class="func-checks" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <label class="custom-check-card">
+                                    <input type="checkbox" id="check-cable">
+                                    <span class="checkmark"></span>
+                                    <span>Cable original</span>
+                                </label>
+                                <label class="custom-check-card">
+                                    <input type="checkbox" id="check-caja">
+                                    <span class="checkmark"></span>
+                                    <span>Caja</span>
+                                </label>
+                                <label class="custom-check-card">
+                                    <input type="checkbox" id="check-garantia">
+                                    <span class="checkmark"></span>
+                                    <span>Está en garantía</span>
+                                </label>
+                            </div>
+
+                            <div style="margin-top: 1.5rem;">
+                                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">¿Chip o eSIM?</label>
+                                <select id="select-sim" class="custom-input">
+                                    <option value="" disabled selected>Seleccioná una opción...</option>
+                                    <option value="Chip Físico">Chip Físico</option>
+                                    <option value="eSIM">eSIM</option>
+                                    <option value="Ambos (Chip + eSIM)">Ambos (Chip + eSIM)</option>
+                                </select>
+                            </div>
+
+                            <div style="margin-top: 1.5rem;">
+                                <label for="input-antiguedad" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">¿Antigüedad?</label>
+                                <input type="text" id="input-antiguedad" placeholder="Ej: 1 año y medio..." class="custom-input">
+                            </div>
+
+                            <div style="margin-top: 1.5rem;">
+                                <label for="input-origen" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">¿Lo compraste sellado o usado?</label>
+                                <small class="helper-text" style="display:block; margin-bottom: 0.5rem;">Si es usado, ¿dónde lo compraste?</small>
+                                <input type="text" id="input-origen" placeholder="Ej: Sellado en Apple / Usado en otra tienda..." class="custom-input">
+                            </div>
+
+                            <div class="warning-box" style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.05); border-radius: 8px; text-align: center;">
+                                <p style="margin:0; font-size:0.85rem; font-weight: 600;">NO TOMAMOS EQUIPOS TESTER.</p>
+                            </div>
+                        </div>
+
+                        <!-- PASO 6 -->
+                        <div class="wizard-step" id="step-6">
                             <div class="summary-header">
                                 <h3>Revisá tu información</h3>
-                                <p>Tocá enviar y te contactamos al instante por WhatsApp</p>
+                                <p>Tocá enviar y te contactamos al instante por WhatsApp con una cotización</p>
                             </div>
 
                             <div class="summary-card" id="summary-card">
