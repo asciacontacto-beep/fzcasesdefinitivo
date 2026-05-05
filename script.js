@@ -46,7 +46,8 @@ async function loadProductsFromSupabase() {
             battery: p.battery,
             image: p.imagen || "assets/iphone_case.png",
             features: allFeatures,
-            bestseller: p.bestseller || false
+            bestseller: p.bestseller || false,
+            variantes: p.variantes
         };
     });
 
@@ -165,15 +166,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const product = products.find(p => p.id === productId);
             if (!product) return;
 
-            let selectedVariants = {
-                color: null,
-                almacenamiento: null
-            };
+            let selectedUnit = null;
 
             const updateWALink = () => {
                 let message = `Hola, quiero consultar por:\n${product.name}`;
-                if (selectedVariants.color) message += `\n- Color: ${selectedVariants.color}`;
-                if (selectedVariants.almacenamiento) message += `\n- Almacenamiento: ${selectedVariants.almacenamiento}`;
+                if (selectedUnit) {
+                    message += `\n- Almacenamiento: ${selectedUnit.almacenamiento}`;
+                    message += `\n- Color: ${selectedUnit.color}`;
+                    if (selectedUnit.bateria) message += `\n- Condición de Batería: ${selectedUnit.bateria}%`;
+                    if (selectedUnit.notas) message += `\n- Notas: ${selectedUnit.notas}`;
+                }
                 
                 const waText = encodeURIComponent(message);
                 const waLink = `https://wa.me/${phoneNumber}?text=${waText}`;
@@ -234,62 +236,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Variant Rendering
+            // Variant Rendering (Unidades en Stock)
             const variantContainer = document.getElementById('variant-selectors');
-            if (product.variantes) {
-                // Colores
-                if (product.variantes.colores) {
-                    const section = document.createElement('div');
-                    section.className = 'variant-section';
-                    section.innerHTML = `<label class="variant-label">Color</label>`;
+            if (product.variantes && Array.isArray(product.variantes)) {
+                const section = document.createElement('div');
+                section.className = 'variant-section';
+                section.innerHTML = `<label class="variant-label">Unidades disponibles (Seleccioná una)</label>`;
+                
+                const grid = document.createElement('div');
+                grid.className = 'pill-selector';
+                grid.style.flexDirection = 'column'; // List format for better readability
+                
+                product.variantes.forEach((unit, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'pill-btn-variant';
+                    btn.style.width = '100%';
+                    btn.style.textAlign = 'left';
+                    btn.style.display = 'flex';
+                    btn.style.justifyContent = 'space-between';
+                    btn.style.alignItems = 'center';
                     
-                    const grid = document.createElement('div');
-                    grid.className = 'color-selector';
+                    const batteryText = unit.bateria ? ` · ${unit.bateria}%` : '';
                     
-                    product.variantes.colores.forEach(c => {
-                        const btn = document.createElement('button');
-                        btn.className = 'color-btn';
-                        btn.style.backgroundColor = c.hex;
-                        btn.title = c.nombre;
-                        btn.addEventListener('click', () => {
-                            grid.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            selectedVariants.color = c.nombre;
-                            updateWALink();
-                        });
-                        grid.appendChild(btn);
+                    btn.innerHTML = `
+                        <div>
+                            <strong>${unit.almacenamiento}</strong> · ${unit.color}${batteryText}
+                            <div style="font-size: 0.75rem; opacity: 0.7; font-weight: normal;">${unit.notas || ''}</div>
+                        </div>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    `;
+                    
+                    btn.addEventListener('click', () => {
+                        grid.querySelectorAll('.pill-btn-variant').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        selectedUnit = unit;
+                        
+                        // Cambiar imagen si la unidad tiene una propia
+                        const modalImg = document.querySelector('.modal-img img');
+                        if (modalImg) {
+                            if (unit.imagen) {
+                                modalImg.src = unit.imagen;
+                            } else {
+                                modalImg.src = product.image; // Volver a la original si no tiene
+                            }
+                        }
+                        
+                        updateWALink();
                     });
-                    
-                    section.appendChild(grid);
-                    variantContainer.appendChild(section);
-                }
-
-                // Almacenamiento
-                if (product.variantes.almacenamiento) {
-                    const section = document.createElement('div');
-                    section.className = 'variant-section';
-                    section.innerHTML = `<label class="variant-label">Almacenamiento</label>`;
-                    
-                    const grid = document.createElement('div');
-                    grid.className = 'pill-selector';
-                    
-                    product.variantes.almacenamiento.forEach(s => {
-                        const btn = document.createElement('button');
-                        btn.className = 'pill-btn-variant';
-                        btn.textContent = s;
-                        btn.addEventListener('click', () => {
-                            grid.querySelectorAll('.pill-btn-variant').forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            selectedVariants.almacenamiento = s;
-                            updateWALink();
-                        });
-                        grid.appendChild(btn);
-                    });
-                    
-                    section.appendChild(grid);
-                    variantContainer.appendChild(section);
-                }
-
+                    grid.appendChild(btn);
+                });
+                
+                section.appendChild(grid);
+                variantContainer.appendChild(section);
             }
 
             updateWALink();

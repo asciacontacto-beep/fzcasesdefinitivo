@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==============================================================================
     // 1. NAVEGACIÓN (Prioridad Máxima)
     // ==============================================================================
-    window.switchTab = function(targetId, TitleName) {
+    window.switchTab = function (targetId, TitleName) {
         const panels = document.querySelectorAll('.tab-content');
         const navItems = document.querySelectorAll('.nav-item');
         const mainTitle = document.getElementById('main-title');
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
         _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
+
         // Verificación real de sesión de Supabase
         _supabase.auth.getSession().then(({ data, error }) => {
             if (error || !data.session) {
@@ -92,8 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function calcularKPIs() {
         if (!document.getElementById('kpi-total-prod')) return;
-        document.getElementById('kpi-total-prod').textContent = memoryProducts.length;
-        document.getElementById('badge-products').textContent = memoryProducts.length;
+
+        let totalUnits = 0;
+        memoryProducts.forEach(p => {
+            if (p.variantes && Array.isArray(p.variantes) && p.variantes.length > 0) {
+                totalUnits += p.variantes.length;
+            } else {
+                totalUnits += 1;
+            }
+        });
+
+        document.getElementById('kpi-total-prod').textContent = totalUnits;
+        document.getElementById('badge-products').textContent = totalUnits;
 
         const actualMonth = new Date().getMonth();
         const salesThisMonth = memorySales.filter(s => new Date(s.fecha).getMonth() === actualMonth);
@@ -121,6 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
         arr.forEach(prod => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td>
+                    <button class="expand-btn" onclick="window.toggleVariants(${prod.id}, this)">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                </td>
                 <td><img src="${prod.imagen}" class="prod-thumb"></td>
                 <td><strong>${prod.nombre}</strong> <br> <small>ID: ${prod.id}</small></td>
                 <td>${prod.categoria}</td>
@@ -134,6 +149,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             `;
             tbody.appendChild(tr);
+
+            // Fila de variantes (oculta por defecto)
+            const trVariants = document.createElement('tr');
+            trVariants.id = `variants-row-${prod.id}`;
+            trVariants.style.display = 'none';
+            trVariants.className = 'variants-expanded-row';
+
+            let variantsHtml = '<div class="variants-expanded-content">';
+            if (prod.variantes && Array.isArray(prod.variantes)) {
+                variantsHtml += `
+                    <table class="variants-inner-table">
+                        <thead>
+                            <tr>
+                                <th>Almac.</th>
+                                <th>Color</th>
+                                <th>Batería</th>
+                                <th>Notas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${prod.variantes.map(v => `
+                                <tr>
+                                    <td>${v.almacenamiento}</td>
+                                    <td>${v.color}</td>
+                                    <td>${v.bateria ? v.bateria + '%' : '-'}</td>
+                                    <td>${v.notas || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                variantsHtml += '<p style="padding: 10px; color: #8e8e93; font-size: 0.85rem;">No hay variantes cargadas para este producto.</p>';
+            }
+            variantsHtml += '</div>';
+
+            trVariants.innerHTML = `<td colspan="9">${variantsHtml}</td>`;
+            tbody.appendChild(trVariants);
         });
 
         const selectProd = document.getElementById('sale-prod');
@@ -205,22 +258,139 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- Helpers de UI (Chips, Imágenes, Modelos) --
     function initChipSelectors() {
         document.querySelectorAll('.chip-container, .chip-container-pills').forEach(container => {
-            const chips = container.querySelectorAll('.chip, .chip-pill');
+            const chips = container.querySelectorAll('.chip, .chip-pill, .chip-pill-variant');
             const hiddenInput = container.querySelector('input[type="hidden"]');
             chips.forEach(chip => {
                 chip.onclick = () => {
-                    chips.forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    if (hiddenInput) {
-                        hiddenInput.value = chip.getAttribute('data-val');
-                        hiddenInput.dispatchEvent(new Event('change'));
+                    if (container.classList.contains('multi-select')) {
+                        // Lógica multi-select (usada en variantes)
+                        chip.classList.toggle('active');
+                    } else {
+                        // Lógica single-select (original)
+                        chips.forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
+                        if (hiddenInput) {
+                            hiddenInput.value = chip.getAttribute('data-val');
+                            hiddenInput.dispatchEvent(new Event('change'));
+                        }
                     }
                 };
             });
         });
     }
 
+    // -- Lógica de Unidades en Stock (Variaciones Específicas) --
+    let currentStockItems = [];
+
+    function renderStockItems() {
+        const tbody = document.getElementById('tbody-stock-items');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        currentStockItems.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid #f0f0f0';
+            tr.innerHTML = `
+                <td style="padding: 8px;">${item.almacenamiento}</td>
+                <td style="padding: 8px;">${item.color}</td>
+                <td style="padding: 8px;">${item.bateria ? item.bateria + '%' : '-'}</td>
+                <td style="padding: 8px; font-size: 0.7rem; color: #007aff;">${item.imagen ? '📷 Imagen' : '-'}</td>
+                <td style="padding: 8px;">${item.notas || ''}</td>
+                <td style="padding: 8px; text-align: center; white-space: nowrap;">
+                    <button type="button" class="expand-btn" style="display:inline-block; margin-right: 5px;" onclick="window.editStockItem(${index})" title="Editar">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button type="button" class="remove-color" onclick="window.removeStockItem(${index})" title="Eliminar">&times;</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.removeStockItem = (index) => {
+        if (confirm("¿Estás seguro de eliminar esta variante?")) {
+            currentStockItems.splice(index, 1);
+            renderStockItems();
+        }
+    };
+
+    window.editStockItem = (index) => {
+        const item = currentStockItems[index];
+
+        // Cargar datos en los inputs
+        document.getElementById('item-storage').value = item.almacenamiento;
+        document.getElementById('item-color').value = item.color;
+        document.getElementById('item-battery').value = item.bateria || '';
+        document.getElementById('item-notes').value = item.notas || '';
+
+        // Cargar imagen si existe
+        if (item.imagen) {
+            document.getElementById('item-image-data').value = item.imagen;
+            document.getElementById('item-image-preview').style.display = 'block';
+            document.getElementById('item-image-preview').innerHTML = 'Imagen cargada <button type="button" onclick="window.clearVariantImage()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px;">(Quitar)</button>';
+        } else {
+            window.clearVariantImage();
+        }
+
+        // Eliminar del array para que al darle "+" se re-inserte (o se cancele y quede fuera)
+        currentStockItems.splice(index, 1);
+        renderStockItems();
+
+        // Scroll al formulario de variantes
+        document.querySelector('.add-stock-item-row').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.clearVariantImage = () => {
+        document.getElementById('item-image-data').value = '';
+        document.getElementById('item-image-file').value = '';
+        document.getElementById('item-image-preview').style.display = 'none';
+        document.getElementById('item-image-preview').innerHTML = 'Listo!';
+    };
+
+    document.getElementById('btn-add-stock-item').onclick = () => {
+        const storage = document.getElementById('item-storage').value;
+        const color = document.getElementById('item-color').value.trim();
+        const battery = document.getElementById('item-battery').value.trim();
+        const imageData = document.getElementById('item-image-data').value;
+        const notes = document.getElementById('item-notes').value.trim();
+
+        if (color) {
+            currentStockItems.push({
+                almacenamiento: storage,
+                color: color,
+                bateria: battery,
+                imagen: imageData,
+                notas: notes
+            });
+            // Limpiar inputs (menos el select)
+            document.getElementById('item-color').value = '';
+            document.getElementById('item-battery').value = '';
+            document.getElementById('item-image-data').value = '';
+            document.getElementById('item-image-file').value = '';
+            document.getElementById('item-image-preview').style.display = 'none';
+            document.getElementById('item-notes').value = '';
+            renderStockItems();
+        } else {
+            alert("Por favor, ingresá al menos el color.");
+        }
+    };
+
+    window.toggleVariants = (id, btn) => {
+        const row = document.getElementById(`variants-row-${id}`);
+        if (row.style.display === 'none') {
+            row.style.display = 'table-row';
+            btn.classList.add('active');
+        } else {
+            row.style.display = 'none';
+            btn.classList.remove('active');
+        }
+    };
+
+    function initVariantSelectors() {
+        renderStockItems();
+    }
+
     function initImageUpload() {
+        // Imágenes de producto base
         [1, 2, 3].forEach(slot => {
             const fileInput = document.getElementById(`file-${slot}`);
             const hiddenInput = document.getElementById(`prod-img-${slot}`);
@@ -237,31 +407,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 reader.readAsDataURL(e.target.files[0]);
             };
         });
+
+        // Imágenes de variantes
+        const vTrigger = document.getElementById('btn-trigger-variant-file');
+        const vFile = document.getElementById('item-image-file');
+        const vHidden = document.getElementById('item-image-data');
+        const vPreview = document.getElementById('item-image-preview');
+
+        if (vTrigger && vFile) {
+            vTrigger.onclick = () => vFile.click();
+            vFile.onchange = e => {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        vHidden.value = ev.target.result;
+                        vPreview.style.display = 'block';
+                        vPreview.innerHTML = 'Imagen cargada <button type="button" onclick="window.clearVariantImage()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px;">(Quitar)</button>';
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            };
+        }
     }
 
     const CATEGORY_MODELS = {
         'iPhone': [
-            'iPhone 11', 'iPhone 11 Pro', 'iPhone 11 Pro Max', 
-            'iPhone 12 Mini', 'iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max', 
-            'iPhone 13 Mini', 'iPhone 13', 'iPhone 13 Pro', 'iPhone 13 Pro Max', 
-            'iPhone 14', 'iPhone 14 Plus', 'iPhone 14 Pro', 'iPhone 14 Pro Max', 
-            'iPhone 15', 'iPhone 15 Plus', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 
+            'iPhone 11', 'iPhone 11 Pro', 'iPhone 11 Pro Max',
+            'iPhone 12 Mini', 'iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max',
+            'iPhone 13 Mini', 'iPhone 13', 'iPhone 13 Pro', 'iPhone 13 Pro Max',
+            'iPhone 14', 'iPhone 14 Plus', 'iPhone 14 Pro', 'iPhone 14 Pro Max',
+            'iPhone 15', 'iPhone 15 Plus', 'iPhone 15 Pro', 'iPhone 15 Pro Max',
             'iPhone 16', 'iPhone 16 Plus', 'iPhone 16 Pro', 'iPhone 16 Pro Max',
             'iPhone 17', 'iPhone 17 Plus', 'iPhone 17 Pro', 'iPhone 17 Pro Max'
         ],
         'MacBook': [
-            'MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3', 
+            'MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3',
             'MacBook Pro 13"', 'MacBook Pro 14"', 'MacBook Pro 16"',
             'iMac 24"'
         ],
         'iPad': [
-            'iPad (9na Gen)', 'iPad (10ma Gen)', 
-            'iPad Mini (6ta Gen)', 
-            'iPad Air (5ta Gen)', 'iPad Air (M2)', 
+            'iPad (9na Gen)', 'iPad (10ma Gen)',
+            'iPad Mini (6ta Gen)',
+            'iPad Air (5ta Gen)', 'iPad Air (M2)',
             'iPad Pro 11"', 'iPad Pro 12.9"', 'iPad Pro 13" (M4)'
         ],
         'AirPods': [
-            'AirPods 2', 'AirPods 3', 'AirPods 4', 
+            'AirPods 2', 'AirPods 3', 'AirPods 4',
             'AirPods Pro (1ra Gen)', 'AirPods Pro 2', 'AirPods Max'
         ],
         'Accesorios': [
@@ -288,9 +479,15 @@ document.addEventListener('DOMContentLoaded', () => {
         formProduct.reset();
         document.getElementById('prod-id').value = '';
         document.getElementById('modal-prod-title').textContent = 'Nuevo Producto';
+
+        // Reset unidades stock
+        currentStockItems = [];
+        renderStockItems();
+
         // Reset chips
         document.querySelectorAll('.chip, .chip-pill').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.chip-container, .chip-container-pills').forEach(container => {
+            if (container.classList.contains('multi-select')) return;
             const first = container.querySelector('.chip, .chip-pill');
             if (first) first.click();
         });
@@ -307,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formProduct.onsubmit = async (e) => {
         e.preventDefault();
         const id = document.getElementById('prod-id').value;
+
         const prodData = {
             nombre: document.getElementById('prod-name').value,
             categoria: document.getElementById('prod-cat').value,
@@ -319,11 +517,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ubicacion: document.getElementById('prod-location') ? document.getElementById('prod-location').value : null,
             notas: document.getElementById('prod-features') ? document.getElementById('prod-features').value : null,
             imagen: document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
-            stock: 1,
-            activo: document.getElementById('prod-active').checked
+            stock: currentStockItems.length > 0 ? currentStockItems.length : 1,
+            activo: document.getElementById('prod-active').checked,
+            variantes: currentStockItems.length > 0 ? currentStockItems : null
         };
 
-        const { error } = id 
+        const { error } = id
             ? await _supabase.from('products').update(prodData).eq('id', id)
             : await _supabase.from('products').insert([prodData]);
 
@@ -365,10 +564,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -- Inicializadores de Formulario --
     initChipSelectors();
+    initVariantSelectors();
 
     // Lógica para mostrar/ocultar Condición de Batería
     const subcatInput = document.getElementById('prod-subcat');
     const batteryGroup = document.getElementById('group-battery');
+
     if (subcatInput && batteryGroup) {
         subcatInput.addEventListener('change', (e) => {
             if (e.target.value === 'Usado') {
@@ -412,15 +613,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('prod-sell').value = p.precio_venta;
         document.getElementById('prod-cost').value = p.precio_costo;
         document.getElementById('prod-active').checked = p.activo;
-        
+
         const subcatInputEdit = document.getElementById('prod-subcat');
         if (subcatInputEdit) {
             subcatInputEdit.value = p.subcategoria || 'Nuevo';
             subcatInputEdit.dispatchEvent(new Event('change'));
         }
-        
+
         document.getElementById('prod-battery').value = p.battery || '';
-        
+
+        // Reset y Cargar Unidades en Stock (Variantes)
+        currentStockItems = Array.isArray(p.variantes) ? [...p.variantes] : [];
+        renderStockItems();
+
         // Chips
         const fields = [
             { id: 'container-category', val: p.categoria },
@@ -428,8 +633,11 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'container-storage', val: p.almacenamiento }
         ];
         fields.forEach(f => {
-            const chip = document.getElementById(f.id).querySelector(`[data-val="${f.val}"]`);
-            if (chip) chip.click();
+            const container = document.getElementById(f.id);
+            if (container) {
+                const chip = container.querySelector(`[data-val="${f.val}"]`);
+                if (chip) chip.click();
+            }
         });
 
         modalProduct.classList.remove('hidden');
