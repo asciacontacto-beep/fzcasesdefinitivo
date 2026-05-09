@@ -553,6 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'MacBook': [
             'MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3', 'MacBook Air M4',
             'MacBook Pro 13"', 'MacBook Pro 14"', 'MacBook Pro 16"', 'MacBook Pro M4',
+            'MacBook Neo',
             'iMac 24"', 'Mac Mini', 'Mac Studio', 'Mac Pro'
         ],
         'iPad': [
