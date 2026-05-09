@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'iMac 24"', 'Mac Mini', 'Mac Studio', 'Mac Pro'
         ],
         'iPad': [
-            'iPad (9na Gen)', 'iPad (10ma Gen)',
+            'iPad (9na Gen)', 'iPad (10ma Gen)', 'iPad A16',
             'iPad Mini (6ta Gen)',
             'iPad Air (5ta Gen)', 'iPad Air (M2)',
             'iPad Pro 11"', 'iPad Pro 12.9"', 'iPad Pro 13" (M4)'
