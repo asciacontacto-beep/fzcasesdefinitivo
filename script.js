@@ -104,7 +104,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.renderFilters = function() {
         if (!filterContainer) return;
-        const allCategories = ['Todos', ...new Set(products.map(p => p.category))];
+        
+        const preferredOrder = ['Todos', 'iPhone', 'iPad', 'MacBook', 'Apple Watch', 'Accesorios'];
+        const uniqueCategories = [...new Set(products.map(p => p.category))];
+        const allCategories = ['Todos', ...uniqueCategories];
+
+        // Ordenar según preferredOrder
+        allCategories.sort((a, b) => {
+            let indexA = preferredOrder.indexOf(a);
+            let indexB = preferredOrder.indexOf(b);
+            if (indexA === -1) indexA = 99;
+            if (indexB === -1) indexB = 99;
+            return indexA - indexB;
+        });
         
         filterContainer.innerHTML = '';
         allCategories.forEach(cat => {
