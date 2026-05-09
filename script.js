@@ -201,38 +201,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="${product.image}" alt="${product.name}">
                 </div>
                 <div class="modal-info">
-                    <div class="modal-rating">⭐⭐⭐⭐⭐ <span class="rating-text">(34 valoraciones)</span></div>
+                    <div class="modal-top-meta">
+                        <span class="modal-category-tag">${product.category}</span>
+                        ${product.bestseller ? '<span class="badge-premium">★ Más vendido</span>' : ''}
+                    </div>
                     <h2>${product.name}</h2>
-                    <div class="cat">
-                        ${product.category} | ${product.subcategory} 
-                        ${product.bestseller ? '<span class="badge-premium">★ MÁS VENDIDO</span>' : ''}
-                    </div>
 
-                    <div class="payment-minimal">
-                        <span class="payment-extra">Tarjetas de Crédito / Débito · Mercado Pago · Efectivo</span>
-                    </div>
-                    
-                    <div class="modal-meta-row">
-                        <div class="meta-item">
-                            <span class="meta-label">Condición:</span>
-                            <span class="meta-badge">${product.subcategory}</span>
-                        </div>
+                    <div class="modal-condition-row">
+                        <span class="condition-pill condition-${(product.subcategory || '').toLowerCase().replace(/ /g, '-')}">${product.subcategory || 'Sin especificar'}</span>
+                        <span class="modal-payment-text">Efectivo · Transferencia · MercadoPago</span>
                     </div>
 
                     ${product.precio ? `<div class="modal-price">$${product.precio.toLocaleString('es-AR')}</div>` : ''}
 
                     <div id="variant-selectors" class="variant-selectors"></div>
-                    
-                    <div class="original-alert">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        Equipo 100% Original Apple
+
+                    <div class="modal-trust-row">
+                        <div class="trust-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            100% Original Apple
+                        </div>
+                        <div class="trust-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            Garantía FZCASES
+                        </div>
+                        <div class="trust-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Retiro en Tandil / Necochea
+                        </div>
                     </div>
 
-                    <ul class="specs">
-                        ${product.features.map(f => `<li>${f}</li>`).join('')}
-                    </ul>
-
-                    <a href="" id="modal-wa-btn" target="_blank" class="btn-primary" style="display:block; text-align:center;">Consultar por WhatsApp</a>
+                    <a href="" id="modal-wa-btn" target="_blank" class="btn-wa-modal">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                        Consultar por WhatsApp
+                    </a>
                 </div>
             `;
 
@@ -257,29 +259,35 @@ document.addEventListener('DOMContentLoaded', () => {
             if (allVariants.length > 0) {
                 const section = document.createElement('div');
                 section.className = 'variant-section';
-                section.innerHTML = `<label class="variant-label">Unidades disponibles (Seleccioná una)</label>`;
+                section.innerHTML = `<label class="variant-label">Seleccioná una unidad</label>`;
                 
                 const grid = document.createElement('div');
                 grid.className = 'pill-selector';
-                grid.style.flexDirection = 'column'; // List format for better readability
+                grid.style.flexDirection = 'column';
                 
                 allVariants.forEach((unit, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'pill-btn-variant';
-                    btn.style.width = '100%';
-                    btn.style.textAlign = 'left';
-                    btn.style.display = 'flex';
-                    btn.style.justifyContent = 'space-between';
-                    btn.style.alignItems = 'center';
+                    if (index === 0) btn.classList.add('active');
                     
-                    const batteryText = unit.bateria ? ` · ${unit.bateria}%` : '';
+                    const batteryText = unit.bateria ? `<span class="variant-battery">🔋 ${unit.bateria}%</span>` : '';
+                    const storageText = unit.almacenamiento && unit.almacenamiento !== '-' ? unit.almacenamiento : '';
+                    const colorText = unit.color || '';
+                    const measureText = unit.medida && unit.medida !== '-' ? unit.medida : '';
+                    
+                    // Build the main label
+                    const parts = [measureText, storageText, colorText].filter(Boolean);
+                    const mainLabel = parts.join(' · ');
                     
                     btn.innerHTML = `
-                        <div>
-                            <strong>${unit.almacenamiento}</strong> · ${unit.color}${batteryText}
-                            <div style="font-size: 0.75rem; opacity: 0.7; font-weight: normal;">${unit.notas || ''}</div>
+                        <div class="variant-btn-content">
+                            <div class="variant-btn-main">${mainLabel}</div>
+                            ${unit.notas ? `<div class="variant-btn-note">${unit.notas}</div>` : ''}
                         </div>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <div class="variant-btn-right">
+                            ${batteryText}
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
                     `;
                     
                     btn.addEventListener('click', () => {
@@ -290,17 +298,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Cambiar imagen si la unidad tiene una propia
                         const modalImg = document.querySelector('.modal-img img');
                         if (modalImg) {
-                            if (unit.imagen) {
-                                modalImg.src = unit.imagen;
-                            } else {
-                                modalImg.src = product.image; // Volver a la original si no tiene
-                            }
+                            modalImg.src = unit.imagen || product.image;
                         }
                         
                         updateWALink();
                     });
                     grid.appendChild(btn);
                 });
+                
+                // Auto-seleccionar la primera variante
+                if (allVariants.length > 0) {
+                    selectedUnit = allVariants[0];
+                    updateWALink();
+                }
                 
                 section.appendChild(grid);
                 variantContainer.appendChild(section);
