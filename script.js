@@ -46,6 +46,7 @@ async function loadProductsFromSupabase() {
             battery: p.battery,
             image: p.imagen || "assets/iphone_case.png",
             features: allFeatures,
+            notas: p.notas,
             bestseller: p.bestseller || false,
             variantes: p.variantes
         };
@@ -238,7 +239,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Variant Rendering (Unidades en Stock)
             const variantContainer = document.getElementById('variant-selectors');
+            
+            let allVariants = [];
+            // Siempre agregamos la unidad principal como la primera variante
+            allVariants.push({
+                almacenamiento: product.storage,
+                color: product.color,
+                bateria: product.battery,
+                notas: product.notas,
+                imagen: product.image,
+                isMain: true
+            });
+
             if (product.variantes && Array.isArray(product.variantes)) {
+                allVariants = allVariants.concat(product.variantes);
+            }
+
+            if (allVariants.length > 0) {
                 const section = document.createElement('div');
                 section.className = 'variant-section';
                 section.innerHTML = `<label class="variant-label">Unidades disponibles (Seleccioná una)</label>`;
@@ -247,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 grid.className = 'pill-selector';
                 grid.style.flexDirection = 'column'; // List format for better readability
                 
-                product.variantes.forEach((unit, index) => {
+                allVariants.forEach((unit, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'pill-btn-variant';
                     btn.style.width = '100%';
