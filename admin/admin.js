@@ -551,9 +551,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'iPhone 17', 'iPhone 17 Plus', 'iPhone 17 Pro', 'iPhone 17 Pro Max'
         ],
         'MacBook': [
-            'MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3',
-            'MacBook Pro 13"', 'MacBook Pro 14"', 'MacBook Pro 16"',
-            'iMac 24"'
+            'MacBook Air M1', 'MacBook Air M2', 'MacBook Air M3', 'MacBook Air M4',
+            'MacBook Pro 13"', 'MacBook Pro 14"', 'MacBook Pro 16"', 'MacBook Pro M4',
+            'iMac 24"', 'Mac Mini', 'Mac Studio', 'Mac Pro'
         ],
         'iPad': [
             'iPad (9na Gen)', 'iPad (10ma Gen)',
