@@ -324,6 +324,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             });
         });
+
+        // Trigger inicial para subcategoria (batería)
+        const subcatInput = document.getElementById('prod-subcat');
+        if (subcatInput) {
+            subcatInput.addEventListener('change', (e) => {
+                const batInput = document.getElementById('item-battery');
+                if (batInput) {
+                    if (e.target.value === 'Nuevo') {
+                        batInput.disabled = true;
+                        batInput.value = '';
+                        batInput.placeholder = '-';
+                    } else {
+                        batInput.disabled = false;
+                        batInput.placeholder = '%';
+                    }
+                }
+            });
+            // Ejecutar una vez para estado inicial
+            subcatInput.dispatchEvent(new Event('change'));
+        }
     }
 
     // -- Lógica de Unidades en Stock (Variaciones Específicas) --
