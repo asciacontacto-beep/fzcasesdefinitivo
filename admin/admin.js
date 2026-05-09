@@ -314,6 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -- Lógica de Unidades en Stock (Variaciones Específicas) --
     let currentStockItems = [];
+    let editingVariantIndex = -1;
 
     function renderStockItems() {
         const tbody = document.getElementById('tbody-stock-items');
@@ -327,6 +328,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStockItems.forEach((item, index) => {
             const row = document.createElement('div');
             row.className = 'stock-variant-row stock-variant-item';
+            if (index === editingVariantIndex) {
+                row.style.backgroundColor = '#f0f8ff'; // Highlight editing row
+            }
             row.innerHTML = `
                 <div>${item.almacenamiento}</div>
                 <div>${item.color}</div>
@@ -347,6 +351,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.removeStockItem = (index) => {
         if (confirm("¿Estás seguro de eliminar esta variante?")) {
             currentStockItems.splice(index, 1);
+            if (editingVariantIndex === index) resetEditVariantState();
+            else if (editingVariantIndex > index) editingVariantIndex--;
             renderStockItems();
         }
     };
@@ -356,7 +362,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cargar datos en los inputs
         document.getElementById('item-storage').value = item.almacenamiento;
-        document.getElementById('item-color').value = item.color;
+        
+        // Si el color no está en el select, agregarlo temporalmente
+        const colorSelect = document.getElementById('item-color');
+        let optionExists = Array.from(colorSelect.options).some(opt => opt.value === item.color);
+        if (!optionExists && item.color) {
+            const opt = document.createElement('option');
+            opt.value = item.color;
+            opt.text = item.color;
+            colorSelect.appendChild(opt);
+        }
+        colorSelect.value = item.color;
+        
         document.getElementById('item-battery').value = item.bateria || '';
         document.getElementById('item-notes').value = item.notas || '';
 
@@ -369,12 +386,15 @@ document.addEventListener('DOMContentLoaded', () => {
             window.clearVariantImage();
         }
 
-        // Eliminar del array para que al darle "+" se re-inserte (o se cancele y quede fuera)
-        currentStockItems.splice(index, 1);
+        editingVariantIndex = index;
+        const btn = document.getElementById('btn-add-stock-item');
+        btn.innerHTML = '✓';
+        btn.style.background = '#007aff';
+        
         renderStockItems();
 
         // Scroll al formulario de variantes
-        document.querySelector('.add-stock-item-row').scrollIntoView({ behavior: 'smooth' });
+        document.querySelector('.add-stock-item-row').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
 
     window.clearVariantImage = () => {
@@ -383,6 +403,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('item-image-preview').style.display = 'none';
         document.getElementById('item-image-preview').innerHTML = 'Listo!';
     };
+
+    function resetEditVariantState() {
+        editingVariantIndex = -1;
+        const btn = document.getElementById('btn-add-stock-item');
+        if (btn) {
+            btn.innerHTML = '+';
+            btn.style.background = '#000';
+        }
+    }
 
     document.getElementById('btn-add-stock-item').onclick = () => {
         const storage = document.getElementById('item-storage').value;
@@ -393,15 +422,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const notes = document.getElementById('item-notes').value.trim();
 
         if (color) {
-            currentStockItems.push({
+            const variantData = {
                 almacenamiento: storage,
                 color: color,
                 bateria: battery,
                 imagen: imageData,
                 notas: notes
-            });
-            // Limpiar inputs (menos el select)
-            document.getElementById('item-color').value = '';
+            };
+
+            if (editingVariantIndex >= 0) {
+                currentStockItems[editingVariantIndex] = variantData;
+                resetEditVariantState();
+            } else {
+                currentStockItems.push(variantData);
+            }
+
+            // Limpiar inputs
+            document.getElementById('item-color').value = 'Negro'; // Default
             document.getElementById('item-battery').value = '';
             document.getElementById('item-image-data').value = '';
             document.getElementById('item-image-file').value = '';
@@ -521,6 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset unidades stock
         currentStockItems = [];
+        resetEditVariantState();
         renderStockItems();
 
         // Reset chips
@@ -662,6 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset y Cargar Unidades en Stock (Variantes)
         currentStockItems = Array.isArray(p.variantes) ? [...p.variantes] : [];
+        resetEditVariantState();
         renderStockItems();
 
         // Chips
