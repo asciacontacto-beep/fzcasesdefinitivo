@@ -573,9 +573,11 @@ document.addEventListener('DOMContentLoaded', () => {
             'AirPods Pro (1ra Gen)', 'AirPods Pro 2', 'Airpods pro 3', 'AirPods Max'
         ],
         'Apple Watch': [
-            'Apple Watch SE', 'Apple Watch SE3 44mm', 'Apple Watch Series 8',
-            'Apple Watch Series 9', 'Apple Watch Series 10', 'Apple Watch S11 42mm Silver',
-            'Apple Watch S11 46mm Jet Black', 'Apple Watch Ultra', 'Apple Watch Ultra 2'
+            'Apple Watch SE', 'Apple Watch SE 2', 'Apple Watch SE 3',
+            'Apple Watch Series 4', 'Apple Watch Series 5', 'Apple Watch Series 6',
+            'Apple Watch Series 7', 'Apple Watch Series 8', 'Apple Watch Series 9',
+            'Apple Watch Series 10', 'Apple Watch Series 11',
+            'Apple Watch Ultra', 'Apple Watch Ultra 2'
         ],
         'Accesorios': [
             'Cargador Magsafe', 'Cable usb c', 'Cable Ligthning', 'Cable Tipo C a Tipo C',
