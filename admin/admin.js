@@ -595,8 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const CATEGORY_COLORS = {
         'MacBook': [
-            'Silver', 'Space Gray', 'Midnight', 'Starlight',
-            'Orange', 'Lavanda', 'Citrus', 'Indigo'
+            'Rosa', 'Plata', 'Indigo', 'Citrus'
         ],
         'default': [
             'Negro', 'Blanco', 'Dorado', 'Azul', 'Verde', 'Rosa', 'Teal',
