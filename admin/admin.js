@@ -323,12 +323,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = document.createElement('tr');
             tr.style.borderBottom = '1px solid #f0f0f0';
             tr.innerHTML = `
-                <td style="padding: 8px;">${item.almacenamiento}</td>
-                <td style="padding: 8px;">${item.color}</td>
-                <td style="padding: 8px;">${item.bateria ? item.bateria + '%' : '-'}</td>
-                <td style="padding: 8px; font-size: 0.7rem; color: #007aff;">${item.imagen ? '📷 Imagen' : '-'}</td>
+                <td style="padding: 8px; width: 95px;">${item.almacenamiento}</td>
+                <td style="padding: 8px; width: 130px;">${item.color}</td>
+                <td style="padding: 8px; width: 70px;">${item.bateria ? item.bateria + '%' : '-'}</td>
+                <td style="padding: 8px; width: 70px; font-size: 0.7rem; color: #007aff;">${item.imagen ? '📷 Imagen' : '-'}</td>
                 <td style="padding: 8px;">${item.notas || ''}</td>
-                <td style="padding: 8px; text-align: center; white-space: nowrap;">
+                <td style="padding: 8px; text-align: center; white-space: nowrap; width: 80px;">
                     <button type="button" class="expand-btn" style="display:inline-block; margin-right: 5px;" onclick="window.editStockItem(${index})" title="Editar">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     </button>
