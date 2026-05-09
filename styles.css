@@ -18,7 +18,7 @@
 
 html {
     scroll-behavior: smooth;
-    font-size: 13px; /* Escala global reducida */
+    font-size: 11px; /* Escala global compacta */
 }
 
 body {
@@ -58,7 +58,7 @@ a {
 .nav-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem 3rem;
+    padding: 1.2rem 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -185,13 +185,13 @@ a {
 /* Hero Inmersivo - Apple Style */
 .hero-immersive {
     position: relative;
-    height: 100vh;
-    min-height: 700px;
+    height: 80vh;
+    min-height: 500px;
     width: 100%;
     overflow: hidden;
     display: flex;
     align-items: center;
-    background: #000; /* Fallback */
+    background: #000;
     margin-top: 0;
 }
 
