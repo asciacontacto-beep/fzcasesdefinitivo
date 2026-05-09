@@ -372,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.style.backgroundColor = '#f0f8ff'; // Highlight editing row
             }
             row.innerHTML = `
+                <div>${item.medida || '-'}</div>
                 <div>${item.almacenamiento}</div>
                 <div>${item.color}</div>
                 <div>${item.bateria ? item.bateria + '%' : '-'}</div>
@@ -402,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cargar datos en los inputs
         document.getElementById('item-storage').value = item.almacenamiento;
+        document.getElementById('item-measure').value = item.medida || '-';
         
         // Si el color no está en el select, agregarlo temporalmente
         const colorSelect = document.getElementById('item-color');
@@ -415,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
         colorSelect.value = item.color;
         
         document.getElementById('item-battery').value = item.bateria || '';
-        document.getElementById('item-notes').value = item.notas || '';
+        document.getElementById('item-notes').value = item.notes || item.notas || '';
 
         // Cargar imagen si existe
         if (item.imagen) {
@@ -454,6 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btn-add-stock-item').onclick = () => {
+        const measure = document.getElementById('item-measure').value;
         const storage = document.getElementById('item-storage').value;
         const colorRaw = document.getElementById('item-color').value.trim();
         const color = normalizeColorValue(colorRaw);
@@ -463,6 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (color) {
             const variantData = {
+                medida: measure,
                 almacenamiento: storage,
                 color: color,
                 bateria: battery,
@@ -572,8 +576,12 @@ document.addEventListener('DOMContentLoaded', () => {
             'AirPods 2', 'AirPods 3', 'AirPods 4', 'Airpods con cancelacion',
             'AirPods Pro (1ra Gen)', 'AirPods Pro 2', 'Airpods pro 3', 'AirPods Max'
         ],
+        'Apple Watch': [
+            'Apple Watch SE', 'Apple Watch SE 2', 'Apple Watch SE 3', 
+            'Apple Watch Series 8', 'Apple Watch Series 9', 'Apple Watch Series 10', 
+            'Apple Watch Series 11', 'Apple Watch Ultra', 'Apple Watch Ultra 2'
+        ],
         'Accesorios': [
-            'Apple Watch SE', 'Apple Watch Series 8', 'Apple Watch Series 9', 'Apple Watch Series 10', 'Apple Watch Ultra', 'Apple Watch Ultra 2',
             'Cargador Magsafe', 'Cable usb c', 'Cable Ligthning', 'Cable Tipo C a Tipo C',
             'Adpaptador Usb c', 'Adaptador usb c Duo', 'Adaptador Usb c 60w', 'Adaptador de corriente 20W',
             'Airtag', 'Airtag x4', 'Earpods', 'Magic Mouse',
@@ -597,11 +605,14 @@ document.addEventListener('DOMContentLoaded', () => {
         'MacBook': [
             'Rosa', 'Plata', 'Indigo', 'Citrus'
         ],
+        'Apple Watch': [
+            'Midnight', 'Starlight', 'Silver', 'Jet Black', 'Titanium', 'Black', 'Blue', 'Rose Gold'
+        ],
         'default': [
             'Negro', 'Blanco', 'Dorado', 'Azul', 'Verde', 'Rosa', 'Teal',
             'Orange', 'Lavanda', 'Citrus', 'Indigo',
             'Natural Titanium', 'Desert Titanium', 'Midnight', 'Starlight',
-            'Space Gray', 'Silver'
+            'Space Gray', 'Silver', 'Jet Black'
         ]
     };
 
@@ -656,6 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nombre: document.getElementById('prod-name').value,
             categoria: document.getElementById('prod-cat').value,
             subcategoria: document.getElementById('prod-subcat').value,
+            medida: mainUnit.medida,
             almacenamiento: mainUnit.almacenamiento,
             color: mainUnit.color,
             precio_venta: Number(document.getElementById('prod-sell').value),
@@ -773,6 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset y Cargar Unidades en Stock (Variantes)
         currentStockItems = [{
+            medida: p.medida || '-',
             almacenamiento: p.almacenamiento || '128GB',
             color: p.color || 'Negro',
             bateria: p.battery || '',

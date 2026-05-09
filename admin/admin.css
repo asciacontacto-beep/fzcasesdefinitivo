@@ -1737,7 +1737,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .stock-variant-row {
     display: grid;
-    grid-template-columns: 75px 105px 55px 45px 1fr 45px;
+    grid-template-columns: 75px 75px 105px 55px 45px 1fr 45px;
     gap: 6px;
     align-items: center;
     padding: 8px 10px;
