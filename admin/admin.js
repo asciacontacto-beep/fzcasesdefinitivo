@@ -594,23 +594,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- Handlers de Envío --
     formProduct.onsubmit = async (e) => {
         e.preventDefault();
+        
+        if (currentStockItems.length === 0) {
+            alert("Debes agregar al menos una unidad en la grilla de stock.");
+            return;
+        }
+
         const id = document.getElementById('prod-id').value;
+        const mainUnit = currentStockItems[0];
+        const extraUnits = currentStockItems.slice(1);
 
         const prodData = {
             nombre: document.getElementById('prod-name').value,
             categoria: document.getElementById('prod-cat').value,
             subcategoria: document.getElementById('prod-subcat').value,
-            almacenamiento: document.getElementById('prod-storage').value,
-            color: normalizeColorValue(document.getElementById('prod-color-custom').value || document.getElementById('prod-color').value),
+            almacenamiento: mainUnit.almacenamiento,
+            color: mainUnit.color,
             precio_venta: Number(document.getElementById('prod-sell').value),
             precio_costo: Number(document.getElementById('prod-cost').value),
-            battery: document.getElementById('prod-battery').value,
+            battery: mainUnit.bateria,
             ubicacion: document.getElementById('prod-location') ? document.getElementById('prod-location').value : null,
-            notas: document.getElementById('prod-features') ? document.getElementById('prod-features').value : null,
-            imagen: document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
-            stock: currentStockItems.length + 1,
+            notas: mainUnit.notas,
+            imagen: mainUnit.imagen || document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
+            stock: currentStockItems.length,
             activo: document.getElementById('prod-active').checked,
-            variantes: currentStockItems.length > 0 ? currentStockItems : null
+            variantes: extraUnits.length > 0 ? extraUnits : null
         };
 
         const { error } = id
@@ -713,7 +721,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('prod-battery').value = p.battery || '';
 
         // Reset y Cargar Unidades en Stock (Variantes)
-        currentStockItems = Array.isArray(p.variantes) ? [...p.variantes] : [];
+        currentStockItems = [{
+            almacenamiento: p.almacenamiento || '128GB',
+            color: p.color || 'Negro',
+            bateria: p.battery || '',
+            notas: p.notas || '',
+            imagen: p.imagen && p.imagen !== '/assets/iphone_case.png' ? p.imagen : ''
+        }];
+        if (Array.isArray(p.variantes)) {
+            currentStockItems = currentStockItems.concat(p.variantes);
+        }
         resetEditVariantState();
         renderStockItems();
 
