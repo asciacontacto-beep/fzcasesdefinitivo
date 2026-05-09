@@ -1324,6 +1324,12 @@ a.contact-item:hover {
     align-items: center;
     overflow: hidden;
     max-height: 500px;
+    
+    /* Comportamiento Sticky */
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    z-index: 5;
 }
 
 .modal-img img {
