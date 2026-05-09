@@ -648,7 +648,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!p) return;
         document.getElementById('prod-id').value = p.id;
         document.getElementById('modal-prod-title').textContent = 'Editar Producto';
-        document.getElementById('prod-name').value = p.nombre;
         document.getElementById('prod-sell').value = p.precio_venta;
         document.getElementById('prod-cost').value = p.precio_costo;
         document.getElementById('prod-active').checked = p.activo;
@@ -678,6 +677,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (chip) chip.click();
             }
         });
+
+        // Set name AFTER category is selected and dropdown is populated
+        setTimeout(() => {
+            document.getElementById('prod-name').value = p.nombre;
+        }, 50);
 
         modalProduct.classList.remove('hidden');
     };
