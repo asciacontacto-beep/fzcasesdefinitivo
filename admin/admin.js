@@ -190,7 +190,21 @@ document.addEventListener('DOMContentLoaded', () => {
             trVariants.className = 'variants-expanded-row';
 
             let variantsHtml = '<div class="variants-expanded-content">';
+            let allVariants = [];
+            // Agregar el modelo principal como la primera variante
+            allVariants.push({
+                almacenamiento: prod.almacenamiento,
+                color: prod.color,
+                bateria: prod.battery,
+                notas: prod.notas,
+                isMain: true
+            });
+
             if (prod.variantes && Array.isArray(prod.variantes)) {
+                allVariants = allVariants.concat(prod.variantes);
+            }
+
+            if (allVariants.length > 0) {
                 variantsHtml += `
                     <table class="variants-inner-table">
                         <thead>
@@ -202,12 +216,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             </tr>
                         </thead>
                         <tbody>
-                            ${prod.variantes.map(v => `
+                            ${allVariants.map(v => `
                                 <tr>
-                                    <td>${v.almacenamiento}</td>
-                                    <td>${v.color}</td>
+                                    <td>${v.almacenamiento || '-'}</td>
+                                    <td>${v.color || '-'}</td>
                                     <td>${v.bateria ? v.bateria + '%' : '-'}</td>
-                                    <td>${v.notas || '-'}</td>
+                                    <td>${v.notas || '-'} ${v.isMain ? '<span style="font-size:0.65rem; color:#8e8e93; margin-left: 5px;">(Principal)</span>' : ''}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -594,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ubicacion: document.getElementById('prod-location') ? document.getElementById('prod-location').value : null,
             notas: document.getElementById('prod-features') ? document.getElementById('prod-features').value : null,
             imagen: document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
-            stock: currentStockItems.length > 0 ? currentStockItems.length : 1,
+            stock: currentStockItems.length + 1,
             activo: document.getElementById('prod-active').checked,
             variantes: currentStockItems.length > 0 ? currentStockItems : null
         };
