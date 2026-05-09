@@ -957,7 +957,7 @@ input:checked + .switch-slider:before {
    ========================================================================== */
 
 .modal-card.modal-card-tech {
-    max-width: 600px !important;
+    max-width: 700px !important;
     width: 95%;
     padding: 0 !important; /* Quitamos padding para controlar mejor las secciones */
     background: #ffffff !important;
@@ -1737,10 +1737,10 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .stock-variant-row {
     display: grid;
-    grid-template-columns: 85px 110px 55px 65px 1fr 65px;
-    gap: 8px;
+    grid-template-columns: 75px 105px 55px 45px 1fr 45px;
+    gap: 6px;
     align-items: center;
-    padding: 10px 12px;
+    padding: 8px 10px;
 }
 
 .stock-variant-header {
