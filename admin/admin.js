@@ -372,7 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.style.backgroundColor = '#f0f8ff'; // Highlight editing row
             }
             row.innerHTML = `
-                <div>${item.medida || '-'}</div>
                 <div>${item.almacenamiento}</div>
                 <div>${item.color}</div>
                 <div>${item.bateria ? item.bateria + '%' : '-'}</div>
@@ -403,8 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cargar datos en los inputs
         document.getElementById('item-storage').value = item.almacenamiento;
-        document.getElementById('item-measure').value = item.medida || '-';
-        
+
         // Si el color no está en el select, agregarlo temporalmente
         const colorSelect = document.getElementById('item-color');
         let optionExists = Array.from(colorSelect.options).some(opt => opt.value === item.color);
@@ -415,9 +413,9 @@ document.addEventListener('DOMContentLoaded', () => {
             colorSelect.appendChild(opt);
         }
         colorSelect.value = item.color;
-        
+
         document.getElementById('item-battery').value = item.bateria || '';
-        document.getElementById('item-notes').value = item.notes || item.notas || '';
+        document.getElementById('item-notes').value = item.notas || '';
 
         // Cargar imagen si existe
         if (item.imagen) {
@@ -432,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('btn-add-stock-item');
         btn.innerHTML = '✓';
         btn.style.background = '#007aff';
-        
+
         renderStockItems();
 
         // Scroll al formulario de variantes
@@ -456,7 +454,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btn-add-stock-item').onclick = () => {
-        const measure = document.getElementById('item-measure').value;
         const storage = document.getElementById('item-storage').value;
         const colorRaw = document.getElementById('item-color').value.trim();
         const color = normalizeColorValue(colorRaw);
@@ -466,7 +463,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (color) {
             const variantData = {
-                medida: measure,
                 almacenamiento: storage,
                 color: color,
                 bateria: battery,
@@ -577,9 +573,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'AirPods Pro (1ra Gen)', 'AirPods Pro 2', 'Airpods pro 3', 'AirPods Max'
         ],
         'Apple Watch': [
-            'Apple Watch SE', 'Apple Watch SE 2', 'Apple Watch SE 3', 
-            'Apple Watch Series 8', 'Apple Watch Series 9', 'Apple Watch Series 10', 
-            'Apple Watch Series 11', 'Apple Watch Ultra', 'Apple Watch Ultra 2'
+            'Apple Watch SE', 'Apple Watch SE3 44mm', 'Apple Watch Series 8',
+            'Apple Watch Series 9', 'Apple Watch Series 10', 'Apple Watch S11 42mm Silver',
+            'Apple Watch S11 46mm Jet Black', 'Apple Watch Ultra', 'Apple Watch Ultra 2'
         ],
         'Accesorios': [
             'Cargador Magsafe', 'Cable usb c', 'Cable Ligthning', 'Cable Tipo C a Tipo C',
@@ -653,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- Handlers de Envío --
     formProduct.onsubmit = async (e) => {
         e.preventDefault();
-        
+
         if (currentStockItems.length === 0) {
             alert("Debes agregar al menos una unidad en la grilla de stock.");
             return;
@@ -667,7 +663,6 @@ document.addEventListener('DOMContentLoaded', () => {
             nombre: document.getElementById('prod-name').value,
             categoria: document.getElementById('prod-cat').value,
             subcategoria: document.getElementById('prod-subcat').value,
-            medida: mainUnit.medida,
             almacenamiento: mainUnit.almacenamiento,
             color: mainUnit.color,
             precio_venta: Number(document.getElementById('prod-sell').value),
@@ -784,9 +779,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('prod-battery').value = p.battery || '';
 
         // Reset y Cargar Unidades en Stock (Variantes)
+        const isWatch = p.categoria === 'Apple Watch';
+        const isMeasure = p.almacenamiento && p.almacenamiento.includes('mm');
         currentStockItems = [{
-            medida: p.medida || '-',
-            almacenamiento: p.almacenamiento || '128GB',
+            medida: isWatch && isMeasure ? p.almacenamiento : (p.medida || '-'),
+            almacenamiento: isWatch && isMeasure ? '-' : (p.almacenamiento || '128GB'),
             color: p.color || 'Negro',
             bateria: p.battery || '',
             notas: p.notas || '',
