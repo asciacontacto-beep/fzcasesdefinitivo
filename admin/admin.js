@@ -542,12 +542,14 @@ document.addEventListener('DOMContentLoaded', () => {
             'iPad Pro 11"', 'iPad Pro 12.9"', 'iPad Pro 13" (M4)'
         ],
         'AirPods': [
-            'AirPods 2', 'AirPods 3', 'AirPods 4',
-            'AirPods Pro (1ra Gen)', 'AirPods Pro 2', 'AirPods Max'
+            'AirPods 2', 'AirPods 3', 'AirPods 4', 'Airpods con cancelacion',
+            'AirPods Pro (1ra Gen)', 'AirPods Pro 2', 'Airpods pro 3', 'AirPods Max'
         ],
         'Accesorios': [
             'Apple Watch SE', 'Apple Watch Series 8', 'Apple Watch Series 9', 'Apple Watch Series 10', 'Apple Watch Ultra', 'Apple Watch Ultra 2',
-            'Cargador MagSafe', 'Cable Tipo C a Lightning', 'Cable Tipo C a Tipo C', 'Adaptador de corriente 20W',
+            'Cargador Magsafe', 'Cable usb c', 'Cable Ligthning', 'Cable Tipo C a Tipo C',
+            'Adpaptador Usb c', 'Adaptador usb c Duo', 'Adaptador Usb c 60w', 'Adaptador de corriente 20W',
+            'Airtag', 'Airtag x4', 'Earpods', 'Magic Mouse',
             'Funda Silicone Case', 'Funda Clear Case', 'Funda FineWoven',
             'Apple Pencil (1ra Gen)', 'Apple Pencil (2da Gen)', 'Apple Pencil (USB-C)', 'Apple Pencil Pro'
         ]
