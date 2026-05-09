@@ -344,6 +344,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ejecutar una vez para estado inicial
             subcatInput.dispatchEvent(new Event('change'));
         }
+
+        // Trigger inicial para colores según categoría
+        const catInput = document.getElementById('prod-cat');
+        if (catInput) {
+            catInput.dispatchEvent(new Event('change'));
+        }
     }
 
     // -- Lógica de Unidades en Stock (Variaciones Específicas) --
@@ -587,6 +593,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const CATEGORY_COLORS = {
+        'MacBook': [
+            'Silver', 'Space Gray', 'Midnight', 'Starlight',
+            'Orange', 'Lavanda', 'Citrus', 'Indigo'
+        ],
+        'default': [
+            'Negro', 'Blanco', 'Dorado', 'Azul', 'Verde', 'Rosa', 'Teal',
+            'Orange', 'Lavanda', 'Citrus', 'Indigo',
+            'Natural Titanium', 'Desert Titanium', 'Midnight', 'Starlight',
+            'Space Gray', 'Silver'
+        ]
+    };
+
+    function updateColorDropdown(category) {
+        const select = document.getElementById('item-color');
+        if (!select) return;
+        const colors = CATEGORY_COLORS[category] || CATEGORY_COLORS['default'];
+        select.innerHTML = colors.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
     // -- Listeners de Botones Abrir --
     document.getElementById('btn-add-product').onclick = () => {
         formProduct.reset();
@@ -703,7 +729,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initImageUpload();
-    document.getElementById('prod-cat').onchange = (e) => updateModelDropdown(e.target.value);
+    document.getElementById('prod-cat').onchange = (e) => {
+        updateModelDropdown(e.target.value);
+        updateColorDropdown(e.target.value);
+    };
     document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => {
         b.closest('.modal-overlay').classList.add('hidden');
     });
