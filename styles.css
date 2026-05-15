@@ -1269,7 +1269,7 @@ a.contact-item:hover {
 .modal-content {
     background: var(--bg-main);
     width: 95%;
-    max-width: 1100px;
+    max-width: 1200px;
     max-height: 90vh; /* Constrain height */
     border-radius: 24px;
     position: relative;
@@ -1315,16 +1315,15 @@ a.contact-item:hover {
 }
 
 .modal-img {
-    flex: 0.8;
-    min-width: 280px;
-    background: #f5f5f7;
+    flex: 1.3;
+    min-width: 320px;
+    background: #ffffff; /* White background often better for 'contain' product shots */
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: stretch;
     overflow: hidden;
-    min-height: 420px;
-    max-height: 560px;
+    min-height: 500px;
 
     /* Comportamiento Sticky */
     position: sticky;
@@ -1336,15 +1335,17 @@ a.contact-item:hover {
 .modal-img img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
     display: block;
+    padding: 1rem; /* Small padding so it doesn't touch the edges when contained */
 }
 
 @media (max-width: 768px) {
     .modal-img {
-        min-height: 260px;
-        max-height: 320px;
+        min-height: 300px;
+        height: 50vh;
+        max-height: 450px;
         padding: 0;
         flex: none;
         width: 100%;
@@ -1353,8 +1354,9 @@ a.contact-item:hover {
     .modal-img img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        object-position: center top;
+        object-fit: contain;
+        object-position: center;
+        padding: 0.5rem;
     }
     .modal-info {
         padding: 1.5rem;
