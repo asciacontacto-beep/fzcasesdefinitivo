@@ -45,8 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==============================================================================
     const SUPABASE_URL = 'https://ffvswmjaxbvomowmigtr.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmdnN3bWpheGJ2b21vd21pZ3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNjU3MTEsImV4cCI6MjA4NzY0MTcxMX0.96OTSCQOwg5SfidmxpQ3yNA4Qfy8DEqhgR57CpmMAW8';
-    let _supabase = null;
-
     try {
         _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -54,8 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
         _supabase.auth.getSession().then(({ data, error }) => {
             if (error || !data.session) {
                 console.warn("No hay sesión válida en Supabase, redirigiendo...");
+                document.body.innerHTML = ''; // Limpia el DOM por seguridad
                 localStorage.removeItem('admin_logged');
                 window.location.href = '/admin/index.html';
+            } else {
+                // SESIÓN VÁLIDA: Revelar contenido
+                document.body.classList.remove('auth-hidden');
+                fetchData();
             }
         });
     } catch (e) {
@@ -819,8 +822,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modalProduct.classList.remove('hidden');
     };
 
-    // Inicializar carga de datos
-    fetchData();
+    // Inicializar carga de datos se movió dentro de la verificación de sesión
+    // fetchData();
 
     // Fecha Header
     const mainSubtitle = document.getElementById('main-subtitle');

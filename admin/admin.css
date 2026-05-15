@@ -339,6 +339,10 @@ body.admin-dashboard-body {
     color: var(--admin-accent);
 }
 
+.auth-hidden {
+    display: none !important;
+}
+
 .admin-sidebar {
     position: fixed;
     top: 0;
