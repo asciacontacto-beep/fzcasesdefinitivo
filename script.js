@@ -45,6 +45,8 @@ async function loadProductsFromSupabase() {
             color: p.color,
             battery: p.battery,
             image: p.imagen || "assets/iphone_case.png",
+            image2: p.imagen2 || null,
+            image3: p.imagen3 || null,
             features: allFeatures,
             notas: p.notas,
             bestseller: p.bestseller || false,
@@ -197,8 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             modalBody.innerHTML = `
-                <div class="modal-img">
-                    <img src="${product.image}" alt="${product.name}">
+                <div class="modal-img" id="modal-img-container">
+                    <img src="${product.image}" alt="${product.name}" id="modal-main-img">
+                    <div class="modal-img-thumbnails" id="modal-thumbnails"></div>
                 </div>
                 <div class="modal-info">
                     <div class="modal-top-meta">
@@ -238,17 +241,57 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            // =========================================================
+            // GALLERY: Build thumbnails from product base images
+            // =========================================================
+            const productGallery = [product.image, product.image2, product.image3].filter(Boolean);
+
+            function setMainImage(src) {
+                const mainImg = document.getElementById('modal-main-img');
+                if (mainImg) {
+                    mainImg.style.opacity = '0';
+                    setTimeout(() => {
+                        mainImg.src = src;
+                        mainImg.style.opacity = '1';
+                    }, 150);
+                }
+            }
+
+            function buildThumbnails(images, activeIndex = 0) {
+                const thumbsContainer = document.getElementById('modal-thumbnails');
+                if (!thumbsContainer) return;
+                if (images.length <= 1) {
+                    thumbsContainer.style.display = 'none';
+                    return;
+                }
+                thumbsContainer.style.display = 'flex';
+                thumbsContainer.innerHTML = '';
+                images.forEach((imgSrc, i) => {
+                    const thumb = document.createElement('button');
+                    thumb.className = 'modal-thumb' + (i === activeIndex ? ' active' : '');
+                    thumb.innerHTML = `<img src="${imgSrc}" alt="foto ${i + 1}">`;
+                    thumb.addEventListener('click', () => {
+                        thumbsContainer.querySelectorAll('.modal-thumb').forEach(t => t.classList.remove('active'));
+                        thumb.classList.add('active');
+                        setMainImage(imgSrc);
+                    });
+                    thumbsContainer.appendChild(thumb);
+                });
+            }
+
+            // Init gallery with product base images
+            buildThumbnails(productGallery, 0);
+
             // Variant Rendering (Unidades en Stock)
             const variantContainer = document.getElementById('variant-selectors');
             
             let allVariants = [];
-            // Siempre agregamos la unidad principal como la primera variante
             allVariants.push({
                 almacenamiento: product.storage,
                 color: product.color,
                 bateria: product.battery,
                 notas: product.notas,
-                imagen: product.image,
+                imagen: null, // Main product uses gallery
                 isMain: true
             });
 
@@ -275,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const colorText = unit.color || '';
                     const measureText = unit.medida && unit.medida !== '-' ? unit.medida : '';
                     
-                    // Build the main label
                     const parts = [measureText, storageText, colorText].filter(Boolean);
                     const mainLabel = parts.join(' · ');
                     
@@ -295,10 +337,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.classList.add('active');
                         selectedUnit = unit;
                         
-                        // Cambiar imagen si la unidad tiene una propia
-                        const modalImg = document.querySelector('.modal-img img');
-                        if (modalImg) {
-                            modalImg.src = unit.imagen || product.image;
+                        // Image logic: variant image overrides; otherwise restore product gallery
+                        if (unit.imagen && !unit.isMain) {
+                            // Variant has its own image — show it alone
+                            setMainImage(unit.imagen);
+                            buildThumbnails([unit.imagen], 0);
+                        } else {
+                            // No variant image — show product gallery
+                            setMainImage(productGallery[0]);
+                            buildThumbnails(productGallery, 0);
                         }
                         
                         updateWALink();
@@ -306,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     grid.appendChild(btn);
                 });
                 
-                // Auto-seleccionar la primera variante
+                // Auto-select first
                 if (allVariants.length > 0) {
                     selectedUnit = allVariants[0];
                     updateWALink();
