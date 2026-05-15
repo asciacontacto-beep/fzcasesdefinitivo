@@ -93,18 +93,6 @@
                     <span class="nav-text">Ventas</span>
                     <span class="nav-badge" id="badge-sales">0</span>
                 </li>
-                <li class="nav-item" data-target="view-canje">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
-                            fill="none">
-                            <polyline points="23 4 23 10 17 10"></polyline>
-                            <polyline points="1 20 1 14 7 14"></polyline>
-                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                        </svg>
-                    </span>
-                    <span class="nav-text">Plan Canje</span>
-                    <span class="nav-badge" id="badge-canjes">0</span>
-                </li>
             </ul>
         </nav>
 
@@ -205,9 +193,8 @@
 
                 <div class="welcome-box mt-2">
                     <h2>¡Bienvenido al Panel FZCASES!</h2>
-                    <p>Usa el menú lateral o las pestañas de arriba para comenzar a registrar tu inventario, asentar
-                        ventas y verificar solicitudes de planes recambio. Todo será guardado localmente de manera
-                        instántanea.</p>
+                    <p>Usa el menú lateral o las pestañas de arriba para comenzar a registrar tu inventario y asentar
+                        ventas. Todo será guardado de manera instántanea.</p>
                 </div>
             </div>
 
@@ -353,37 +340,7 @@
                 </div>
             </div>
 
-            <!-- CONTENIDO TAB CANJE -->
-            <div id="view-canje" class="tab-content" style="display:none;">
-                <div class="table-header">
-                    <div class="filters-box">
-                        <span style="color:#6e6e73; font-size:0.9rem;">Historial de Solicitudes Pendientes</span>
-                    </div>
-                </div>
 
-                <div class="table-container">
-                    <table class="admin-table" id="table-canjes">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Modelo</th>
-                                <th>Estado Físico</th>
-                                <th>Batería</th>
-                                <th>Status</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-canjes">
-                            <!-- JS Injection -->
-                        </tbody>
-                    </table>
-
-                    <div class="empty-state hidden" id="empty-canjes">
-                        <div class="empty-icon"></div>
-                        <h3>No hay solicitudes de canje entrantes</h3>
-                    </div>
-                </div>
-            </div>
 
         </div> <!-- /panels-wrapper -->
 

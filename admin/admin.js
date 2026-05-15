@@ -158,6 +158,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('kpi-net-profit').textContent = formatMoney(grossRevenue - totalCost);
     }
 
+    // Filtro de productos
+    const searchProducts = document.getElementById('search-products');
+    if (searchProducts) {
+        searchProducts.addEventListener('input', (e) => {
+            renderProductos(e.target.value);
+        });
+    }
+
     function renderProductos(filterText = "") {
         const tbody = document.getElementById('tbody-products');
         if (!tbody) return;
