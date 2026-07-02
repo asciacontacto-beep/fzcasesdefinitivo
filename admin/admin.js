@@ -438,6 +438,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div>${(item.notas && item.notas.match(/\[SIM: (.*?)\]/)) ? item.notas.match(/\[SIM: (.*?)\]/)[1] : '-'}</div>
                 <div>${(item.notas && item.notas.match(/\[CAJA: (.*?)\]/)) ? item.notas.match(/\[CAJA: (.*?)\]/)[1] : '-'}</div>
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${(item.notas || '').replace(/\[SIM: .*?\]\s*/g, '').replace(/\[CAJA: .*?\]\s*/g, '')}</div>
+                <div style="text-align: center;">
+                    ${item.imagen ? `<img src="${item.imagen}" class="variant-photo-thumb" title="Foto propia de esta variante">` : `<span style="color:#c7c7cc; font-size:0.7rem;">&mdash;</span>`}
+                </div>
                 <div style="text-align: center; white-space: nowrap;">
                     <button type="button" class="expand-btn" style="display:inline-block; margin-right: 5px;" onclick="window.editStockItem(${index})" title="Editar">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -464,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Cargar datos en los inputs
         document.getElementById('item-storage').value = item.almacenamiento;
 
-        // Si el color no estÃ¡ en el select, agregarlo temporalmente
+        // Si el color no está en el select, agregarlo temporalmente
         const colorSelect = document.getElementById('item-color');
         let optionExists = Array.from(colorSelect.options).some(opt => opt.value === item.color);
         if (!optionExists && item.color) {
@@ -482,9 +485,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const boxMatch = item.notas && item.notas.match(/\[CAJA: (.*?)\]/);
         document.getElementById('item-box').value = boxMatch ? boxMatch[1] : '-';
 
+        // Restaurar imagen de la variante (si tiene)
+        window.clearVariantImage();
+        if (item.imagen) {
+            document.getElementById('item-image-data').value = item.imagen;
+            const previewImg = document.getElementById('item-image-preview-img');
+            const previewText = document.getElementById('item-image-preview');
+            if (previewImg) {
+                previewImg.src = item.imagen;
+                previewImg.style.display = 'block';
+                if (previewImg.previousElementSibling) previewImg.previousElementSibling.style.display = 'none';
+            }
+            previewText.style.display = 'block';
+            previewText.innerHTML = 'Imagen cargada <button type="button" onclick="window.clearVariantImage()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px;">(Quitar)</button>';
+        }
+
         editingVariantIndex = index;
         const btn = document.getElementById('btn-add-stock-item');
-        btn.innerHTML = 'ï¿½S';
+        btn.innerHTML = '&check;';
         btn.style.background = '#007aff';
 
         renderStockItems();
@@ -495,9 +513,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.clearVariantImage = () => {
         document.getElementById('item-image-data').value = '';
-        document.getElementById('item-image-file').value = '';
         document.getElementById('item-image-preview').style.display = 'none';
-        document.getElementById('item-image-preview').innerHTML = 'Listo!';
+        document.getElementById('item-image-preview').innerHTML = '';
+        const previewImg = document.getElementById('item-image-preview-img');
+        if (previewImg) {
+            previewImg.src = '';
+            previewImg.style.display = 'none';
+            if (previewImg.previousElementSibling) previewImg.previousElementSibling.style.display = '';
+        }
     };
 
     function resetEditVariantState() {
@@ -526,11 +549,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (color) {
+            const imageData = document.getElementById('item-image-data').value;
             const variantData = {
                 almacenamiento: storage,
                 color: color,
                 bateria: battery,
-                notas: notes.trim()
+                notas: notes.trim(),
+                imagen: imageData || null
             };
 
             if (editingVariantIndex >= 0) {
@@ -545,13 +570,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('item-battery').value = '';
             document.getElementById('item-sim').value = '-';
             document.getElementById('item-box').value = '-';
-            document.getElementById('item-image-data').value = '';
-            document.getElementById('item-image-file').value = '';
-            document.getElementById('item-image-preview').style.display = 'none';
             document.getElementById('item-notes').value = '';
+            window.clearVariantImage();
             renderStockItems();
         } else {
-            alert("Por favor, ingresÃ¡ al menos el color.");
+            alert("Por favor, ingresá al menos el color.");
         }
     };
 
@@ -625,24 +648,25 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        // ImÃ¡genes de variantes
+        // Imágenes de variantes
         const vTrigger = document.getElementById('btn-trigger-variant-file');
-        const vFile = document.getElementById('item-image-file');
         const vHidden = document.getElementById('item-image-data');
         const vPreview = document.getElementById('item-image-preview');
+        const vPreviewImg = document.getElementById('item-image-preview-img');
 
-        if (vTrigger && vFile) {
-            vTrigger.onclick = () => vFile.click();
-            vFile.onchange = e => {
-                if (e.target.files && e.target.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = ev => {
-                        vHidden.value = ev.target.result;
-                        vPreview.style.display = 'block';
-                        vPreview.innerHTML = 'Imagen cargada <button type="button" onclick="window.clearVariantImage()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px;">(Quitar)</button>';
-                    };
-                    reader.readAsDataURL(e.target.files[0]);
-                }
+        if (vTrigger) {
+            vTrigger.onclick = () => {
+                window.uploadAndCompressImage((base64) => {
+                    vHidden.value = base64;
+                    vPreview.style.display = 'block';
+                    vPreview.innerHTML = 'Imagen cargada <button type="button" onclick="window.clearVariantImage()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px;">(Quitar)</button>';
+                    if (vPreviewImg) {
+                        vPreviewImg.src = base64;
+                        vPreviewImg.classList.remove('hidden');
+                        vPreviewImg.style.display = 'block';
+                        if (vPreviewImg.previousElementSibling) vPreviewImg.previousElementSibling.style.display = 'none';
+                    }
+                });
             };
         }
     }
@@ -1201,6 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset unidades stock
         currentStockItems = [];
         resetEditVariantState();
+        window.clearVariantImage();
         renderStockItems();
 
         // Reset chips

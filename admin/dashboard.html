@@ -985,6 +985,7 @@
                                         <div>SIM</div>
                                         <div>Caja</div>
                                         <div>Notas</div>
+                                        <div style="text-align: center;">Foto</div>
                                         <div style="text-align: center;">Acc</div>
                                     </div>
                                     <div id="tbody-stock-items" class="stock-items-scroll">
@@ -1051,6 +1052,19 @@
                                     <div class="input-col">
                                         <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Notas</div>
                                         <input type="text" id="item-notes" placeholder="Notas..." class="tech-input">
+                                    </div>
+                                    <div class="input-col" style="align-items: center;">
+                                        <div style="font-size: 0.65rem; color: transparent; margin-bottom: 4px; font-weight: 600;">Foto</div>
+                                        <div class="variant-photo-box" id="btn-trigger-variant-file" title="Foto de esta variante (opcional)">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                                <circle cx="12" cy="13" r="4"></circle>
+                                            </svg>
+                                            <img id="item-image-preview-img" class="hidden" style="display:none;">
+                                        </div>
+                                        <input type="file" id="item-image-file" accept="image/*" style="display:none">
+                                        <input type="hidden" id="item-image-data" value="">
+                                        <div id="item-image-preview" style="display:none; font-size: 0.65rem; margin-top: 2px;"></div>
                                     </div>
                                     <div class="input-col">
                                         <div style="font-size: 0.65rem; color: transparent; margin-bottom: 4px; font-weight: 600;">Acc</div>

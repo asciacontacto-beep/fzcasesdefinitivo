@@ -1742,11 +1742,40 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .stock-variant-row {
     display: grid;
-    grid-template-columns: 75px 135px 65px 85px 80px 1fr 50px;
+    grid-template-columns: 75px 135px 65px 85px 80px 1fr 60px 50px;
     gap: 8px;
     align-items: center;
     padding: 8px 10px;
-    min-width: 700px;
+    min-width: 760px;
+}
+
+.variant-photo-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1.5px dashed #d2d2d7;
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    color: #8e8e93;
+    flex-shrink: 0;
+}
+
+.variant-photo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.variant-photo-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #eee;
 }
 
 .stock-variant-header {
