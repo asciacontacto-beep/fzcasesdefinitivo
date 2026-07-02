@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | FZCASES</title>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Autenticación Bloqueadora -->
+    <script>
+        // Mantenemos la verificación rápida para que no parpadee
+        if (localStorage.getItem('admin_logged') !== 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../styles.css"> <!-- Base reset + variables -->
+    <link rel="stylesheet" href="admin.css"> <!-- Administrador Custom CSS -->
+</head>
+
+<body class="admin-dashboard-body auth-hidden">
+
+    <!-- Mobile Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-open">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- NAVEGACI�N SIDEBAR -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <button class="mobile-menu-close" id="mobile-menu-close">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+
+        <div class="sidebar-header">
+            <h2>FZCASES</h2>
+            <p>Panel Admin</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item active" data-target="view-dashboard">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Dashboard</span>
+                </li>
+                <li class="nav-item" data-target="view-productos">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                            </path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Productos</span>
+                    <span class="nav-badge" id="badge-products">0</span>
+                </li>
+                <li class="nav-item" data-target="view-ventas">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Ventas</span>
+                    <span class="nav-badge" id="badge-sales">0</span>
+                </li>
+                <li class="nav-item" data-target="view-hero" style="cursor: pointer;">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Configuración del Sitio</span>
+                </li>
+                <li class="nav-item" data-target="view-nosotros" style="cursor: pointer;">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Página: Nosotros</span>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+
+        <!-- HEADER GENERAL DASHBOARD -->
+        <header class="main-header">
+            <div class="header-left">
+                <h1 id="main-title">Dashboard</h1>
+                <p id="main-subtitle">Cargando fecha...</p>
+            </div>
+            <div class="header-right">
+                <div class="admin-profile">
+                    <div class="avatar">A</div>
+                    <span class="profile-name">Admin</span>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- SECCI�N 2: PANELES CONTENIDO VISTAS -->
+        <div class="panels-wrapper">
+
+            <!-- CONTENIDO TAB DASHBOARD -->
+            <div id="view-dashboard" class="tab-content active">
+                <section class="kpi-grid">
+                    <!-- Tarjeta 1 -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-products">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <path
+                                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                    </path>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive">Catálogo</span>
+                        </div>
+                        <div class="kpi-number" id="kpi-total-prod">0</div>
+                        <div class="kpi-label">Productos totales</div>
+                    </div>
+                    <!-- Tarjeta 2 -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-sales">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive">+12%</span>
+                        </div>
+                        <div class="kpi-number" id="kpi-total-sales">0</div>
+                        <div class="kpi-label">Ventas este mes</div>
+                    </div>
+                    <!-- Tarjeta 3 -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-revenue">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive">Bruto</span>
+                        </div>
+                        <div class="kpi-number" id="kpi-gross-revenue">$0</div>
+                        <div class="kpi-label">Ingresos totales</div>
+                    </div>
+                    <!-- Tarjeta 4 -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-profit">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive">Neto</span>
+                        </div>
+                        <div class="kpi-number text-success" id="kpi-net-profit">$0</div>
+                        <div class="kpi-label">Ganancia real</div>
+                    </div>
+                </section>
+
+                <div class="welcome-box mt-2">
+                    <h2>¡Bienvenido al Panel FZCASES!</h2>
+                    <p>Usa el menú lateral o las pestañas de arriba para comenzar a registrar tu inventario y asentar
+                        ventas. Todo será guardado de manera instántanea.</p>
+                </div>
+            </div>
+
+            <!-- CONTENIDO TAB PRODUCTOS -->
+            <div id="view-productos" class="tab-content" style="display:none;">
+                <div class="table-header">
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="#9ca3af" stroke-width="2" fill="none">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="search-products" placeholder="Buscar productos...">
+                    </div>
+                    <select id="admin-filter-category" class="form-input" style="width: auto; flex: none; min-width: 150px;">
+                        <option value="Todas">Todas las categorías</option>
+                        <option value="iPhone">iPhone</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="iPad">iPad / Tablets</option>
+                        <option value="MacBook">MacBook / Notebooks</option>
+                        <option value="Apple Watch">Apple Watch / Smartwatches</option>
+                        <option value="Accesorios">Accesorios</option>
+                    </select>
+                    <select id="admin-filter-model" class="form-input" style="width: auto; flex: none; min-width: 150px;">
+                        <option value="Todos">Todos los modelos</option>
+                    </select>
+                    <button class="btn btn-primary" id="btn-add-product">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Nuevo Producto
+                    </button>
+                    <input type="file" id="hero-file-upload" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="table-container">
+                    <table class="admin-table" id="table-products">
+                        <thead class="tech-thead">
+                            <tr>
+                                <th style="width: 40px;"></th> <!-- Toggle Expand -->
+                                <th>Imagen</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Precio (USD)</th>
+                                <th>Costo (USD)</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-products">
+                            <!-- JS Injection -->
+                        </tbody>
+                    </table>
+
+                    <div class="empty-state hidden" id="empty-products">
+                        <div class="empty-icon"></div>
+                        <h3>No hay productos todavía</h3>
+                        <button class="btn btn-primary mt-2"
+                            onclick="document.getElementById('btn-add-product').click()">Agregar tu primer
+                            producto</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENIDO TAB VENTAS -->
+            <div id="view-ventas" class="tab-content" style="display:none;">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-sales">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive">Mensual</span>
+                        </div>
+                        <div class="kpi-number" id="ventas-total-sales">0</div>
+                        <div class="kpi-label">Volumen de ventas</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-products">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <path
+                                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                    </path>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive">Costos</span>
+                        </div>
+                        <div class="kpi-number" id="ventas-total-cost">$0</div>
+                        <div class="kpi-label">Inversión acumulada</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-profit">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive">Neto</span>
+                        </div>
+                        <div class="kpi-number text-success" id="ventas-net-profit">$0</div>
+                        <div class="kpi-label">Ganancia real</div>
+                    </div>
+                </div>
+
+                <div class="table-header mt-2">
+                    <div class="filters-box">
+                        <span style="color:#6e6e73; font-size:0.9rem;">Registros de Ventas Recientes</span>
+                    </div>
+                    <button class="btn btn-success" id="btn-add-sale">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Registrar Venta
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="admin-table" id="table-sales">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cliente</th>
+                                <th>Cant.</th>
+                                <th>Venta</th>
+                                <th>Costo</th>
+                                <th>Ganancia</th>
+                                <th>Pago</th>
+                                <th>Info</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-sales">
+                            <!-- JS Injection -->
+                        </tbody>
+                    </table>
+
+                    <div class="empty-state hidden" id="empty-sales">
+                        <div class="empty-icon"></div>
+                        <h3>Aún no has registrado ninguna venta</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENIDO TAB PORTADAS -->
+            <div id="view-hero" class="tab-content" style="display:none;">
+                <div class="table-header">
+                    <h2>Configuración del Sitio</h2>
+                    <button class="btn btn-primary" id="btn-upload-hero" style="background-color: #5e5ce6;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Subir Nueva Portada
+                    </button>
+                    <input type="file" id="hero-gallery-upload" accept="image/*" style="display: none;">
+                </div>
+
+                <!-- Previsualizador -->
+                <div style="background-color: #1c1c1e; border-radius: 12px; margin-bottom: 2rem; padding: 2rem; border: 1px solid #333;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="margin: 0; color: #fff;">Previsualización en Vivo</h3>
+                            <p style="color: #6e6e73; font-size: 0.85rem; margin: 4px 0 0;">Navegá entre las fotos activas con las flechas para ver cómo queda el carrusel.</p>
+                        </div>
+                        <div id="prev-counter" style="background: rgba(255,255,255,0.08); border: 1px solid #444; border-radius: 20px; padding: 4px 14px; font-size: 0.8rem; color: #aaa; white-space: nowrap;">Sin portadas activas</div>
+                    </div>
+
+                    <!-- Mini-Carousel -->
+                    <div id="admin-preview-carousel" style="position: relative; width: 100%; height: 340px; border-radius: 10px; overflow: hidden; background: #111;">
+
+                        <!-- Slides (populated by JS) -->
+                        <div id="admin-prev-slides" style="position: absolute; inset: 0;">
+                            <div class="adm-prev-slide active" style="position:absolute;inset:0;opacity:1;transition:opacity 0.7s ease;">
+                                <img id="hero-preview-img" src="../assets/hero-fz.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.65;">
+                            </div>
+                        </div>
+
+                        <!-- Overlay gradient -->
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.3) 100%); z-index: 2; pointer-events: none;"></div>
+
+                        <!-- Arrow Left -->
+                        <button id="adm-prev-btn" onclick="window.adminPreviewNav(-1)" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:20;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+
+                        <!-- Arrow Right -->
+                        <button id="adm-next-btn" onclick="window.adminPreviewNav(1)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:20;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+
+                        <!-- Dots -->
+                        <div id="adm-prev-dots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:7px;"></div>
+
+                        <!-- Text overlay -->
+                        <div style="position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+                            <div style="text-align: center; padding: 0 3rem;">
+                                <h2 id="prev-title" style="font-size: 2rem; font-weight: 800; letter-spacing: -1px; margin: 0; line-height: 1.2; color: #fff;">Tu próximo iPhone <br>empieza acá.</h2>
+                                <p id="prev-subtitle" style="font-size: 0.95rem; color: #f5f5f7; margin-top: 10px;">Equipos sellados y usados con el respaldo que solo FZCASES te puede dar.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Grid de config: Texto + Fuente + Logo -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+
+                    <!-- Card: Textos del Hero -->
+                    <div class="tech-card" style="padding: 1.5rem;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                            TEXTOS DEL HERO
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Título Principal</label>
+                                <input id="cfg-hero-title" type="text" class="admin-input" placeholder="Tu próximo iPhone empieza acá." style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Subtítulo</label>
+                                <input id="cfg-hero-subtitle" type="text" class="admin-input" placeholder="Equipos sellados y usados con el respaldo de FZCASES." style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Color del Texto</label>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input id="cfg-hero-color" type="color" value="#ffffff" style="width: 44px; height: 36px; border: none; border-radius: 8px; cursor: pointer; padding: 2px; background: transparent;">
+                                    <span id="cfg-hero-color-label" style="font-size: 0.85rem; color: #aaa;">#ffffff</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Tipografía -->
+                    <div class="tech-card" style="padding: 1.5rem;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                            TIPOGRAFÍA DEL TÍTULO
+                        </div>
+                        <select id="cfg-hero-font" class="admin-input" style="width: 100%;">
+                            <option value="Inter">Inter (Moderna)</option>
+                            <option value="Montserrat">Montserrat (Bold y limpia)</option>
+                            <option value="Playfair Display">Playfair Display (Elegante)</option>
+                            <option value="Bebas Neue">Bebas Neue (Impactante)</option>
+                            <option value="Oswald">Oswald (Compacta)</option>
+                            <option value="Raleway">Raleway (Fina y premium)</option>
+                            <option value="Poppins">Poppins (Redondeada)</option>
+                            <option value="Anton">Anton (Display bold)</option>
+                        </select>
+                        <p style="color: #6e6e73; font-size: 0.75rem; margin-top: 8px;">El cambio se reflejará en el previsualizador y en la tienda.</p>
+                    </div>
+
+                    <!-- Card: Logo -->
+                    <div class="tech-card" style="padding: 1.5rem; grid-column: span 2;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            LOGO DE LA TIENDA
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1.5rem;">
+                            <div style="background: #111; border-radius: 8px; padding: 1rem; border: 1px solid #333;">
+                                <img id="logo-preview" src="../assets/logo.png" alt="Logo actual" style="height: 50px; object-fit: contain;">
+                            </div>
+                            <div style="flex: 1;">
+                                <p style="color: #6e6e73; font-size: 0.85rem; margin-bottom: 0.75rem;">Al subir un logo nuevo, se actualizará automáticamente en toda la página (navbar, sidebar, footer).</p>
+                                <button class="btn btn-primary" id="btn-upload-logo" style="background-color: #636366;">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    Subir nuevo logo
+                                </button>
+                                <input type="file" id="logo-upload" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card: Estilos de Fondo -->
+                    <div class="tech-card" style="padding: 1.5rem; grid-column: span 2;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            ESTILOS DE FONDO
+                        </div>
+                        <label style="display: flex; align-items: center; cursor: pointer; color: #1d1d1f; font-size: 0.95rem; font-weight: 600;">
+                            <input type="checkbox" id="cfg-animated-bg-enabled" checked style="margin-right: 8px; width: 16px; height: 16px;">
+                            Habilitar fondo animado (Efecto Aurora) en la sección principal del Inicio (donde aparecen los productos destacados)
+                        </label>
+                        <p style="color: #6e6e73; font-size: 0.85rem; margin-top: 8px; margin-bottom: 1.5rem;">Si lo desactivas, la página principal tendrá un fondo blanco liso estándar, dándole un estilo más clásico y minimalista.</p>
+                        
+                        <div style="border-top: 1px solid #e5e5ea; padding-top: 1rem;">
+                            <label style="font-size: 0.75rem; color: #1d1d1f; margin-bottom: 4px; display: block; font-weight: 600;">Fondo Personalizado (Opcional)</label>
+                            <p style="color: #6e6e73; font-size: 0.8rem; margin-top: 0; margin-bottom: 10px;">Si agregas una foto aquí, reemplazará el fondo del inicio (ideal si el animado está desactivado).</p>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="cfg-bg-img" class="admin-input" placeholder="URL de la Imagen (ej. https://...)" style="width: 100%;">
+                                <button type="button" class="btn btn-secondary" onclick="window.uploadAndCompressImage((base64) => { document.getElementById('cfg-bg-img').value = base64; })" style="padding: 0 12px; white-space: nowrap;">Subir Foto</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Navegación de Categorías -->
+                    <div class="tech-card" style="padding: 1.5rem; grid-column: span 2;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                                NAVEGACI�N DE CATEGORÍAS
+                            </div>
+                            <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 0.85rem; font-weight: normal; margin: 0;">
+                                <input type="checkbox" id="cfg-catnav-enabled" checked style="margin-right: 8px; width: 16px; height: 16px;">
+                                Mostrar sección
+                            </label>
+                        </div>
+                        <p style="color: #6e6e73; font-size: 0.85rem; margin-bottom: 1rem;">Modifica el nombre, enlace e imagen de cada categoría. Las imágenes recomendadas son PNG con fondo transparente.</p>
+                        
+                        <div id="catnav-items-container" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+
+                    <!-- Card: Plan Canje -->
+                    <div class="tech-card" style="padding: 1.5rem; grid-column: span 2;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+                            SECCI�N PLAN CANJE (INICIO)
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 0.75rem; color: #6e6e73; margin-bottom: 4px; display: block;">Título Principal</label>
+                                <input type="text" id="cfg-canje-title" class="admin-input" placeholder="¿Querés cambiar tu iPhone?" style="width: 100%;">
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 0.75rem; color: #6e6e73; margin-bottom: 4px; display: block;">Subtítulo / Texto</label>
+                                <textarea id="cfg-canje-subtitle" class="admin-input" placeholder="Tasamos tu equipo usado al instante..." style="width: 100%; height: 60px;"></textarea>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 0.75rem; color: #6e6e73; margin-bottom: 4px; display: block;">Imagen Representativa (PNG transparente ideal)</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="cfg-canje-img" class="admin-input" placeholder="URL de la Imagen" style="width: 100%;">
+                                    <button type="button" class="btn btn-secondary" onclick="window.uploadAndCompressImage((base64) => { document.getElementById('cfg-canje-img').value = base64; })" style="padding: 0 12px; white-space: nowrap;">Subir Foto</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Garantía -->
+                    <div class="tech-card" style="padding: 1.5rem; grid-column: span 2;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            SECCI�N GARANTÍA (INICIO)
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="font-size: 0.75rem; color: #6e6e73; margin-bottom: 4px; display: block;">Título Arriba (Garantía)</label>
+                                <input type="text" id="cfg-garantia-title1" class="admin-input" placeholder="Garantía" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.75rem; color: #6e6e73; margin-bottom: 4px; display: block;">Título Abajo (Y más info)</label>
+                                <input type="text" id="cfg-garantia-title2" class="admin-input" placeholder="Y MÁS INFORMACI�N" style="width: 100%;">
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 0.75rem; color: #6e6e73; margin-bottom: 4px; display: block;">Texto de Descripción</label>
+                                <textarea id="cfg-garantia-text" class="admin-input" placeholder="La garantía siempre fue, es y será la oficial..." style="width: 100%; height: 60px;"></textarea>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 0.75rem; color: #6e6e73; margin-bottom: 4px; display: block;">Imagen Decorativa</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="cfg-garantia-img" class="admin-input" placeholder="URL de la Imagen" style="width: 100%;">
+                                    <button type="button" class="btn btn-secondary" onclick="window.uploadAndCompressImage((base64) => { document.getElementById('cfg-garantia-img').value = base64; })" style="padding: 0 12px; white-space: nowrap;">Subir Foto</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Config Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Redes Sociales y Links -->
+                    <div class="tech-card" style="padding: 1.5rem;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            REDES SOCIALES Y CONTACTO (PIE DE PÁGINA)
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Enlace de Instagram</label>
+                                <input id="cfg-footer-ig" type="text" class="admin-input" placeholder="https://instagram.com/fzcases" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Enlace de Facebook</label>
+                                <input id="cfg-footer-fb" type="text" class="admin-input" placeholder="https://facebook.com/fzcases" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Enlace de TikTok</label>
+                                <input id="cfg-footer-tt" type="text" class="admin-input" placeholder="https://tiktok.com/@fzcases" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">WhatsApp (Número con código)</label>
+                                <input id="cfg-footer-wa-num" type="text" class="admin-input" placeholder="5491100000000" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">WhatsApp (Texto visible)</label>
+                                <input id="cfg-footer-wa-txt" type="text" class="admin-input" placeholder="+54 9 11 0000-0000" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Email de Contacto</label>
+                                <input id="cfg-footer-email" type="text" class="admin-input" placeholder="info@fzcases.com" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Textos Generales del Footer -->
+                    <div class="tech-card" style="padding: 1.5rem;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            TEXTOS DEL PIE DE PÁGINA
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div>
+                                <label style="font-size: 0.8rem; color: #6e6e73; display: block; margin-bottom: 4px;">Descripción del Footer</label>
+                                <textarea id="cfg-footer-desc" class="admin-input" placeholder="Especialistas en la venta de equipos Apple premium..." style="width: 100%; height: 100px; resize: vertical;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón guardar -->
+                <div style="text-align: right; margin-bottom: 2rem;">
+                    <button class="btn btn-primary" id="btn-save-hero-config" style="background: linear-gradient(135deg, #5e5ce6, #0071e3); padding: 0.8rem 2rem; font-size: 1rem;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Guardar Configuración
+                    </button>
+                </div>
+
+                <!-- Gallery de Portadas -->
+                <h3 style="margin-bottom: 0.5rem;">Galería de Portadas</h3>
+                <p style="color: #6e6e73; font-size: 0.85rem; margin-bottom: 1rem;">Las portadas marcadas con <strong style="color:#5e5ce6;">ACTIVA</strong> se mostrarán en el carrusel. Puedes activar varias para generar un carrusel automático.</p>
+                <div id="hero-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;">
+                    <!-- JS Injection -->
+                </div>
+            </div>
+
+            <!-- CONTENIDO TAB NOSOTROS -->
+            <div id="view-nosotros" class="tab-content" style="display:none;">
+                <div class="kpi-header" style="margin-bottom: 2rem;">
+                    <h2>Configuración de la página "Sobre Nosotros"</h2>
+                    <button class="btn btn-primary" id="btn-save-nosotros" style="background: linear-gradient(135deg, #5e5ce6, #0071e3); padding: 0.8rem 2rem; font-size: 1rem;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Guardar Cambios
+                    </button>
+                </div>
+
+                <!-- Formularios -->
+                <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+                    
+                    <!-- Historia -->
+                    <div class="tech-card" style="padding: 1.5rem;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">NUESTRA HISTORIA (LÍNEA DE TIEMPO)</div>
+                        <div id="nosotros-timeline-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Inyectado por JS -->
+                        </div>
+                        <button class="btn btn-secondary mt-2" id="btn-add-timeline">+ Agregar Hito</button>
+                    </div>
+
+                    
+
+
+
+                </div>
+            </div>
+
+        </div> <!-- /panels-wrapper -->
+
+    </main>
+
+    <!-- ==============================================================================
+         MODALES
+    =============================================================================== -->
+
+    <!-- MODAL 1: AGREGAR/EDITAR PRODUCTO -->
+    <div class="modal-overlay hidden" id="modal-product">
+        <div class="modal-card modal-card-tech">
+            <!-- Header Modern -->
+            <div class="tech-header">
+                <div class="tech-header-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                        </path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="tech-header-text">
+                    <h3 id="modal-prod-title">Nuevo Producto</h3>
+                    <p>Completá los datos del equipo</p>
+                </div>
+                <button class="tech-close" data-close="modal-product">&times;</button>
+            </div>
+
+            <form id="form-product" novalidate>
+                <div class="tech-body-scroll">
+                    <input type="hidden" id="prod-id" value="">
+
+                    <!-- CARD 2: EQUIPO -->
+                    <div class="tech-card">
+                        <div class="tech-card-label">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                                <circle cx="6" cy="6" r="1"></circle>
+                                <circle cx="6" cy="18" r="1"></circle>
+                            </svg>
+                            DATOS DEL EQUIPO
+                        </div>
+
+                        <div class="tech-field">
+                            <label>Categoría</label>
+                            <div class="chip-container scrollable" id="container-category">
+                                <button type="button" class="chip active" data-val="iPhone">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none">
+                                        <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+                                        <line x1="12" y1="18" x2="12" y2="18"></line>
+                                    </svg>
+                                    iPhone
+                                </button>
+                                <button type="button" class="chip" data-val="MacBook">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none">
+                                        <rect x="2" y="4" width="20" height="12" rx="2" ry="2"></rect>
+                                        <line x1="2" y1="20" x2="22" y2="20"></line>
+                                    </svg>
+                                    MacBook
+                                </button>
+                                <button type="button" class="chip" data-val="iPad">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none">
+                                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                                        <line x1="12" y1="18" x2="12" y2="18"></line>
+                                    </svg>
+                                    iPad
+                                </button>
+                                <button type="button" class="chip" data-val="Samsung">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                      <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                                    </svg>
+                                    Samsung
+                                </button>
+                                <button type="button" class="chip" data-val="AirPods">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none">
+                                        <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                                        <path
+                                            d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z">
+                                        </path>
+                                    </svg>
+                                    AirPods
+                                </button>
+                                <button type="button" class="chip" data-val="Apple Watch">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none">
+                                        <path d="M6 18h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"></path>
+                                        <path d="M9 6V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path>
+                                        <path d="M9 18v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3"></path>
+                                    </svg>
+                                    Apple Watch
+                                </button>
+                                <button type="button" class="chip" data-val="Accesorios">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                        <path d="M2 17l10 5 10-5"></path>
+                                        <path d="M2 12l10 5 10-5"></path>
+                                    </svg>
+                                    Accesorios
+                                </button>
+                                <input type="hidden" id="prod-cat" value="iPhone">
+                            </div>
+                        </div>
+
+                        <div class="tech-field">
+                            <label>Modelo / Equipo</label>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select id="prod-name" class="tech-select" style="flex: 1;">
+                                    <!-- Se rellena dinámicamente -->
+                                </select>
+                                <button type="button" id="btn-add-model" class="btn btn-secondary" style="padding: 0 10px; font-size: 1.2rem; font-weight: bold; background: #e5e5ea; border: none; border-radius: 8px; height: 38px; cursor: pointer;" title="Agregar nuevo modelo">+</button>
+                                <button type="button" id="btn-del-model" class="btn btn-secondary" style="padding: 0 10px; font-size: 1.1rem; background: #ffebee; color: #d32f2f; border: none; border-radius: 8px; height: 38px; cursor: pointer;" title="Eliminar modelo seleccionado">�x️</button>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="tech-field">
+                                <label>Condición</label>
+                                <div class="chip-container-pills" id="container-condition">
+                                    <button type="button" class="chip-pill active" data-val="Nuevo">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor"
+                                            stroke-width="2.5" fill="none">
+                                            <path d="M21 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3"></path>
+                                            <path d="M21 16v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3"></path>
+                                            <rect x="2" y="8" width="20" height="8" rx="2"></rect>
+                                        </svg>
+                                        Sellado
+                                    </button>
+                                    <button type="button" class="chip-pill" data-val="Usado">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor"
+                                            stroke-width="2.5" fill="none">
+                                            <path d="M2.5 2v6h6M21.5 22v-6h-6"></path>
+                                            <path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.3"></path>
+                                        </svg>
+                                        Usado
+                                    </button>
+                                    <input type="hidden" id="prod-subcat" value="Nuevo">
+                                </div>
+                            </div>
+                            <div class="tech-field">
+                                <label>Ubicación del stock</label>
+                                <div class="chip-container-pills multi-select" id="container-location">
+                                    <button type="button" class="chip-pill active" data-val="Tandil">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor"
+                                            stroke-width="2.5" fill="none">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                        Tandil
+                                    </button>
+                                    <button type="button" class="chip-pill" data-val="NECOCHEA">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor"
+                                            stroke-width="2.5" fill="none">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                        NECOCHEA
+                                    </button>
+                                    <input type="hidden" id="prod-location" value="Tandil">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="tech-field">
+                                <label>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none"
+                                        style="vertical-align: middle; margin-right: 4px;">
+                                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                                    </svg>
+                                    IMEI (Opcional)
+                                </label>
+                                <input type="text" id="prod-imei" class="tech-input" placeholder="Ej: 356938035643809">
+                            </div>
+                            <div class="tech-field">
+                                <label>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor"
+                                        stroke-width="2.5" fill="none"
+                                        style="vertical-align: middle; margin-right: 4px;">
+                                        <path
+                                            d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2z">
+                                        </path>
+                                        <path d="M7 7h10M7 12h10M7 17h10"></path>
+                                    </svg>
+                                    Número de Serie (Opcional)
+                                </label>
+                                <input type="text" id="prod-serial" class="tech-input" placeholder="Ej: C39XXXXXXXXX">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD 3: ESPECIFICACIONES -->
+                    <div class="tech-card">
+                        <div class="tech-card-label">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                            ESPECIFICACIONES
+                        </div>
+
+                        <!-- Ocultamos especificaciones principales para manejar todo por la grilla de variantes -->
+                        <div style="display: none;">
+                            <div class="tech-field">
+                                <label>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5"
+                                        fill="none" style="vertical-align: middle; margin-right: 4px;">
+                                        <path d="M22 12L2 12"></path>
+                                        <path
+                                            d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z">
+                                        </path>
+                                        <line x1="6" y1="16" x2="6.01" y2="16"></line>
+                                        <line x1="10" y1="16" x2="10.01" y2="16"></line>
+                                    </svg>
+                                    Almacenamiento
+                                </label>
+                                <div class="chip-container" id="container-storage">
+                                    <button type="button" class="chip active" data-val="64GB">64GB</button>
+                                    <button type="button" class="chip" data-val="128GB">128GB</button>
+                                    <button type="button" class="chip" data-val="256GB">256GB</button>
+                                    <button type="button" class="chip" data-val="512GB">512GB</button>
+                                    <button type="button" class="chip" data-val="1TB">1TB</button>
+                                    <input type="hidden" id="prod-storage" value="128GB">
+                                </div>
+                            </div>
+
+                            <div class="tech-field">
+                                <label>Color comercial</label>
+                                <div class="chip-container scrollable" id="container-colors">
+                                    <button type="button" class="chip active" data-val="Negro">Negro</button>
+                                    <button type="button" class="chip" data-val="Blanco">Blanco</button>
+                                    <button type="button" class="chip" data-val="Dorado">Dorado</button>
+                                    <button type="button" class="chip" data-val="Azul">Azul</button>
+                                    <button type="button" class="chip" data-val="Verde">Verde</button>
+                                    <button type="button" class="chip" data-val="Rosa">Rosa</button>
+                                    <button type="button" class="chip" data-val="Teal">Teal</button>
+                                    <button type="button" class="chip" data-val="Natural Titanium">Natural Titanium</button>
+                                    <button type="button" class="chip" data-val="Desert Titanium">Desert Titanium</button>
+                                    <button type="button" class="chip" data-val="Midnight">Midnight</button>
+                                    <button type="button" class="chip" data-val="Starlight">Starlight</button>
+                                    <button type="button" class="chip" data-val="Space Gray">Space Gray</button>
+                                    <button type="button" class="chip" data-val="Silver">Silver</button>
+                                    <input type="hidden" id="prod-color" value="Negro">
+                                </div>
+                                <input type="text" id="prod-color-custom" class="tech-input mt-1"
+                                    placeholder="U otro color específico...">
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="tech-field">
+                                <label>Precio de Venta (USD)</label>
+                                <input type="number" id="prod-sell" class="tech-input" placeholder="0">
+                            </div>
+                            <div class="tech-field">
+                                <label>Costo de Equipo (USD)</label>
+                                <input type="number" id="prod-cost" class="tech-input" placeholder="0">
+                            </div>
+                        </div>
+
+                        <!-- NUEVA SECCI�N: VARIANTES -->
+                        <div class="tech-variants-box mt-2">
+                            <div class="tech-card-label" style="margin-bottom: 10px; color: var(--admin-primary);">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                                    </path>
+                                </svg>
+                                UNIDADES EN STOCK (VARIACIONES)
+                            </div>
+                            <p style="font-size: 0.8rem; color: #6e6e73; margin-bottom: 15px;">Cargá cada teléfono
+                                específico                              <div class="tech-field mt-1" id="stock-units-section">
+                                <div class="stock-variant-grid-container">
+                                    <div class="stock-variant-row stock-variant-header">
+                                        <div>Almac.</div>
+                                        <div>Color</div>
+                                        <div>Bat.</div>
+                                        <div>SIM</div>
+                                        <div>Caja</div>
+                                        <div>Notas</div>
+                                        <div style="text-align: center;">Acc</div>
+                                    </div>
+                                    <div id="tbody-stock-items" class="stock-items-scroll">
+                                        <!-- Items dinámicos inyectados como divs -->
+                                    </div>
+                                    
+                                    <div class="add-stock-item-row stock-variant-row" style="align-items: flex-end;">
+                                    <div class="input-col">
+                                        <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Almac.</div>
+                                        <select id="item-storage" class="tech-input">
+                                        <option value="-">-</option>
+                                        <option value="64GB">64GB</option>
+                                        <option value="128GB">128GB</option>
+                                        <option value="256GB">256GB</option>
+                                        <option value="512GB">512GB</option>
+                                        <option value="1TB">1TB</option>
+                                    </select>
+                                    </div>
+                                    <div class="input-col">
+                                        <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Color</div>
+                                        <div style="display: flex; gap: 4px; align-items: center;">
+                                        <select id="item-color" class="tech-input" style="flex: 1;">
+                                        <option value="Negro">Negro</option>
+                                        <option value="Blanco">Blanco</option>
+                                        <option value="Dorado">Dorado</option>
+                                        <option value="Azul">Azul</option>
+                                        <option value="Verde">Verde</option>
+                                        <option value="Rosa">Rosa</option>
+                                        <option value="Teal">Teal</option>
+                                        <option value="Orange">Orange</option>
+                                        <option value="Lavanda">Lavanda</option>
+                                        <option value="Citrus">Citrus</option>
+                                        <option value="Indigo">Indigo</option>
+                                        <option value="Natural Titanium">Natural Titanium</option>
+                                        <option value="Desert Titanium">Desert Titanium</option>
+                                        <option value="Midnight">Midnight</option>
+                                        <option value="Starlight">Starlight</option>
+                                        <option value="Space Gray">Space Gray</option>
+                                        <option value="Silver">Silver</option>
+                                    </select>
+                                    <button type="button" id="btn-add-color" class="btn btn-secondary" style="padding: 0 10px; font-size: 1.2rem; font-weight: bold; background: #e5e5ea; border: none; border-radius: 8px; height: 38px; cursor: pointer;" title="Agregar nuevo color">+</button>
+                                    </div>
+                                    </div>
+                                    <div class="input-col">
+                                        <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Bat.</div>
+                                        <input type="number" id="item-battery" placeholder="Ej: 100" class="tech-input" min="0" max="100">
+                                    </div>
+                                    <div class="input-col">
+                                        <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">SIM</div>
+                                        <select id="item-sim" class="tech-input">
+                                        <option value="-">-</option>
+                                        <option value="SIM Física">Física</option>
+                                        <option value="eSIM">eSIM</option>
+                                    </select>
+                                    </div>
+                                    <div class="input-col">
+                                        <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Caja</div>
+                                        <select id="item-box" class="tech-input">
+                                        <option value="-">-</option>
+                                        <option value="Con Caja">Sí</option>
+                                        <option value="Sin Caja">No</option>
+                                    </select>
+                                    </div>
+                                    <div class="input-col">
+                                        <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Notas</div>
+                                        <input type="text" id="item-notes" placeholder="Notas..." class="tech-input">
+                                    </div>
+                                    <div class="input-col">
+                                        <div style="font-size: 0.65rem; color: transparent; margin-bottom: 4px; font-weight: 600;">Acc</div>
+                                        <button type="button" id="btn-add-stock-item" class="btn-add-variant" style="height: 100%;">+</button>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                    <!-- CARD 1: FOTOS -->
+                    <div class="tech-card">
+                        <div class="tech-card-label">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                </path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            FOTOS DEL PRODUCTO
+                        </div>
+                        <div class="tech-photos-grid">
+                            <!-- Foto 1 -->
+                            <div class="tech-photo-item">
+                                <div class="tech-photo-box main" id="photo-box-1"
+                                    onclick="document.getElementById('file-1').click()">
+                                    <input type="file" id="file-1" style="display:none" accept="image/*">
+                                    <div class="photo-placeholder">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                                            stroke-width="2" fill="none">
+                                            <path
+                                                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                            </path>
+                                            <circle cx="12" cy="13" r="4"></circle>
+                                        </svg>
+                                        <span>Subir</span>
+                                    </div>
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                        class="hidden" id="img-1">
+                                </div>
+                                <div class="photo-label-outer">Principal</div>
+                            </div>
+
+                            <!-- Foto 2 -->
+                            <div class="tech-photo-item">
+                                <div class="tech-photo-box" id="photo-box-2"
+                                    onclick="document.getElementById('file-2').click()">
+                                    <input type="file" id="file-2" style="display:none" accept="image/*">
+                                    <div class="photo-placeholder">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                                            stroke-width="2" fill="none">
+                                            <path
+                                                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                            </path>
+                                            <circle cx="12" cy="13" r="4"></circle>
+                                        </svg>
+                                        <span>Subir</span>
+                                    </div>
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                        class="hidden" id="img-2">
+                                </div>
+                                <div class="photo-label-outer">Foto 2</div>
+                            </div>
+
+                            <!-- Foto 3 -->
+                            <div class="tech-photo-item">
+                                <div class="tech-photo-box" id="photo-box-3"
+                                    onclick="document.getElementById('file-3').click()">
+                                    <input type="file" id="file-3" style="display:none" accept="image/*">
+                                    <div class="photo-placeholder">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                                            stroke-width="2" fill="none">
+                                            <path
+                                                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                            </path>
+                                            <circle cx="12" cy="13" r="4"></circle>
+                                        </svg>
+                                        <span>Subir</span>
+                                    </div>
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                        class="hidden" id="img-3">
+                                </div>
+                                <div class="photo-label-outer">Foto 3</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="prod-img-1" value="">
+                        <input type="hidden" id="prod-img-2" value="">
+                        <input type="hidden" id="prod-img-3" value="">
+                    </div>
+
+                <!-- CARD 4: ESTADO Y NOTAS -->
+                <div class="tech-card">
+                    <div class="tech-card-label">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        ESTADO Y NOTAS
+                    </div>
+
+                    <div class="tech-toggle-row">
+                        <div class="tech-toggle-info">
+                            <div class="dot green"></div>
+                            <strong>Disponible para la venta</strong>
+                        </div>
+                        <label class="tech-switch">
+                            <input type="checkbox" id="prod-active" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tech-toggle-row" style="margin-top: 1rem;">
+                        <div class="tech-toggle-info">
+                            <div class="dot" style="background-color: #0071e3;"></div>
+                            <strong>Destacado (Más Vendido)</strong>
+                        </div>
+                        <label class="tech-switch">
+                            <input type="checkbox" id="prod-bestseller">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tech-toggle-row" style="margin-top: 1rem;">
+                        <div class="tech-toggle-info">
+                            <div class="dot" style="background-color: #ff9f0a;"></div>
+                            <strong>Nuevo Ingreso</strong>
+                        </div>
+                        <label class="tech-switch">
+                            <input type="checkbox" id="prod-nuevo">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="display: none;">
+                        <div class="tech-field hidden" id="group-battery">
+                            <label>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5"
+                                    fill="none" style="vertical-align: middle; margin-right: 4px;">
+                                    <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+                                    <line x1="22" y1="11" x2="22" y2="13"></line>
+                                </svg>
+                                Condición de batería (%)
+                            </label>
+                            <input type="text" id="prod-battery" class="tech-input" placeholder="Ej: 98">
+                        </div>
+
+                        <div class="tech-field">
+                            <label>Notas internas</label>
+                            <textarea id="prod-features" class="tech-textarea"
+                                placeholder="Notas visibles solo para vos..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="tech-field">
+                        <label>
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5"
+                                fill="none" style="vertical-align: middle; margin-right: 4px;">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                            Garantía
+                        </label>
+                        <div class="chip-container" id="container-warranty">
+                            <button type="button" class="chip active" data-val="30 días">30 días</button>
+                            <button type="button" class="chip" data-val="3 meses">3 meses</button>
+                            <button type="button" class="chip" data-val="6 meses">6 meses</button>
+                            <button type="button" class="chip" data-val="1 año">1 año</button>
+                            <input type="hidden" id="prod-warranty" value="30 días">
+                        </div>
+                    </div>
+                </div> <!-- End of tech-body-scroll -->
+                
+                <div class="tech-footer">
+                    <button type="submit" class="btn-tech-primary">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Guardar producto
+                    </button>
+                    <button type="button" class="btn-tech-outline" data-close="modal-product">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- MODAL 2: REGISTRAR VENTA -->
+    <div class="modal-overlay hidden" id="modal-sale">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Registrar Venta</h3>
+                <button class="modal-close" data-close="modal-sale">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-sale">
+                    <div class="form-group full-width">
+                        <label>Producto Vendido *</label>
+                        <select id="sale-prod" required class="admin-input">
+                            <!-- Inyectado JS -->
+                        </select>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Cantidad Vendida *</label>
+                            <input type="number" id="sale-qty" min="1" value="1" required class="admin-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Método de Pago *</label>
+                            <select id="sale-method" required class="admin-input">
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Transferencia">Transferencia</option>
+                                <option value="MercadoPago">MercadoPago</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Precio Final Acordado ($) *</label>
+                            <input type="number" id="sale-price" min="0" required class="admin-input">
+                            <small class="helper-text" id="sale-cost-helper">Costo: $0</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Cliente (Opc.)</label>
+                            <input type="text" id="sale-client" class="admin-input">
+                        </div>
+                    </div>
+
+                    <div class="sale-preview-box">
+                        <div>
+                            <span>Total Venta:</span>
+                            <strong id="preview-total">$0</strong>
+                        </div>
+                        <div>
+                            <span>Ganancia Neta:</span>
+                            <strong id="preview-profit" class="text-success">$0</strong>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-2">
+                        <button type="button" class="btn btn-secondary" data-close="modal-sale">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Asentar Venta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CONFIRMACI�N GEN�0RICA -->
+    <div class="modal-overlay hidden" id="modal-confirm" style="z-index: 10000;">
+        <div class="modal-card modal-confirm-card">
+            <div class="modal-confirm-body">
+                <div class="modal-confirm-icon" id="confirm-icon"></div>
+                <h3 class="modal-confirm-title" id="confirm-title">¿Estás seguro?</h3>
+                <p class="modal-confirm-text" id="confirm-message">Esta acción no se puede deshacer.</p>
+                <div class="modal-confirm-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-confirm-cancel">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-confirm-ok">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de Administrador Lógicos -->
+    <div id="admin-toast" class="admin-toast"></div>
+    <script src="admin.js?v=3"></script>
+</body>
+
+</html>
+
+
+
