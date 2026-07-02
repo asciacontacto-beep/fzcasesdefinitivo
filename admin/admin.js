@@ -419,6 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderStockItems() {
         const tbody = document.getElementById('tbody-stock-items');
         tbody.innerHTML = '';
+        refreshPhotoTargetOptions();
 
         if (currentStockItems.length === 0) {
             tbody.innerHTML = '<div style="padding: 20px; text-align: center; color: #8e8e93; font-size: 0.85rem;">No hay unidades cargadas</div>';
@@ -485,21 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const boxMatch = item.notas && item.notas.match(/\[CAJA: (.*?)\]/);
         document.getElementById('item-box').value = boxMatch ? boxMatch[1] : '-';
 
-        // Restaurar imagen de la variante (si tiene)
-        window.clearVariantImage();
-        if (item.imagen) {
-            document.getElementById('item-image-data').value = item.imagen;
-            const previewImg = document.getElementById('item-image-preview-img');
-            const previewText = document.getElementById('item-image-preview');
-            if (previewImg) {
-                previewImg.src = item.imagen;
-                previewImg.style.display = 'block';
-                if (previewImg.previousElementSibling) previewImg.previousElementSibling.style.display = 'none';
-            }
-            previewText.style.display = 'block';
-            previewText.innerHTML = 'Imagen cargada <button type="button" onclick="window.clearVariantImage()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px;">(Quitar)</button>';
-        }
-
         editingVariantIndex = index;
         const btn = document.getElementById('btn-add-stock-item');
         btn.innerHTML = '&check;';
@@ -511,17 +497,29 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.add-stock-item-row').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
 
-    window.clearVariantImage = () => {
-        document.getElementById('item-image-data').value = '';
-        document.getElementById('item-image-preview').style.display = 'none';
-        document.getElementById('item-image-preview').innerHTML = '';
-        const previewImg = document.getElementById('item-image-preview-img');
-        if (previewImg) {
-            previewImg.src = '';
-            previewImg.style.display = 'none';
-            if (previewImg.previousElementSibling) previewImg.previousElementSibling.style.display = '';
-        }
-    };
+    // Popula el selector "Aplica a" de FOTOS DEL PRODUCTO con las variantes actuales
+    function refreshPhotoTargetOptions() {
+        const select = document.getElementById('photo-target-select');
+        if (!select) return;
+        const prevValue = select.value || '__product__';
+
+        select.innerHTML = '<option value="__product__">Producto (fotos generales)</option>';
+        // La primera unidad (index 0) ES el producto: sus fotos son las generales de arriba.
+        // Solo las unidades extra (index 1+) tienen sentido como variante con foto propia.
+        currentStockItems.forEach((item, index) => {
+            if (index === 0) return;
+            const opt = document.createElement('option');
+            opt.value = String(index);
+            const parts = [item.almacenamiento, item.color].filter(v => v && v !== '-');
+            opt.text = parts.join(' · ') || `Variante ${index + 1}`;
+            select.appendChild(opt);
+        });
+
+        // Mantener selección si sigue existiendo, si no volver a "producto"
+        const stillValid = prevValue === '__product__' || currentStockItems[Number(prevValue)];
+        select.value = stillValid ? prevValue : '__product__';
+        if (typeof window.applyPhotoTargetMode === 'function') window.applyPhotoTargetMode();
+    }
 
     function resetEditVariantState() {
         editingVariantIndex = -1;
@@ -549,13 +547,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (color) {
-            const imageData = document.getElementById('item-image-data').value;
+            // La foto de la variante se maneja aparte, desde FOTOS DEL PRODUCTO.
+            // Si estamos editando una variante existente, preservamos la foto que ya tenía.
+            const existingImagen = editingVariantIndex >= 0 ? currentStockItems[editingVariantIndex].imagen : null;
             const variantData = {
                 almacenamiento: storage,
                 color: color,
                 bateria: battery,
                 notas: notes.trim(),
-                imagen: imageData || null
+                imagen: existingImagen || null
             };
 
             if (editingVariantIndex >= 0) {
@@ -571,7 +571,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('item-sim').value = '-';
             document.getElementById('item-box').value = '-';
             document.getElementById('item-notes').value = '';
-            window.clearVariantImage();
             renderStockItems();
         } else {
             alert("Por favor, ingresá al menos el color.");
@@ -629,46 +628,76 @@ document.addEventListener('DOMContentLoaded', () => {
         input.click();
     };
 
+    function setPhotoBoxImage(slot, src) {
+        const thumb = document.getElementById(`img-${slot}`);
+        if (!thumb) return;
+        if (src) {
+            thumb.src = src;
+            thumb.classList.remove('hidden');
+            if (thumb.previousElementSibling) thumb.previousElementSibling.classList.add('hidden');
+        } else {
+            thumb.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            thumb.classList.add('hidden');
+            if (thumb.previousElementSibling) thumb.previousElementSibling.classList.remove('hidden');
+        }
+    }
+
+    // Cambia el modo del bloque FOTOS DEL PRODUCTO según el selector "Aplica a":
+    // Producto general -> 3 casilleros de siempre. Una variante puntual -> 1 solo
+    // casillero (cada variante tiene una única foto propia), mostrando la que ya tenga.
+    window.applyPhotoTargetMode = () => {
+        const select = document.getElementById('photo-target-select');
+        const item2 = document.getElementById('photo-item-2');
+        const item3 = document.getElementById('photo-item-3');
+        const label1 = document.getElementById('photo-label-1');
+        if (!select) return;
+
+        if (select.value === '__product__') {
+            if (item2) item2.style.display = '';
+            if (item3) item3.style.display = '';
+            if (label1) label1.textContent = 'Principal';
+            setPhotoBoxImage(1, document.getElementById('prod-img-1').value || null);
+        } else {
+            if (item2) item2.style.display = 'none';
+            if (item3) item3.style.display = 'none';
+            const variant = currentStockItems[Number(select.value)];
+            if (label1) label1.textContent = variant ? `Foto: ${variant.color}` : 'Variante';
+            setPhotoBoxImage(1, variant ? variant.imagen : null);
+        }
+    };
+
     function initImageUpload() {
-        // ImÃ¡genes de producto base
+        // Imágenes de producto / variantes: el casillero 1 (Principal) se reasigna
+        // según lo elegido en "Aplica a"; los casilleros 2 y 3 siempre son del producto.
         [1, 2, 3].forEach(slot => {
             const fileInput = document.getElementById(`file-${slot}`);
-            const hiddenInput = document.getElementById(`prod-img-${slot}`);
-            const thumb = document.getElementById(`img-${slot}`);
             if (!fileInput) return;
             fileInput.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
                 const reader = new FileReader();
                 reader.onload = ev => {
-                    hiddenInput.value = ev.target.result;
-                    thumb.src = ev.target.result;
-                    thumb.classList.remove('hidden');
-                    if (thumb.previousElementSibling) thumb.previousElementSibling.classList.add('hidden');
+                    const select = document.getElementById('photo-target-select');
+                    const targetingVariant = slot === 1 && select && select.value !== '__product__';
+
+                    if (targetingVariant) {
+                        const variant = currentStockItems[Number(select.value)];
+                        if (variant) {
+                            variant.imagen = ev.target.result;
+                            setPhotoBoxImage(1, ev.target.result);
+                            renderStockItems();
+                        }
+                    } else {
+                        document.getElementById(`prod-img-${slot}`).value = ev.target.result;
+                        setPhotoBoxImage(slot, ev.target.result);
+                    }
                 };
-                reader.readAsDataURL(e.target.files[0]);
+                reader.readAsDataURL(file);
             };
         });
 
-        // Imágenes de variantes
-        const vTrigger = document.getElementById('btn-trigger-variant-file');
-        const vHidden = document.getElementById('item-image-data');
-        const vPreview = document.getElementById('item-image-preview');
-        const vPreviewImg = document.getElementById('item-image-preview-img');
-
-        if (vTrigger) {
-            vTrigger.onclick = () => {
-                window.uploadAndCompressImage((base64) => {
-                    vHidden.value = base64;
-                    vPreview.style.display = 'block';
-                    vPreview.innerHTML = 'Imagen cargada <button type="button" onclick="window.clearVariantImage()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px;">(Quitar)</button>';
-                    if (vPreviewImg) {
-                        vPreviewImg.src = base64;
-                        vPreviewImg.classList.remove('hidden');
-                        vPreviewImg.style.display = 'block';
-                        if (vPreviewImg.previousElementSibling) vPreviewImg.previousElementSibling.style.display = 'none';
-                    }
-                });
-            };
-        }
+        const targetSelect = document.getElementById('photo-target-select');
+        if (targetSelect) targetSelect.onchange = window.applyPhotoTargetMode;
     }
 
     const CATEGORY_MODELS = {
@@ -1225,8 +1254,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset unidades stock
         currentStockItems = [];
         resetEditVariantState();
-        window.clearVariantImage();
         renderStockItems();
+        setPhotoBoxImage(1, null);
+        setPhotoBoxImage(2, null);
+        setPhotoBoxImage(3, null);
 
         // Reset chips
         document.querySelectorAll('.chip, .chip-pill').forEach(c => c.classList.remove('active'));
@@ -1274,7 +1305,9 @@ document.addEventListener('DOMContentLoaded', () => {
             battery: mainUnit.bateria,
             ubicacion: document.getElementById('prod-location') ? document.getElementById('prod-location').value : null,
             notas: finalNotas,
-            imagen: mainUnit.imagen || document.getElementById('prod-img-1').value || '/assets/iphone_case.png',
+            imagen: document.getElementById('prod-img-1').value || mainUnit.imagen || '/assets/iphone_case.png',
+            imagen2: document.getElementById('prod-img-2').value || null,
+            imagen3: document.getElementById('prod-img-3').value || null,
             stock: currentStockItems.length,
             activo: document.getElementById('prod-active').checked,
             variantes: extraUnits.length > 0 ? extraUnits : null
@@ -1403,6 +1436,15 @@ document.addEventListener('DOMContentLoaded', () => {
             currentStockItems = currentStockItems.concat(p.variantes);
         }
         resetEditVariantState();
+
+        // Precargar fotos generales del producto
+        document.getElementById('photo-target-select').value = '__product__';
+        document.getElementById('prod-img-1').value = p.imagen && p.imagen !== '/assets/iphone_case.png' ? p.imagen : '';
+        document.getElementById('prod-img-2').value = p.imagen2 || '';
+        document.getElementById('prod-img-3').value = p.imagen3 || '';
+        setPhotoBoxImage(2, p.imagen2 || null);
+        setPhotoBoxImage(3, p.imagen3 || null);
+
         renderStockItems();
 
         // Chips

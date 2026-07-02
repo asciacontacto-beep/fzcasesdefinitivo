@@ -1053,18 +1053,9 @@
                                         <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Notas</div>
                                         <input type="text" id="item-notes" placeholder="Notas..." class="tech-input">
                                     </div>
-                                    <div class="input-col" style="align-items: center;">
+                                    <div class="input-col">
                                         <div style="font-size: 0.65rem; color: transparent; margin-bottom: 4px; font-weight: 600;">Foto</div>
-                                        <div class="variant-photo-box" id="btn-trigger-variant-file" title="Foto de esta variante (opcional)">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-                                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                                <circle cx="12" cy="13" r="4"></circle>
-                                            </svg>
-                                            <img id="item-image-preview-img" class="hidden" style="display:none;">
-                                        </div>
-                                        <input type="file" id="item-image-file" accept="image/*" style="display:none">
-                                        <input type="hidden" id="item-image-data" value="">
-                                        <div id="item-image-preview" style="display:none; font-size: 0.65rem; margin-top: 2px;"></div>
+                                        <div style="font-size: 0.65rem; color: #c7c7cc; text-align: center;" title="La foto de cada variante se carga desde FOTOS DEL PRODUCTO, eligiendo la variante ahí">&mdash;</div>
                                     </div>
                                     <div class="input-col">
                                         <div style="font-size: 0.65rem; color: transparent; margin-bottom: 4px; font-weight: 600;">Acc</div>
@@ -1086,9 +1077,15 @@
                             </svg>
                             FOTOS DEL PRODUCTO
                         </div>
+                        <div class="tech-field mb-1">
+                            <label style="font-size: 0.7rem; color: #8e8e93; text-transform: uppercase; font-weight: 600;">Aplica a</label>
+                            <select id="photo-target-select" class="tech-input">
+                                <option value="__product__">Producto (fotos generales)</option>
+                            </select>
+                        </div>
                         <div class="tech-photos-grid">
                             <!-- Foto 1 -->
-                            <div class="tech-photo-item">
+                            <div class="tech-photo-item" id="photo-item-1">
                                 <div class="tech-photo-box main" id="photo-box-1"
                                     onclick="document.getElementById('file-1').click()">
                                     <input type="file" id="file-1" style="display:none" accept="image/*">
@@ -1105,11 +1102,11 @@
                                     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                                         class="hidden" id="img-1">
                                 </div>
-                                <div class="photo-label-outer">Principal</div>
+                                <div class="photo-label-outer" id="photo-label-1">Principal</div>
                             </div>
 
                             <!-- Foto 2 -->
-                            <div class="tech-photo-item">
+                            <div class="tech-photo-item" id="photo-item-2">
                                 <div class="tech-photo-box" id="photo-box-2"
                                     onclick="document.getElementById('file-2').click()">
                                     <input type="file" id="file-2" style="display:none" accept="image/*">
@@ -1130,7 +1127,7 @@
                             </div>
 
                             <!-- Foto 3 -->
-                            <div class="tech-photo-item">
+                            <div class="tech-photo-item" id="photo-item-3">
                                 <div class="tech-photo-box" id="photo-box-3"
                                     onclick="document.getElementById('file-3').click()">
                                     <input type="file" id="file-3" style="display:none" accept="image/*">
