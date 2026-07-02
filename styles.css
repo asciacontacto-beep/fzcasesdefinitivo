@@ -27,6 +27,7 @@ body {
     font-family: var(--font-stack);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 a {
@@ -4551,4 +4552,16 @@ a.contact-item:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+/* Perf: backdrop-filter blur es carísimo para el GPU en celulares de gama media/baja
+   y es la causa principal de jank en scroll/animaciones en mobile. Se desactiva
+   solo bajo 768px; el fondo rgba semi-transparente de cada elemento se mantiene,
+   así que el efecto degrada a "translúcido" en vez de "vidrio esmerilado" sin
+   romper layout ni sacar ninguna animación. */
+@media (max-width: 768px) {
+    * {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
 }

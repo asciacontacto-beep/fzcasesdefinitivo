@@ -14,8 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css?v=3.0">
+    <link rel="preload" as="image" href="assets/hero-fz.jpg" fetchpriority="high">
     <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 
 <body>
@@ -152,7 +153,7 @@
         <div id="hero-slides-container" class="hero-slides-container">
             <!-- Slide por defecto, reemplazado por JS si hay imágenes en DB -->
             <div class="hero-slide active">
-                <img src="assets/hero-fz.jpg" alt="Portada FZCASES" class="hero-slide-img">
+                <img src="assets/hero-fz.jpg" alt="Portada FZCASES" class="hero-slide-img" fetchpriority="high" width="1920" height="1440">
             </div>
         </div>
         <div class="hero-overlay-mask"></div>
@@ -185,31 +186,31 @@
         <div id="dynamic-category-list" class="category-list">
             <a href="catalogo.html?cat=iPhone" class="category-item cat-anim" style="--i:0">
                 <div class="cat-img-wrap">
-                    <img class="category-icon-img" src="https://www.apple.com/la/iphone/home/images/overview/chapternav/nav_iphone_17pro__b8rt659h2ogi_large.png" alt="iPhone">
+                    <img class="category-icon-img" src="https://www.apple.com/la/iphone/home/images/overview/chapternav/nav_iphone_17pro__b8rt659h2ogi_large.png" alt="iPhone" loading="lazy" width="90" height="90">
                 </div>
                 <span>iPhone</span>
             </a>
             <a href="catalogo.html?cat=iPad" class="category-item cat-anim" style="--i:1">
                 <div class="cat-img-wrap">
-                    <img class="category-icon-img" src="https://www.apple.com/assets-www/en_WW/ipad/03_chapternav/small/ipad_pro_bd732ab83_2x.png" alt="iPad">
+                    <img class="category-icon-img" src="https://www.apple.com/assets-www/en_WW/ipad/03_chapternav/small/ipad_pro_bd732ab83_2x.png" alt="iPad" loading="lazy" width="90" height="90">
                 </div>
                 <span>iPad</span>
             </a>
             <a href="catalogo.html?cat=MacBook" class="category-item cat-anim" style="--i:2">
                 <div class="cat-img-wrap">
-                    <img class="category-icon-img" src="https://www.apple.com/assets-www/en_WW/mac/04_chapternav/small/nav_mbp_0b36bc863_2x.png" alt="MacBook" style="width:85px;height:auto;">
+                    <img class="category-icon-img" src="https://www.apple.com/assets-www/en_WW/mac/04_chapternav/small/nav_mbp_0b36bc863_2x.png" alt="MacBook" style="width:85px;height:auto;" loading="lazy" width="85" height="85">
                 </div>
                 <span>MacBook</span>
             </a>
             <a href="catalogo.html?cat=Apple+Watch" class="category-item cat-anim" style="--i:3">
                 <div class="cat-img-wrap">
-                    <img class="category-icon-img" src="assets/nav_watch_real.png" alt="Apple Watch" style="height:65px;width:auto;">
+                    <img class="category-icon-img" src="assets/nav_watch_real.png" alt="Apple Watch" style="height:65px;width:auto;" loading="lazy" width="65" height="65">
                 </div>
                 <span>Apple Watch</span>
             </a>
             <a href="catalogo.html?cat=Accesorios" class="category-item cat-anim" style="--i:4">
                 <div class="cat-img-wrap">
-                    <img class="category-icon-img" src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MTJV3?wid=200&hei=200&fmt=png-alpha" alt="Accesorios">
+                    <img class="category-icon-img" src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MTJV3?wid=200&hei=200&fmt=png-alpha" alt="Accesorios" loading="lazy" width="90" height="90">
                 </div>
                 <span>Accesorios</span>
             </a>
@@ -312,7 +313,7 @@
                 </div>
                 <div class="canje-right-col">
                     <div class="canje-device-visual">
-                        <img id="dynamic-canje-img" src="assets/canje_exchange.png" alt="Canje de iPhone" class="canje-iphone-img">
+                        <img id="dynamic-canje-img" src="assets/canje_exchange.png" alt="Canje de iPhone" class="canje-iphone-img" loading="lazy" width="700" height="700">
                         <div class="canje-exchange-labels">
                             <span class="canje-tag-badge">Tu iPhone actual</span>
                             <span class="canje-arrow-exchange">�!</span>
@@ -584,7 +585,7 @@
             </div>
             
             <div class="warranty-visual">
-                <img id="dynamic-garantia-img" src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-blue-select-202209?wid=470&hei=556&fmt=png-alpha" alt="iPhone Garantizado" class="warranty-iphone-img">
+                <img id="dynamic-garantia-img" src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-blue-select-202209?wid=470&hei=556&fmt=png-alpha" alt="iPhone Garantizado" class="warranty-iphone-img" loading="lazy" width="470" height="556">
             </div>
         </div>
     </section>
@@ -915,7 +916,7 @@
             <div class="footer-grid">
                 <!-- Columna 1: Logo y Redes -->
                 <div class="footer-brand">
-                    <img src="assets/logo.png" alt="FZCASES Logo" class="footer-logo">
+                    <img src="assets/logo.png" alt="FZCASES Logo" class="footer-logo" loading="lazy" width="150" height="150">
                     <p class="footer-desc">Especialistas en la venta de equipos Apple premium, ofreciendo la mejor calidad y servicio para vos.</p>
                     <div class="social-links">
                         <a href="https://instagram.com/fzcases" target="_blank" aria-label="Instagram">
@@ -1007,7 +1008,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="script.js?v=3.0"></script>
+    <script src="script.js?v=3.0" defer></script>
 </body>
 
 </html>

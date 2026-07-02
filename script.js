@@ -130,7 +130,7 @@ async function loadProductsFromSupabase() {
                         a.style.setProperty('--i', displayIndex++);
                         a.innerHTML = `
                             <div class="cat-img-wrap">
-                                <img class="category-icon-img" src="${item.imgUrl}" alt="${item.name}" ${styleImg}>
+                                <img class="category-icon-img" src="${item.imgUrl}" alt="${item.name}" loading="lazy" ${styleImg}>
                             </div>
                             <span>${item.name}</span>
                         `;
@@ -184,7 +184,7 @@ async function loadProductsFromSupabase() {
                     if (cfg.about.bento[0]) {
                         html += `
                         <div class="bento-card bento-large scroll-animate fade-up">
-                            <img src="${cfg.about.bento[0].img}" alt="${cfg.about.bento[0].title}" class="bento-img">
+                            <img src="${cfg.about.bento[0].img}" alt="${cfg.about.bento[0].title}" class="bento-img" loading="lazy">
                             <div class="bento-content overlay-content">
                                 <h3>${cfg.about.bento[0].title}</h3>
                                 <p>${cfg.about.bento[0].desc}</p>
