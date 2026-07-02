@@ -615,6 +615,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (catSelect) {
             catSelect.addEventListener('change', updateDynamicFilters);
+
+            // Sincronizar el select con el filtro que vino por URL (?cat=...) ANTES
+            // de la primera corrida, si no updateDynamicFilters lo pisa con "Todos"
+            // (valor por defecto del <select>) y se pierde el filtro del link de origen.
+            let catMatch = 'Todos';
+            if (activeFilter === 'iPhone') catMatch = 'iPhone';
+            else if (activeFilter === 'Samsung') catMatch = 'Samsung';
+            else if (activeFilter === 'iPad') catMatch = 'iPad';
+            else if (activeFilter === 'MacBook') catMatch = 'MacBook';
+            else if (activeFilter === 'Apple Watch') catMatch = 'Apple Watch';
+            else if (activeFilter === 'Accesorios') catMatch = 'Accesorios';
+            catSelect.value = catMatch;
         }
 
         // Ejecutar primera vez
