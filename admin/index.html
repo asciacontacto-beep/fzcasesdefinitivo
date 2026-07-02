@@ -144,11 +144,21 @@
                 btnSpinner.style.display = "inline-block";
                 errorMessage.style.display = 'none';
 
-                // --- BYPASS DE AUTENTICACIÓN ---
-                setTimeout(() => {
+                _supabase.auth.signInWithPassword({ email: userVal, password: passVal }).then(({ data, error }) => {
+                    if (error || !data.session) {
+                        btnLogin.disabled = false;
+                        btnLogin.classList.remove('loading');
+                        btnText.textContent = "Ingresar al Panel";
+                        btnSpinner.style.display = "none";
+                        errorMessage.style.display = 'flex';
+                        loginContainer.classList.add('shake');
+                        setTimeout(() => loginContainer.classList.remove('shake'), 500);
+                        return;
+                    }
+
                     localStorage.setItem('admin_logged', 'true');
                     localStorage.setItem('fzcasesAuthTimestamp', Date.now());
-                    localStorage.setItem('fzcases_bypass', 'true'); // Flag de bypass
+                    localStorage.removeItem('fzcases_bypass');
 
                     if (rememberCheckbox.checked) {
                         localStorage.setItem('fzcases_remember_user', userVal);
@@ -163,7 +173,7 @@
                     setTimeout(() => {
                         window.location.href = "/admin/dashboard.html";
                     }, 500);
-                }, 800);
+                });
             });
         });
     </script>

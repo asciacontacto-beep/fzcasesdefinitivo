@@ -48,25 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        if (localStorage.getItem('fzcases_bypass') === 'true') {
-            console.warn("Bypass de autenticaciÃ³n activado.");
-            document.body.classList.remove('auth-hidden');
-            fetchData();
-        } else {
-            // VerificaciÃ³n real de sesiÃ³n de Supabase
-            _supabase.auth.getSession().then(({ data, error }) => {
-                if (error || !data.session) {
-                    console.warn("No hay sesiÃ³n vÃ¡lida en Supabase, redirigiendo...");
-                    document.body.innerHTML = ''; // Limpia el DOM por seguridad
-                    localStorage.removeItem('admin_logged');
-                    window.location.href = '/admin/index.html';
-                } else {
-                    // SESIï¿½N VÃLIDA: Revelar contenido
-                    document.body.classList.remove('auth-hidden');
-                    fetchData();
-                }
-            });
-        }
+        // Verificación real de sesión de Supabase
+        _supabase.auth.getSession().then(({ data, error }) => {
+            if (error || !data.session) {
+                console.warn("No hay sesión válida en Supabase, redirigiendo...");
+                document.body.innerHTML = ''; // Limpia el DOM por seguridad
+                localStorage.removeItem('admin_logged');
+                window.location.href = '/admin/index.html';
+            } else {
+                // SESIÓN VÁLIDA: Revelar contenido
+                document.body.classList.remove('auth-hidden');
+                fetchData();
+            }
+        });
     } catch (e) {
         console.error("Error inicializando Supabase:", e);
     }
