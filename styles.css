@@ -4432,9 +4432,15 @@ a.contact-item:hover {
     position: absolute;
     width: 60vw; height: 60vw;
     border-radius: 50%;
-    filter: blur(90px);
+    filter: blur(64px);
     opacity: 0.4;
     animation: float-aurora 20s ease-in-out infinite alternate;
+    animation-play-state: paused; /* Solo corre cuando la sección está visible: ver IntersectionObserver en script.js */
+}
+
+.featured-showcase.in-view .featured-bg-animation::before,
+.featured-showcase.in-view .featured-bg-animation::after {
+    animation-play-state: running;
 }
 .featured-bg-animation::before {
     background: radial-gradient(circle, rgba(0,113,227,0.3) 0%, rgba(0,113,227,0) 70%);

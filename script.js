@@ -1123,6 +1123,19 @@ document.addEventListener('DOMContentLoaded', () => {
         animatables.forEach(el => scrollObserver.observe(el));
     };
 
+    // Pausa la animación aurora (filter:blur pesado en GPU) cuando la sección
+    // no está en pantalla, en vez de sacarla. Evita que corra infinito de fondo
+    // en toda la página, que era el mayor costo de perf en desktop.
+    const featuredShowcase = document.querySelector('.featured-showcase');
+    if (featuredShowcase) {
+        const auroraObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                entry.target.classList.toggle('in-view', entry.isIntersecting);
+            });
+        }, { threshold: 0 });
+        auroraObserver.observe(featuredShowcase);
+    }
+
     // =========================================================================
     // COMO FUNCIONA - ANIMATIONS
     // =========================================================================
