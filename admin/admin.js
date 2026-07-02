@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.warn("No hay sesiÃ³n vÃ¡lida en Supabase, redirigiendo...");
                     document.body.innerHTML = ''; // Limpia el DOM por seguridad
                     localStorage.removeItem('admin_logged');
-                    window.location.href = 'index.html';
+                    window.location.href = '/admin/index.html';
                 } else {
                     // SESIï¿½N VÃLIDA: Revelar contenido
                     document.body.classList.remove('auth-hidden');
