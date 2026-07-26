@@ -5,11 +5,18 @@ const _supabase = typeof supabase !== 'undefined' ? supabase.createClient(SUPABA
 
 let products = [];
 
+// Sin imagen2/imagen3/variantes: son las fotos que más pesan (2-3 fotos extra +
+// una por cada variante de color/almacenamiento) y no hacen falta para pintar
+// la grilla del catálogo, solo cuando se abre el modal de un producto puntual.
+// Bajarlas todas de una para TODOS los productos era el motivo real de que el
+// catálogo tardara en cargar.
+const CATALOG_LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,precio_venta,precio_costo,battery,ubicacion,notas,imagen,stock,activo,created_at,orden';
+
 async function loadProductsFromSupabase() {
     if (!_supabase) return;
     const { data, error } = await _supabase
         .from('products')
-        .select('*')
+        .select(CATALOG_LIST_FIELDS)
         .order('orden', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
 
@@ -274,13 +281,18 @@ async function loadProductsFromSupabase() {
             color: p.color,
             battery: p.battery,
             image: (p.imagen || "assets/iphone_case.png").replace(/^\/assets\//, 'assets/'),
-            image2: p.imagen2 ? p.imagen2.replace(/^\/assets\//, 'assets/') : null,
-            image3: p.imagen3 ? p.imagen3.replace(/^\/assets\//, 'assets/') : null,
+            // image2/image3/variantes NO vienen en este fetch (son las fotos que más
+            // pesan, x cada producto) — se piden recién al abrir el modal de ESE
+            // producto puntual, en openModal(). Ver _detailLoaded más abajo.
+            image2: null,
+            image3: null,
+            stock: p.stock,
             features: allFeatures,
             notas: cleanNotas,
             bestseller: p.bestseller || isBestseller,
             nuevoIngreso: isNuevo,
-            variantes: p.variantes
+            variantes: null,
+            _detailLoaded: false
         };
     });
 
@@ -808,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div onclick="openModal(${product.id})" style="cursor: pointer;">
                         <h3>${product.name}</h3>
                         <p style="color:var(--text-gray); font-size:0.9rem;">
-                            ${product.subcategory || ''} ${product.variantes && product.variantes.length > 0 ? '| Varias opciones disponibles' : (product.storage ? ' | ' + product.storage : '') + (product.color ? ' | ' + product.color : '')}
+                            ${product.subcategory || ''} ${product.stock > 1 ? '| Varias opciones disponibles' : (product.storage ? ' | ' + product.storage : '') + (product.color ? ' | ' + product.color : '')}
                         </p>
                     </div>
                     <a href="${waLink}" target="_blank" class="btn-wa-sm"><span>Consultar por WhatsApp</span></a>
@@ -868,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div onclick="openModal(${product.id})" style="cursor: pointer;">
                     <h3>${product.name}</h3>
                     <p style="color:var(--text-gray); font-size:0.9rem;">
-                        ${product.subcategory || ''} ${product.variantes && product.variantes.length > 0 ? '| Varias opciones disponibles' : (product.storage ? ' | ' + product.storage : '') + (product.color ? ' | ' + product.color : '')}
+                        ${product.subcategory || ''} ${product.stock > 1 ? '| Varias opciones disponibles' : (product.storage ? ' | ' + product.storage : '') + (product.color ? ' | ' + product.color : '')}
                     </p>
                 </div>
                 <a href="${waLink}" target="_blank" class="btn-wa-sm"><span>Consultar por WhatsApp</span></a>
@@ -883,9 +895,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalBody = document.getElementById('modal-body');
         const closeBtn = document.querySelector('.close-btn');
 
-        window.openModal = (productId) => {
+        window.openModal = async (productId) => {
             const product = products.find(p => p.id === productId);
             if (!product) return;
+
+            // Foto 2, Foto 3 y las variantes (con su propia foto c/u) no vinieron en
+            // el fetch inicial del catálogo -> se piden acá, una sola vez por producto.
+            if (!product._detailLoaded && _supabase) {
+                const { data: detail } = await _supabase
+                    .from('products')
+                    .select('imagen2,imagen3,variantes')
+                    .eq('id', productId)
+                    .single();
+                if (detail) {
+                    product.image2 = detail.imagen2 ? detail.imagen2.replace(/^\/assets\//, 'assets/') : null;
+                    product.image3 = detail.imagen3 ? detail.imagen3.replace(/^\/assets\//, 'assets/') : null;
+                    product.variantes = detail.variantes;
+                }
+                product._detailLoaded = true;
+            }
 
             let selectedUnit = null;
 
@@ -918,7 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="modal-condition-row">
                         <span class="condition-pill condition-${(product.subcategory || '').toLowerCase().replace(/ /g, '-')}">${product.subcategory || 'Sin especificar'}</span>
-                        <span class="modal-payment-text">Efectivo · Transferencia · MercadoPago</span>
+                        <span class="modal-payment-text">Efectivo (Dólares o Pesos)</span>
                     </div>
 
                     ${product.precio ? `<div class="modal-price">$${product.precio.toLocaleString('es-AR')}</div>` : ''}
