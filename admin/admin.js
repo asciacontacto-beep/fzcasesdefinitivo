@@ -668,27 +668,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sin esto, una foto de celular moderno guarda 3-8MB en base64 por producto,
     // y el catálogo entero (select=* de todos los productos) se vuelve pesadísimo
     // de bajar -> "tarda en cargar" / "no cargan los productos".
+    //
+    // Usa createImageBitmap con imageOrientation:'from-image' cuando está
+    // disponible: las fotos de celular llevan un flag EXIF de rotación (el
+    // sensor siempre graba "acostado" y el flag dice cómo mostrarla en
+    // pantalla). Un <img>+canvas normal ignora ese flag y dibuja los píxeles
+    // crudos -> fotos que se ven giradas en la web aunque en la galería del
+    // celu estén derechas. createImageBitmap sí lo respeta.
     function compressImageFile(file, callback, maxDim = 1200) {
+        function drawAndCompress(source, srcWidth, srcHeight) {
+            const canvas = document.createElement('canvas');
+            let width = srcWidth;
+            let height = srcHeight;
+            if (width > height && width > maxDim) {
+                height *= maxDim / width;
+                width = maxDim;
+            } else if (height > maxDim) {
+                width *= maxDim / height;
+                height = maxDim;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(source, 0, 0, width, height);
+            callback(canvas.toDataURL('image/jpeg', 0.8));
+        }
+
+        if (window.createImageBitmap) {
+            createImageBitmap(file, { imageOrientation: 'from-image' })
+                .then(bitmap => drawAndCompress(bitmap, bitmap.width, bitmap.height))
+                .catch(() => compressImageFileLegacy(file, drawAndCompress));
+        } else {
+            compressImageFileLegacy(file, drawAndCompress);
+        }
+    }
+
+    function compressImageFileLegacy(file, drawAndCompress) {
         const reader = new FileReader();
         reader.onload = ev => {
             const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                if (width > height && width > maxDim) {
-                    height *= maxDim / width;
-                    width = maxDim;
-                } else if (height > maxDim) {
-                    width *= maxDim / height;
-                    height = maxDim;
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                callback(canvas.toDataURL('image/jpeg', 0.8));
-            };
+            img.onload = () => drawAndCompress(img, img.width, img.height);
             img.src = ev.target.result;
         };
         reader.readAsDataURL(file);
@@ -742,6 +761,42 @@ document.addEventListener('DOMContentLoaded', () => {
             if (label1) label1.textContent = variant ? `Foto: ${variant.color}` : 'Variante';
             setPhotoBoxImage(1, variant ? variant.imagen : null);
         }
+    };
+
+    // Rota 90° en sentido horario la foto que esté puesta en ese casillero
+    // ahora mismo (soluciona fotos que suben giradas por el EXIF del celular).
+    window.rotatePhoto = (slot) => {
+        const select = document.getElementById('photo-target-select');
+        const targetingVariant = slot === 1 && select && select.value !== '__product__';
+        const variant = targetingVariant ? currentStockItems[Number(select.value)] : null;
+        const currentSrc = targetingVariant ? (variant && variant.imagen) : document.getElementById(`prod-img-${slot}`).value;
+
+        if (!currentSrc) {
+            window.showToast('No hay foto cargada en este casillero para rotar', 'error');
+            return;
+        }
+
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.height;
+            canvas.height = img.width;
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(Math.PI / 2);
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+            const rotated = canvas.toDataURL('image/jpeg', 0.9);
+
+            if (targetingVariant && variant) {
+                variant.imagen = rotated;
+                setPhotoBoxImage(1, rotated);
+                renderStockItems();
+            } else {
+                document.getElementById(`prod-img-${slot}`).value = rotated;
+                setPhotoBoxImage(slot, rotated);
+            }
+        };
+        img.src = currentSrc;
     };
 
     function initImageUpload() {

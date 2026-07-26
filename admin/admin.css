@@ -1136,6 +1136,22 @@ input:checked + .switch-slider:before {
     text-align: center;
 }
 
+.btn-rotate-photo {
+    display: block;
+    margin: 0.4rem auto 0;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    background: #f5f5f7;
+    border: 1px solid #e5e5ea;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.btn-rotate-photo:hover {
+    background: #e5e5ea;
+}
+
 /* Fields & Inputs Light */
 .tech-field {
     margin-bottom: 1.5rem;
