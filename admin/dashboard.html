@@ -686,6 +686,68 @@
                         <button class="btn btn-secondary mt-2" id="btn-add-timeline">+ Agregar Hito</button>
                     </div>
 
+                    <!-- Bento (3 tarjetas destacadas) -->
+                    <div class="tech-card" style="padding: 1.5rem;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">DESTACADOS (3 TARJETAS)</div>
+
+                        <div style="border-bottom: 1px solid #e5e5ea; padding-bottom: 1rem; margin-bottom: 1rem;">
+                            <div class="tech-field mb-1">
+                                <label>Tarjeta 1 - Imagen</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="nosotros-bento-1-img" class="tech-input" placeholder="URL o subir foto" style="flex: 1;">
+                                    <button type="button" class="btn btn-secondary" onclick="window.uploadAndCompressImage((base64) => { document.getElementById('nosotros-bento-1-img').value = base64; })" style="padding: 0 12px; white-space: nowrap;">Subir Foto</button>
+                                </div>
+                            </div>
+                            <div class="tech-field mb-1">
+                                <label>Tarjeta 1 - Título</label>
+                                <input type="text" id="nosotros-bento-1-title" class="tech-input" placeholder="Ej: Nuestro local">
+                            </div>
+                            <div class="tech-field">
+                                <label>Tarjeta 1 - Descripción</label>
+                                <textarea id="nosotros-bento-1-text" class="tech-input" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div style="border-bottom: 1px solid #e5e5ea; padding-bottom: 1rem; margin-bottom: 1rem;">
+                            <div class="tech-field mb-1">
+                                <label>Tarjeta 2 - Ícono (emoji)</label>
+                                <input type="text" id="nosotros-bento-2-icon" class="tech-input" placeholder="Ej: 🔧" style="max-width: 100px;">
+                            </div>
+                            <div class="tech-field mb-1">
+                                <label>Tarjeta 2 - Título</label>
+                                <input type="text" id="nosotros-bento-2-title" class="tech-input">
+                            </div>
+                            <div class="tech-field">
+                                <label>Tarjeta 2 - Descripción</label>
+                                <textarea id="nosotros-bento-2-text" class="tech-input" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="tech-field mb-1">
+                                <label>Tarjeta 3 - Ícono (emoji)</label>
+                                <input type="text" id="nosotros-bento-3-icon" class="tech-input" placeholder="Ej: 🛡️" style="max-width: 100px;">
+                            </div>
+                            <div class="tech-field mb-1">
+                                <label>Tarjeta 3 - Título</label>
+                                <input type="text" id="nosotros-bento-3-title" class="tech-input">
+                            </div>
+                            <div class="tech-field">
+                                <label>Tarjeta 3 - Descripción</label>
+                                <textarea id="nosotros-bento-3-text" class="tech-input" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Galería de fotos -->
+                    <div class="tech-card" style="padding: 1.5rem;">
+                        <div class="tech-card-label" style="margin-bottom: 1rem;">GALERÍA DE FOTOS</div>
+                        <div id="nosotros-gallery-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+                            <!-- Inyectado por JS -->
+                        </div>
+                        <button class="btn btn-secondary mt-2" id="btn-add-gallery-img">+ Agregar Foto</button>
+                    </div>
+
                     
 
 

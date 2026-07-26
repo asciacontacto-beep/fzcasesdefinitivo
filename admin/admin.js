@@ -1860,42 +1860,52 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = 'Guardando...';
             btn.disabled = true;
 
-            const cfg = await getConfigSettings();
-            
-            const timelineRows = document.querySelectorAll('#nosotros-timeline-container .timeline-row');
-            const timeline = Array.from(timelineRows).map(row => ({
-                year: row.querySelector('.tl-year').value.trim(),
-                title: row.querySelector('.tl-title').value.trim(),
-                desc: row.querySelector('.tl-desc').value.trim()
-            })).filter(t => t.title || t.desc);
+            try {
+                const cfg = await getConfigSettings();
 
-            const bento = [
-                {
-                    img: document.getElementById('nosotros-bento-1-img').value.trim(),
-                    title: document.getElementById('nosotros-bento-1-title').value.trim(),
-                    desc: document.getElementById('nosotros-bento-1-text').value.trim()
-                },
-                {
-                    icon: document.getElementById('nosotros-bento-2-icon').value.trim(),
-                    title: document.getElementById('nosotros-bento-2-title').value.trim(),
-                    desc: document.getElementById('nosotros-bento-2-text').value.trim()
-                },
-                {
-                    icon: document.getElementById('nosotros-bento-3-icon').value.trim(),
-                    title: document.getElementById('nosotros-bento-3-title').value.trim(),
-                    desc: document.getElementById('nosotros-bento-3-text').value.trim()
-                }
-            ];
+                const timelineRows = document.querySelectorAll('#nosotros-timeline-container .timeline-row');
+                const timeline = Array.from(timelineRows).map(row => ({
+                    year: row.querySelector('.tl-year').value.trim(),
+                    title: row.querySelector('.tl-title').value.trim(),
+                    desc: row.querySelector('.tl-desc').value.trim()
+                })).filter(t => t.title || t.desc);
 
-            const galleryRows = document.querySelectorAll('#nosotros-gallery-container .gallery-row');
-            const gallery = Array.from(galleryRows).map(row => row.querySelector('.gal-url').value.trim()).filter(u => u);
+                const bentoField = (id) => {
+                    const el = document.getElementById(id);
+                    return el ? el.value.trim() : '';
+                };
+                const bento = [
+                    {
+                        img: bentoField('nosotros-bento-1-img'),
+                        title: bentoField('nosotros-bento-1-title'),
+                        desc: bentoField('nosotros-bento-1-text')
+                    },
+                    {
+                        icon: bentoField('nosotros-bento-2-icon'),
+                        title: bentoField('nosotros-bento-2-title'),
+                        desc: bentoField('nosotros-bento-2-text')
+                    },
+                    {
+                        icon: bentoField('nosotros-bento-3-icon'),
+                        title: bentoField('nosotros-bento-3-title'),
+                        desc: bentoField('nosotros-bento-3-text')
+                    }
+                ];
 
-            cfg.about = { timeline, bento, gallery };
-            await saveConfigSettings(cfg);
-            
-            showToast('ConfiguraciÃ³n "Nosotros" guardada');
-            btn.innerHTML = 'Guardar Cambios';
-            btn.disabled = false;
+                const galleryRows = document.querySelectorAll('#nosotros-gallery-container .gallery-row');
+                const gallery = Array.from(galleryRows).map(row => row.querySelector('.gal-url').value.trim()).filter(u => u);
+
+                cfg.about = { timeline, bento, gallery };
+                await saveConfigSettings(cfg);
+
+                showToast('Configuración "Nosotros" guardada');
+            } catch (err) {
+                console.error('Error guardando Nosotros:', err);
+                showToast('No se pudo guardar: ' + err.message, 'error');
+            } finally {
+                btn.innerHTML = 'Guardar Cambios';
+                btn.disabled = false;
+            }
         };
     }
 
