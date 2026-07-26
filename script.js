@@ -10,6 +10,7 @@ async function loadProductsFromSupabase() {
     const { data, error } = await _supabase
         .from('products')
         .select('*')
+        .order('orden', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
 
     if (error) {

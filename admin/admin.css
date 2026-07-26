@@ -1852,3 +1852,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
+/* Drag & drop de productos */
+.drag-handle-cell {
+    cursor: grab;
+    color: #c7c7cc;
+    text-align: center;
+}
+.product-row-draggable {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.product-row-draggable:hover .drag-handle-cell {
+    color: #6e6e73;
+}
+.product-row-draggable.dragging {
+    opacity: 0.4;
+    background: #f0f4ff;
+    cursor: grabbing;
+}
+

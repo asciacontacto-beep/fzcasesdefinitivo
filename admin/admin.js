@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchData() {
         if (!_supabase) return;
         try {
-            const { data: products } = await _supabase.from('products').select('*').order('created_at', { ascending: false });
+            const { data: products } = await _supabase.from('products').select('*').order('orden', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false });
             if (products) memoryProducts = products;
 
             const { data: sales } = await _supabase.from('sales').select('*').order('fecha', { ascending: false });
@@ -222,7 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         arr.forEach(prod => {
             const tr = document.createElement('tr');
+            tr.className = 'product-row-draggable';
+            tr.draggable = true;
+            tr.dataset.id = prod.id;
             tr.innerHTML = `
+                <td class="drag-handle-cell" title="Arrastrá para reordenar">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="8" x2="20" y2="8"></line><line x1="4" y1="16" x2="20" y2="16"></line></svg>
+                </td>
                 <td>
                     <button class="expand-btn" onclick="window.toggleVariants(${prod.id}, this)">
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -291,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             variantsHtml += '</div>';
 
-            trVariants.innerHTML = `<td colspan="9">${variantsHtml}</td>`;
+            trVariants.innerHTML = `<td colspan="10">${variantsHtml}</td>`;
             tbody.appendChild(trVariants);
         });
 
@@ -337,6 +343,72 @@ document.addEventListener('DOMContentLoaded', () => {
         const { error } = await _supabase.from('products').delete().eq('id', id);
         if (!error) fetchData();
     };
+
+    // Drag & drop para reordenar productos. Arrastrás una fila (con su fila de
+    // variantes viajando pegada) y al soltar se reasigna "orden" para TODAS las
+    // filas visibles según su posición final en la tabla. El catálogo público
+    // usa esta misma columna, así que esto cambia el orden real en la web.
+    // Solo funciona sin filtros activos (si no, "posición visible" no refleja
+    // el orden global real y se podría desordenar lo que no se ve).
+    let draggedProductId = null;
+
+    function setupProductDragDrop() {
+        const tbody = document.getElementById('tbody-products');
+        if (!tbody || tbody.dataset.dragReady) return;
+        tbody.dataset.dragReady = 'true';
+
+        const filtersActive = () => {
+            const text = searchProducts ? searchProducts.value.trim() : '';
+            const cat = adminFilterCategory ? adminFilterCategory.value : 'Todas';
+            const mod = adminFilterModel ? adminFilterModel.value : 'Todos';
+            return !!text || cat !== 'Todas' || mod !== 'Todos';
+        };
+
+        tbody.addEventListener('dragstart', (e) => {
+            const row = e.target.closest('.product-row-draggable');
+            if (!row) return;
+            if (filtersActive()) {
+                e.preventDefault();
+                window.showToast('Sacá los filtros/búsqueda para poder reordenar', 'error');
+                return;
+            }
+            draggedProductId = row.dataset.id;
+            row.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        tbody.addEventListener('dragover', (e) => {
+            const row = e.target.closest('.product-row-draggable');
+            if (!row || !draggedProductId || row.dataset.id === draggedProductId) return;
+            e.preventDefault();
+
+            const draggedRow = tbody.querySelector(`.product-row-draggable[data-id="${draggedProductId}"]`);
+            if (!draggedRow) return;
+            const draggedVariants = document.getElementById(`variants-row-${draggedProductId}`);
+
+            const rect = row.getBoundingClientRect();
+            const isAfter = (e.clientY - rect.top) > rect.height / 2;
+            if (isAfter) {
+                row.after(draggedRow);
+            } else {
+                row.before(draggedRow);
+            }
+            if (draggedVariants) draggedRow.after(draggedVariants);
+        });
+
+        tbody.addEventListener('dragend', async (e) => {
+            const row = e.target.closest('.product-row-draggable');
+            if (row) row.classList.remove('dragging');
+            if (!draggedProductId) return;
+            draggedProductId = null;
+
+            const ids = Array.from(tbody.querySelectorAll('.product-row-draggable')).map(r => Number(r.dataset.id));
+            await Promise.all(ids.map((id, index) =>
+                _supabase.from('products').update({ orden: (index + 1) * 10 }).eq('id', id)
+            ));
+            fetchData();
+        });
+    }
 
     // ==============================================================================
     // 4. MODALES Y FORMULARIOS (CRUD)
@@ -1351,6 +1423,13 @@ document.addEventListener('DOMContentLoaded', () => {
             variantes: extraUnits.length > 0 ? extraUnits : null
         };
 
+        if (!id) {
+            // Producto nuevo: lo mandamos al final del orden actual (no None,
+            // para que no empate con otros productos nuevos sin orden definido)
+            const maxOrden = memoryProducts.reduce((max, p) => Math.max(max, p.orden || 0), 0);
+            prodData.orden = maxOrden + 1;
+        }
+
         const { error } = id
             ? await _supabase.from('products').update(prodData).eq('id', id)
             : await _supabase.from('products').insert([prodData]);
@@ -1414,6 +1493,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initImageUpload();
+    setupProductDragDrop();
     document.getElementById('prod-cat').onchange = (e) => {
         updateModelDropdown(e.target.value);
         updateColorDropdown(e.target.value);
