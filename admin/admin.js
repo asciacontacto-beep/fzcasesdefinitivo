@@ -539,6 +539,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cargar datos en los inputs
         document.getElementById('item-storage').value = item.almacenamiento;
+        const ramDiskMatch = (item.almacenamiento || '').match(/^(.+?)\/(.+)$/);
+        document.getElementById('item-storage-ram').value = ramDiskMatch ? ramDiskMatch[1] : '';
+        document.getElementById('item-storage-disk').value = ramDiskMatch ? ramDiskMatch[2] : '';
 
         // Si el color no está en el select, agregarlo temporalmente
         const colorSelect = document.getElementById('item-color');
@@ -603,7 +606,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btn-add-stock-item').onclick = () => {
-        const storage = document.getElementById('item-storage').value;
+        const isMacStorageMode = document.getElementById('item-storage-mac-mode').style.display !== 'none';
+        let storage;
+        if (isMacStorageMode) {
+            const ram = document.getElementById('item-storage-ram').value.trim();
+            const disk = document.getElementById('item-storage-disk').value.trim();
+            storage = ram && disk ? `${ram}/${disk}` : (ram || disk || '-');
+        } else {
+            storage = document.getElementById('item-storage').value;
+        }
         const colorRaw = document.getElementById('item-color').value.trim();
         const color = normalizeColorValue(colorRaw);
         const battery = document.getElementById('item-battery').value.trim();
@@ -643,6 +654,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('item-sim').value = '-';
             document.getElementById('item-box').value = '-';
             document.getElementById('item-notes').value = '';
+            document.getElementById('item-storage-ram').value = '';
+            document.getElementById('item-storage-disk').value = '';
             renderStockItems();
         } else {
             alert("Por favor, ingresá al menos el color.");
@@ -712,6 +725,50 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsDataURL(file);
     }
+
+    // Reemplaza window.prompt() para agregar valores custom (color/almacenamiento).
+    // prompt() no anda en algunos entornos (webview de WhatsApp, ciertos navegadores
+    // embebidos) y ahí el botón "+" parecía no hacer nada. Esto es un campito propio,
+    // siempre funciona igual sin depender del navegador.
+    window.showInlineAddInput = (anchorEl, placeholder, onSubmit) => {
+        const existing = document.getElementById('inline-add-popover');
+        if (existing) existing.remove();
+
+        const rect = anchorEl.getBoundingClientRect();
+        const box = document.createElement('div');
+        box.id = 'inline-add-popover';
+        box.style.cssText = `position:fixed; top:${rect.bottom + 6}px; left:${Math.max(8, rect.right - 220)}px; z-index:9999; background:#fff; border:1px solid #d2d2d7; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); padding:8px; display:flex; gap:6px; align-items:center;`;
+        box.innerHTML = `
+            <input type="text" placeholder="${placeholder}" style="border:1px solid #d2d2d7; border-radius:6px; padding:6px 8px; font-size:0.85rem; width:160px;">
+            <button type="button" style="background:#000; color:#fff; border:none; border-radius:6px; padding:6px 10px; font-size:0.85rem; cursor:pointer;">OK</button>
+        `;
+        document.body.appendChild(box);
+
+        const input = box.querySelector('input');
+        const confirmBtn = box.querySelector('button');
+        input.focus();
+
+        const submit = () => {
+            const value = input.value.trim();
+            box.remove();
+            if (value) onSubmit(value);
+        };
+        const cancel = () => box.remove();
+
+        confirmBtn.onclick = submit;
+        input.onkeydown = (e) => {
+            if (e.key === 'Enter') submit();
+            if (e.key === 'Escape') cancel();
+        };
+        setTimeout(() => {
+            document.addEventListener('click', function onOutside(e) {
+                if (!box.contains(e.target) && e.target !== anchorEl) {
+                    cancel();
+                    document.removeEventListener('click', onOutside);
+                }
+            });
+        }, 0);
+    };
 
     window.uploadAndCompressImage = (callback) => {
         const input = document.createElement('input');
@@ -835,17 +892,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const storageSelectEl = document.getElementById('item-storage');
         if (btnAddStorage && storageSelectEl) {
             btnAddStorage.onclick = () => {
-                const raw = prompt('Almacenamiento / especificación (ej: 16GB/512GB):');
-                if (!raw || !raw.trim()) return;
-                const value = raw.trim();
-                const exists = Array.from(storageSelectEl.options).some(opt => opt.value.toLowerCase() === value.toLowerCase());
-                if (!exists) {
-                    const opt = document.createElement('option');
-                    opt.value = value;
-                    opt.text = value;
-                    storageSelectEl.appendChild(opt);
-                }
-                storageSelectEl.value = value;
+                window.showInlineAddInput(btnAddStorage, 'Ej: 16GB/512GB', (value) => {
+                    const exists = Array.from(storageSelectEl.options).some(opt => opt.value.toLowerCase() === value.toLowerCase());
+                    if (!exists) {
+                        const opt = document.createElement('option');
+                        opt.value = value;
+                        opt.text = value;
+                        storageSelectEl.appendChild(opt);
+                    }
+                    storageSelectEl.value = value;
+                });
             };
         }
 
@@ -854,17 +910,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const colorSelectEl = document.getElementById('item-color');
         if (btnAddColor && colorSelectEl) {
             btnAddColor.onclick = () => {
-                const raw = prompt('Nombre del color nuevo:');
-                if (!raw || !raw.trim()) return;
-                const name = normalizeColorValue(raw.trim());
-                const exists = Array.from(colorSelectEl.options).some(opt => opt.value.toLowerCase() === name.toLowerCase());
-                if (!exists) {
-                    const opt = document.createElement('option');
-                    opt.value = name;
-                    opt.text = name;
-                    colorSelectEl.appendChild(opt);
-                }
-                colorSelectEl.value = name;
+                window.showInlineAddInput(btnAddColor, 'Nombre del color', (raw) => {
+                    const name = normalizeColorValue(raw);
+                    const exists = Array.from(colorSelectEl.options).some(opt => opt.value.toLowerCase() === name.toLowerCase());
+                    if (!exists) {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.text = name;
+                        colorSelectEl.appendChild(opt);
+                    }
+                    colorSelectEl.value = name;
+                });
             };
         }
     }
@@ -1547,11 +1603,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Para Mac, "Almac." es en realidad RAM + Disco (ej. "8GB/256GB") y escribirlo
+    // junto a mano confunde. Se muestran 2 campos separados que se combinan solos.
+    function updateStorageMode(category) {
+        const normalMode = document.getElementById('item-storage-normal-mode');
+        const macMode = document.getElementById('item-storage-mac-mode');
+        if (!normalMode || !macMode) return;
+        if (category === 'MacBook') {
+            normalMode.style.display = 'none';
+            macMode.style.display = '';
+        } else {
+            normalMode.style.display = '';
+            macMode.style.display = 'none';
+        }
+    }
+
     initImageUpload();
     setupProductDragDrop();
     document.getElementById('prod-cat').onchange = (e) => {
         updateModelDropdown(e.target.value);
         updateColorDropdown(e.target.value);
+        updateStorageMode(e.target.value);
     };
     document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => {
         b.closest('.modal-overlay').classList.add('hidden');

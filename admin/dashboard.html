@@ -994,7 +994,7 @@
                                     </div>
                                     
                                     <div class="add-stock-item-row stock-variant-row" style="align-items: flex-end;">
-                                    <div class="input-col">
+                                    <div class="input-col" id="item-storage-normal-mode">
                                         <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Almac.</div>
                                         <div style="display: flex; gap: 4px; align-items: center;">
                                         <select id="item-storage" class="tech-input" style="flex: 1;">
@@ -1007,6 +1007,13 @@
                                         <option value="2TB">2TB</option>
                                     </select>
                                     <button type="button" id="btn-add-storage" class="btn btn-secondary" style="padding: 0 10px; font-size: 1.2rem; font-weight: bold; background: #e5e5ea; border: none; border-radius: 8px; height: 38px; cursor: pointer;" title="Agregar valor custom (ej: 16GB/512GB)">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="input-col" id="item-storage-mac-mode" style="display:none;">
+                                        <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">RAM / Almac.</div>
+                                        <div style="display: flex; gap: 4px; align-items: center;">
+                                        <input type="text" id="item-storage-ram" class="tech-input" placeholder="RAM (ej: 16GB)" style="flex: 1; min-width: 0;">
+                                        <input type="text" id="item-storage-disk" class="tech-input" placeholder="Disco (ej: 512GB)" style="flex: 1; min-width: 0;">
                                         </div>
                                     </div>
                                     <div class="input-col">
