@@ -592,6 +592,36 @@ document.addEventListener('DOMContentLoaded', () => {
         renderStockItems();
     }
 
+    // Redimensiona a max 1200px y comprime a JPEG 0.8 antes de mandar a la DB.
+    // Sin esto, una foto de celular moderno guarda 3-8MB en base64 por producto,
+    // y el catálogo entero (select=* de todos los productos) se vuelve pesadísimo
+    // de bajar -> "tarda en cargar" / "no cargan los productos".
+    function compressImageFile(file, callback, maxDim = 1200) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                if (width > height && width > maxDim) {
+                    height *= maxDim / width;
+                    width = maxDim;
+                } else if (height > maxDim) {
+                    width *= maxDim / height;
+                    height = maxDim;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                callback(canvas.toDataURL('image/jpeg', 0.8));
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
     window.uploadAndCompressImage = (callback) => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -599,31 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.onchange = e => {
             const file = e.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDim = 1200;
-                    if (width > height && width > maxDim) {
-                        height *= maxDim / width;
-                        width = maxDim;
-                    } else if (height > maxDim) {
-                        width *= maxDim / height;
-                        height = maxDim;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                    callback(compressedBase64);
-                };
-                img.src = ev.target.result;
-            };
-            reader.readAsDataURL(file);
+            compressImageFile(file, callback);
         };
         input.click();
     };
@@ -675,29 +681,65 @@ document.addEventListener('DOMContentLoaded', () => {
             fileInput.onchange = e => {
                 const file = e.target.files[0];
                 if (!file) return;
-                const reader = new FileReader();
-                reader.onload = ev => {
+                compressImageFile(file, (compressedBase64) => {
                     const select = document.getElementById('photo-target-select');
                     const targetingVariant = slot === 1 && select && select.value !== '__product__';
 
                     if (targetingVariant) {
                         const variant = currentStockItems[Number(select.value)];
                         if (variant) {
-                            variant.imagen = ev.target.result;
-                            setPhotoBoxImage(1, ev.target.result);
+                            variant.imagen = compressedBase64;
+                            setPhotoBoxImage(1, compressedBase64);
                             renderStockItems();
                         }
                     } else {
-                        document.getElementById(`prod-img-${slot}`).value = ev.target.result;
-                        setPhotoBoxImage(slot, ev.target.result);
+                        document.getElementById(`prod-img-${slot}`).value = compressedBase64;
+                        setPhotoBoxImage(slot, compressedBase64);
                     }
-                };
-                reader.readAsDataURL(file);
+                });
             };
         });
 
         const targetSelect = document.getElementById('photo-target-select');
         if (targetSelect) targetSelect.onchange = window.applyPhotoTargetMode;
+
+        // Agregar almacenamiento custom (ej: "16GB/512GB" para Mac, "128GB WiFi" para iPad)
+        const btnAddStorage = document.getElementById('btn-add-storage');
+        const storageSelectEl = document.getElementById('item-storage');
+        if (btnAddStorage && storageSelectEl) {
+            btnAddStorage.onclick = () => {
+                const raw = prompt('Almacenamiento / especificación (ej: 16GB/512GB):');
+                if (!raw || !raw.trim()) return;
+                const value = raw.trim();
+                const exists = Array.from(storageSelectEl.options).some(opt => opt.value.toLowerCase() === value.toLowerCase());
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = value;
+                    opt.text = value;
+                    storageSelectEl.appendChild(opt);
+                }
+                storageSelectEl.value = value;
+            };
+        }
+
+        // Agregar color custom no listado (ej. colores nuevos de un modelo recién salido)
+        const btnAddColor = document.getElementById('btn-add-color');
+        const colorSelectEl = document.getElementById('item-color');
+        if (btnAddColor && colorSelectEl) {
+            btnAddColor.onclick = () => {
+                const raw = prompt('Nombre del color nuevo:');
+                if (!raw || !raw.trim()) return;
+                const name = normalizeColorValue(raw.trim());
+                const exists = Array.from(colorSelectEl.options).some(opt => opt.value.toLowerCase() === name.toLowerCase());
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.text = name;
+                    colorSelectEl.appendChild(opt);
+                }
+                colorSelectEl.value = name;
+            };
+        }
     }
 
     const CATEGORY_MODELS = {
@@ -1084,12 +1126,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logo-upload').onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            _pendingLogoB64 = ev.target.result;
+        compressImageFile(file, (compressedBase64) => {
+            _pendingLogoB64 = compressedBase64;
             document.getElementById('logo-preview').src = _pendingLogoB64;
-        };
-        reader.readAsDataURL(file);
+        }, 400);
     };
 
     document.getElementById('btn-save-hero-config').onclick = async (e) => {
@@ -1226,21 +1266,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('hero-gallery-upload').onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
+        compressImageFile(file, async (compressedBase64) => {
             const heroData = {
                 nombre: '__SYSTEM_HERO__',
                 categoria: 'Sistema',
                 activo: true,
-                imagen: ev.target.result,
+                imagen: compressedBase64,
                 precio_venta: 0,
                 precio_costo: 0,
                 stock: 0
             };
             await _supabase.from('products').insert([heroData]);
             await fetchData();
-        };
-        reader.readAsDataURL(file);
+        }, 1920);
     };
 
     // -- Listeners de Botones Abrir --

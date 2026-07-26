@@ -995,14 +995,18 @@
                                     <div class="add-stock-item-row stock-variant-row" style="align-items: flex-end;">
                                     <div class="input-col">
                                         <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Almac.</div>
-                                        <select id="item-storage" class="tech-input">
+                                        <div style="display: flex; gap: 4px; align-items: center;">
+                                        <select id="item-storage" class="tech-input" style="flex: 1;">
                                         <option value="-">-</option>
                                         <option value="64GB">64GB</option>
                                         <option value="128GB">128GB</option>
                                         <option value="256GB">256GB</option>
                                         <option value="512GB">512GB</option>
                                         <option value="1TB">1TB</option>
+                                        <option value="2TB">2TB</option>
                                     </select>
+                                    <button type="button" id="btn-add-storage" class="btn btn-secondary" style="padding: 0 10px; font-size: 1.2rem; font-weight: bold; background: #e5e5ea; border: none; border-radius: 8px; height: 38px; cursor: pointer;" title="Agregar valor custom (ej: 16GB/512GB)">+</button>
+                                        </div>
                                     </div>
                                     <div class="input-col">
                                         <div style="font-size: 0.65rem; color: #8e8e93; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Color</div>
