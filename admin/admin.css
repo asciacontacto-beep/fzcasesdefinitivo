@@ -726,16 +726,23 @@ body.admin-dashboard-body {
 .badge-info { background: #dbeafe; color: #1e40af; }
 
 .action-btn {
-    background: transparent;
-    border: none;
-    padding: 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: #f5f5f7;
+    border: 1px solid #e5e5ea;
+    padding: 0;
     cursor: pointer;
-    border-radius: 6px;
-    color: #9ca3af;
-    transition: all 0.2s;
+    border-radius: 8px;
+    color: #6e6e73;
+    transition: all 0.15s;
+    margin-right: 4px;
 }
-.action-btn.edit:hover { color: #3b82f6; background: #eff6ff; }
-.action-btn.delete:hover { color: #ef4444; background: #fef2f2; }
+.action-btn:hover { background: #eff6ff; border-color: #bfdbfe; color: #3b82f6; }
+.action-btn.delete { color: #ef4444; }
+.action-btn.delete:hover { background: #fee2e2; border-color: #ef4444; }
 
 /* Empty States */
 .empty-state {
