@@ -351,7 +351,7 @@ let activeSubcat = (new URLSearchParams(window.location.search).get('subcat'))
     ? decodeURIComponent(new URLSearchParams(window.location.search).get('subcat'))
     : 'Todos';
 
-const phoneNumber = "5491100000000";
+const phoneNumber = "5492494521518";
 
 document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
@@ -1601,9 +1601,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `*Chip o eSIM:* ${f.sim}%0A%0A` +
                 `_Solicito tasacion para plan canje_`;
             
-            // WA Default test number
-            const waNumber = '1123456789'; // Esto se deberá cambiar por global_W_NUMBER si existiera
-            const waURL = `https://wa.me/549${waNumber}?text=${message}`;
+            const waURL = `https://wa.me/${phoneNumber}?text=${message}`;
             
             window.open(waURL, '_blank');
             localStorage.removeItem('fzcases_canje_data'); // clean up after success!
