@@ -1829,6 +1829,13 @@ a.contact-item:hover {
     letter-spacing: -1px;
 }
 
+.modal-descripcion {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
 /* === VARIANTS === */
 .variant-selectors {
     margin-bottom: 1.5rem;

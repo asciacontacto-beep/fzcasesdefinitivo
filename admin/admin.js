@@ -860,6 +860,23 @@ document.addEventListener('DOMContentLoaded', () => {
         img.src = currentSrc;
     };
 
+    // Quita la foto puesta en ese casillero (no había forma de sacar una foto
+    // ya cargada, solo de reemplazarla subiendo otra).
+    window.clearPhoto = (slot) => {
+        const select = document.getElementById('photo-target-select');
+        const targetingVariant = slot === 1 && select && select.value !== '__product__';
+        const variant = targetingVariant ? currentStockItems[Number(select.value)] : null;
+
+        if (targetingVariant && variant) {
+            variant.imagen = null;
+            setPhotoBoxImage(1, null);
+            renderStockItems();
+        } else {
+            document.getElementById(`prod-img-${slot}`).value = '';
+            setPhotoBoxImage(slot, null);
+        }
+    };
+
     function initImageUpload() {
         // Imágenes de producto / variantes: el casillero 1 (Principal) se reasigna
         // según lo elegido en "Aplica a"; los casilleros 2 y 3 siempre son del producto.
@@ -1530,6 +1547,7 @@ document.addEventListener('DOMContentLoaded', () => {
             battery: mainUnit.bateria,
             ubicacion: document.getElementById('prod-location') ? document.getElementById('prod-location').value : null,
             notas: finalNotas,
+            descripcion: document.getElementById('prod-descripcion').value.trim() || null,
             imagen: document.getElementById('prod-img-1').value || mainUnit.imagen || '/assets/iphone_case.png',
             imagen2: document.getElementById('prod-img-2').value || null,
             imagen3: document.getElementById('prod-img-3').value || null,
@@ -1669,6 +1687,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         document.getElementById('prod-battery').value = p.battery || '';
+        document.getElementById('prod-descripcion').value = p.descripcion || '';
 
         // Reset y Cargar Unidades en Stock (Variantes)
         const isWatch = p.categoria === 'Apple Watch';

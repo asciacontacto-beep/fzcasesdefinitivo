@@ -1143,9 +1143,14 @@ input:checked + .switch-slider:before {
     text-align: center;
 }
 
+.photo-actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 0.4rem;
+}
+
 .btn-rotate-photo {
-    display: block;
-    margin: 0.4rem auto 0;
     padding: 4px 10px;
     font-size: 0.75rem;
     font-weight: 600;

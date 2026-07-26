@@ -1115,7 +1115,10 @@
                                         class="hidden" id="img-1">
                                 </div>
                                 <div class="photo-label-outer" id="photo-label-1">Principal</div>
-                                <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.rotatePhoto(1)" title="Rotar 90°">&#8635; Rotar</button>
+                                <div class="photo-actions-row">
+                                    <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.rotatePhoto(1)" title="Rotar 90°">&#8635; Rotar</button>
+                                    <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.clearPhoto(1)" title="Quitar foto">&times; Quitar</button>
+                                </div>
                             </div>
 
                             <!-- Foto 2 -->
@@ -1137,7 +1140,10 @@
                                         class="hidden" id="img-2">
                                 </div>
                                 <div class="photo-label-outer">Foto 2</div>
-                                <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.rotatePhoto(2)" title="Rotar 90°">&#8635; Rotar</button>
+                                <div class="photo-actions-row">
+                                    <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.rotatePhoto(2)" title="Rotar 90°">&#8635; Rotar</button>
+                                    <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.clearPhoto(2)" title="Quitar foto">&times; Quitar</button>
+                                </div>
                             </div>
 
                             <!-- Foto 3 -->
@@ -1159,7 +1165,10 @@
                                         class="hidden" id="img-3">
                                 </div>
                                 <div class="photo-label-outer">Foto 3</div>
-                                <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.rotatePhoto(3)" title="Rotar 90°">&#8635; Rotar</button>
+                                <div class="photo-actions-row">
+                                    <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.rotatePhoto(3)" title="Rotar 90°">&#8635; Rotar</button>
+                                    <button type="button" class="btn-rotate-photo" onclick="event.stopPropagation(); window.clearPhoto(3)" title="Quitar foto">&times; Quitar</button>
+                                </div>
                             </div>
                         </div>
                         <input type="hidden" id="prod-img-1" value="">
@@ -1175,6 +1184,11 @@
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                         </svg>
                         ESTADO Y NOTAS
+                    </div>
+
+                    <div class="tech-field mb-1">
+                        <label>Descripción (la ven los clientes en la web)</label>
+                        <textarea id="prod-descripcion" class="tech-input" rows="3" placeholder="Ej: Impecable, sin marcas de uso, incluye caja y accesorios originales."></textarea>
                     </div>
 
                     <div class="tech-toggle-row">

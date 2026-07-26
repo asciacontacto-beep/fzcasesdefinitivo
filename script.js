@@ -10,7 +10,7 @@ let products = [];
 // la grilla del catálogo, solo cuando se abre el modal de un producto puntual.
 // Bajarlas todas de una para TODOS los productos era el motivo real de que el
 // catálogo tardara en cargar.
-const CATALOG_LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,precio_venta,precio_costo,battery,ubicacion,notas,imagen,stock,activo,created_at,orden';
+const CATALOG_LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,precio_venta,precio_costo,battery,ubicacion,notas,descripcion,imagen,stock,activo,created_at,orden';
 
 async function loadProductsFromSupabase() {
     if (!_supabase) return;
@@ -289,6 +289,7 @@ async function loadProductsFromSupabase() {
             stock: p.stock,
             features: allFeatures,
             notas: cleanNotas,
+            descripcion: p.descripcion || '',
             bestseller: p.bestseller || isBestseller,
             nuevoIngreso: isNuevo,
             variantes: null,
@@ -950,6 +951,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     ${product.precio ? `<div class="modal-price">$${product.precio.toLocaleString('es-AR')}</div>` : ''}
+
+                    ${product.descripcion ? `<p class="modal-descripcion">${product.descripcion.replace(/</g, '&lt;').replace(/\n/g, '<br>')}</p>` : ''}
 
                     <div id="variant-selectors" class="variant-selectors"></div>
 
