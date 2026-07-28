@@ -337,6 +337,7 @@
                             <div class="step-circle" data-step="4">4</div>
                             <div class="step-circle" data-step="5">5</div>
                             <div class="step-circle" data-step="6">6</div>
+                            <div class="step-circle" data-step="7">7</div>
                         </div>
                     </div>
 
@@ -347,17 +348,20 @@
                         <div class="wizard-step active" id="step-1">
                             <h3>¿Qué modelo de iPhone tenés?</h3>
                             <div class="model-options" id="model-options">
+                                <button type="button" class="pill-btn" data-value="iPhone 17 Pro Max">iPhone 17 Pro Max</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 17 Pro">iPhone 17 Pro</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 17 Air">iPhone 17 Air</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 17">iPhone 17</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 17e">iPhone 17e</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 16 Pro Max">iPhone 16 Pro Max</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 16 Pro">iPhone 16 Pro</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 16">iPhone 16</button>
+                                <button type="button" class="pill-btn" data-value="iPhone 16e">iPhone 16e</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 15 Pro Max">iPhone 15 Pro Max</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 15 Pro">iPhone 15 Pro</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 15">iPhone 15</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 14 Pro Max">iPhone 14 Pro Max</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 14 Pro">iPhone 14 Pro</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 14">iPhone 14</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 13 Pro Max">iPhone 13 Pro Max</button>
-                                <button type="button" class="pill-btn" data-value="iPhone 13 Pro">iPhone 13 Pro</button>
                                 <button type="button" class="pill-btn" data-value="iPhone 13">iPhone 13</button>
                                 <button type="button" class="pill-btn" data-value="Otro" id="btn-otro-modelo">Otro</button>
                             </div>
@@ -379,6 +383,25 @@
 
                         <!-- PASO 2 -->
                         <div class="wizard-step" id="step-2">
+                            <h3>¿En qué sucursal harías el canje?</h3>
+                            <div class="model-options" id="ubicacion-options">
+                                <button type="button" class="pill-btn pill-ubicacion" data-value="Necochea">Necochea</button>
+                                <button type="button" class="pill-btn pill-ubicacion" data-value="Tandil">Tandil</button>
+                            </div>
+
+                            <h3 style="margin-top: 2rem;">¿Por cuál te gustaría cambiarlo?</h3>
+                            <div class="model-options" id="deseado-tipo-options">
+                                <button type="button" class="pill-btn pill-deseado-tipo" data-value="Sellado">Sellado</button>
+                                <button type="button" class="pill-btn pill-deseado-tipo" data-value="Usado">Usado</button>
+                                <button type="button" class="pill-btn pill-deseado-tipo" data-value="Todavía no sé" id="btn-deseado-no-se">Todavía no sé</button>
+                            </div>
+                            <div class="other-model-container active" id="deseado-modelo-container">
+                                <input type="text" id="input-deseado-modelo" placeholder="¿Qué modelo en particular? (Ej: iPhone 17 Pro 256GB)" class="custom-input">
+                            </div>
+                        </div>
+
+                        <!-- PASO 3 -->
+                        <div class="wizard-step" id="step-3">
                             <h3>¿En qué estado físico está tu iPhone?</h3>
                             <div class="state-options grid-2x2" id="state-options-container" style="grid-template-columns: 1fr 1fr 1fr;">
                                 <div class="state-card" data-value="Como nuevo">
@@ -410,7 +433,7 @@
                         </div>
 
                         <!-- PASO 3 -->
-                        <div class="wizard-step" id="step-3">
+                        <div class="wizard-step" id="step-4">
                             <h3>¿Qué funciona correctamente?</h3>
                             <div class="func-checks">
                                 <label class="custom-check-card" style="border-color: var(--apple-blue); background: rgba(0, 122, 255, 0.05);">
@@ -449,7 +472,7 @@
                         </div>
 
                         <!-- PASO 4 -->
-                        <div class="wizard-step" id="step-4">
+                        <div class="wizard-step" id="step-5">
                             <h3>Batería</h3>
                             <div class="battery-input-box">
                                 <label for="battery-health">Condición de la batería (%)</label>
@@ -469,10 +492,10 @@
                         </div>
 
                         <!-- PASO 5 -->
-                        <div class="wizard-step" id="step-5">
+                        <div class="wizard-step" id="step-6">
                             <h3>Detalles de Compra y Accesorios</h3>
                             <p style="font-size: 0.9rem; color: var(--apple-red); font-weight: 600; margin-bottom: 1rem;">
-                                �a�️ Importante: Es requisito excluyente entregar el equipo con su Caja y Cable original.
+                                ⚠️ Importante: Es requisito excluyente entregar el equipo con su Caja y Cable original.
                             </p>
                             
                             <div class="func-checks" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -520,7 +543,7 @@
                         </div>
 
                         <!-- PASO 6 -->
-                        <div class="wizard-step" id="step-6">
+                        <div class="wizard-step" id="step-7">
                             <div class="summary-header">
                                 <h3>Revisá tu información</h3>
                                 <p>Tocá enviar y te contactamos al instante por WhatsApp con una cotización</p>

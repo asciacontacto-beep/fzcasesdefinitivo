@@ -1245,11 +1245,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // --- Wizard Logic ---
         let currentStep = 1;
-        const totalSteps = 6;
+        const totalSteps = 7;
         let canjeData = {
             modelo: '',
             capacidad: '',
             color: '',
+            ubicacion: '',
+            deseadoTipo: '',
+            deseadoModelo: '',
             estado: '',
             detalles: '',
             todoFunciona: false,
@@ -1281,12 +1284,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const stepsBoxes = document.querySelectorAll('.wizard-step');
         
         // Elementos Paso 1
-        const pillBtns = document.querySelectorAll('.pill-btn:not(.pill-cap)');
+        const pillBtns = document.querySelectorAll('.pill-btn:not(.pill-cap):not(.pill-ubicacion):not(.pill-deseado-tipo)');
         const pillCaps = document.querySelectorAll('.pill-cap');
         const btnOtro = document.getElementById('btn-otro-modelo');
         const otherContainer = document.getElementById('other-model-container');
         const otherInput = document.getElementById('input-other-model');
         const inputColor = document.getElementById('input-color');
+        const pillUbicacion = document.querySelectorAll('.pill-ubicacion');
+        const pillDeseadoTipo = document.querySelectorAll('.pill-deseado-tipo');
+        const btnDeseadoNoSe = document.getElementById('btn-deseado-no-se');
+        const deseadoModeloContainer = document.getElementById('deseado-modelo-container');
+        const inputDeseadoModelo = document.getElementById('input-deseado-modelo');
 
         // Elementos Paso 2
         const stateCards = document.querySelectorAll('.state-card');
@@ -1328,6 +1336,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (foundCap) foundCap.classList.add('selected');
             }
             if (canjeData.color) inputColor.value = canjeData.color;
+            if (canjeData.ubicacion) {
+                let foundUbic = Array.from(pillUbicacion).find(btn => btn.dataset.value === canjeData.ubicacion);
+                if (foundUbic) foundUbic.classList.add('selected');
+            }
+            if (canjeData.deseadoTipo) {
+                let foundTipo = Array.from(pillDeseadoTipo).find(btn => btn.dataset.value === canjeData.deseadoTipo);
+                if (foundTipo) foundTipo.classList.add('selected');
+                deseadoModeloContainer.classList.toggle('active', canjeData.deseadoTipo !== 'Todavía no sé');
+            }
+            if (canjeData.deseadoModelo) inputDeseadoModelo.value = canjeData.deseadoModelo;
 
             // Step 2
             if (canjeData.estado) {
@@ -1391,12 +1409,40 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        const inputHandlers = [otherInput, inputColor, inputDetalles, inputReparaciones, batteryInput, inputCiclos, selectSim, inputAntiguedad, inputOrigen];
+        pillUbicacion.forEach(btn => {
+            btn.addEventListener('click', () => {
+                pillUbicacion.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                canjeData.ubicacion = btn.dataset.value;
+                saveData();
+                validateCurrentStep();
+            });
+        });
+
+        pillDeseadoTipo.forEach(btn => {
+            btn.addEventListener('click', () => {
+                pillDeseadoTipo.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                canjeData.deseadoTipo = btn.dataset.value;
+                if (btn === btnDeseadoNoSe) {
+                    deseadoModeloContainer.classList.remove('active');
+                    inputDeseadoModelo.value = '';
+                    canjeData.deseadoModelo = '';
+                } else {
+                    deseadoModeloContainer.classList.add('active');
+                }
+                saveData();
+                validateCurrentStep();
+            });
+        });
+
+        const inputHandlers = [otherInput, inputColor, inputDeseadoModelo, inputDetalles, inputReparaciones, batteryInput, inputCiclos, selectSim, inputAntiguedad, inputOrigen];
         inputHandlers.forEach(input => {
             if (!input) return;
             input.addEventListener('input', () => {
                 if (input === otherInput && btnOtro.classList.contains('selected')) canjeData.modelo = input.value.trim();
                 if (input === inputColor) canjeData.color = input.value.trim();
+                if (input === inputDeseadoModelo) canjeData.deseadoModelo = input.value.trim();
                 if (input === inputDetalles) canjeData.detalles = input.value.trim();
                 if (input === inputReparaciones) canjeData.reparaciones = input.value.trim();
                 if (input === batteryInput) canjeData.bateria = input.value.trim();
@@ -1459,28 +1505,34 @@ document.addEventListener('DOMContentLoaded', () => {
             let isValid = false;
             
             if (currentStep === 1) {
-                const selectedModel = document.querySelector('.pill-btn.selected:not(.pill-cap)');
+                const selectedModel = document.querySelector('.pill-btn.selected:not(.pill-cap):not(.pill-ubicacion):not(.pill-deseado-tipo)');
                 const selectedCap = document.querySelector('.pill-cap.selected');
                 const hasModel = selectedModel && (selectedModel.id !== 'btn-otro-modelo' || otherInput.value.trim().length > 2);
                 const hasCap = selectedCap !== null;
-                // Color is now optional for better fluidity
+                // Color es opcional para más fluidez
                 isValid = hasModel && hasCap;
-            } 
+            }
             else if (currentStep === 2) {
+                const hasUbicacion = document.querySelector('.pill-ubicacion.selected') !== null;
+                const hasDeseadoTipo = document.querySelector('.pill-deseado-tipo.selected') !== null;
+                // Modelo particular deseado es opcional
+                isValid = hasUbicacion && hasDeseadoTipo;
+            }
+            else if (currentStep === 3) {
                 const hasState = document.querySelector('.state-card.selected') !== null;
                 // Detalles is now optional
                 isValid = hasState;
-            } 
-            else if (currentStep === 3) {
+            }
+            else if (currentStep === 4) {
                 const hasChecks = canjeData.todoFunciona || canjeData.fallas.length > 0;
                 // Reparaciones is optional
                 isValid = hasChecks;
-            } 
-            else if (currentStep === 4) {
+            }
+            else if (currentStep === 5) {
                 const batteryVal = parseInt(canjeData.bateria);
                 let validBattery = !isNaN(batteryVal) && batteryVal >= 85 && batteryVal <= 100;
-                
-                let requiresCiclos = canjeData.modelo.toLowerCase().includes('15') || canjeData.modelo.toLowerCase().includes('16');
+
+                let requiresCiclos = canjeData.modelo.toLowerCase().includes('15') || canjeData.modelo.toLowerCase().includes('16') || canjeData.modelo.toLowerCase().includes('17');
                 if (requiresCiclos) {
                     boxCiclos.style.display = 'block';
                     isValid = validBattery && canjeData.ciclos.trim().length > 0;
@@ -1489,12 +1541,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     isValid = validBattery;
                 }
             }
-            else if (currentStep === 5) {
+            else if (currentStep === 6) {
                 // Text inputs are optional, but Caja, Cable, and Origen are strictly required
                 const hasOrigen = canjeData.origen.trim().length > 1;
                 isValid = canjeData.cable && canjeData.caja && hasOrigen;
             }
-            else if (currentStep === 6) {
+            else if (currentStep === 7) {
                 isValid = true;
             }
 
@@ -1533,9 +1585,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderSummary();
             }
 
-            // Check if we need to show cycles based on model selected before step 4
-            if (currentStep === 4) {
-                let requiresCiclos = canjeData.modelo.toLowerCase().includes('15') || canjeData.modelo.toLowerCase().includes('16');
+            // Check if we need to show cycles based on model selected before step 5
+            if (currentStep === 5) {
+                let requiresCiclos = canjeData.modelo.toLowerCase().includes('15') || canjeData.modelo.toLowerCase().includes('16') || canjeData.modelo.toLowerCase().includes('17');
                 boxCiclos.style.display = requiresCiclos ? 'block' : 'none';
             }
 
@@ -1546,11 +1598,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const summaryBox = document.getElementById('summary-card');
             
             summaryBox.innerHTML = `
-                <p>�x� <b>Modelo:</b> ${canjeData.modelo} - ${canjeData.capacidad} - ${canjeData.color}</p>
+                <p>📱 <b>Modelo:</b> ${canjeData.modelo} - ${canjeData.capacidad} - ${canjeData.color}</p>
+                <p>📍 <b>Sucursal:</b> ${canjeData.ubicacion}</p>
+                <p>🔄 <b>Le gustaría cambiarlo por:</b> ${canjeData.deseadoTipo === 'Todavía no sé' ? 'Todavía no sé' : (canjeData.deseadoTipo + (canjeData.deseadoModelo ? ' - ' + canjeData.deseadoModelo : ''))}</p>
                 <p>⭐ <b>Estado:</b> ${canjeData.estado}</p>
-                <p>�x9 <b>Batería:</b> ${canjeData.bateria}% ${canjeData.ciclos ? `(${canjeData.ciclos} ciclos)` : ''}</p>
-                <p>�S& <b>Funcionalidad:</b> ${canjeData.todoFunciona ? 'Funciona todo correctamente' : canjeData.fallas.join(', ')}</p>
-                <p>�x� <b>Accesorios:</b> ${canjeData.caja ? 'Caja' : ''} ${canjeData.cable ? '- Cable' : ''}</p>
+                <p>🔋 <b>Batería:</b> ${canjeData.bateria}% ${canjeData.ciclos ? `(${canjeData.ciclos} ciclos)` : ''}</p>
+                <p>✅ <b>Funcionalidad:</b> ${canjeData.todoFunciona ? 'Funciona todo correctamente' : canjeData.fallas.join(', ')}</p>
+                <p>📦 <b>Accesorios:</b> ${canjeData.caja ? 'Caja' : ''} ${canjeData.cable ? '- Cable' : ''}</p>
             `;
         }
 
@@ -1584,11 +1638,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const txtCable = f.cable ? 'Sí' : 'No';
             const txtGarantia = f.garantia ? 'Sí' : 'No';
             const txtCiclos = f.ciclos ? `%0A- *Ciclos:* ${f.ciclos}` : '';
+            const txtDeseado = f.deseadoTipo === 'Todavía no sé'
+                ? 'Todavía no sé'
+                : `${f.deseadoTipo}${f.deseadoModelo ? ' - ' + f.deseadoModelo : ''}`;
 
             const message = `*PLAN CANJE - Nueva Consulta*%0A%0A` +
                 `*Modelo:* ${f.modelo}%0A` +
                 `*Capacidad:* ${f.capacidad}%0A` +
                 `*Color:* ${f.color}%0A` +
+                `*Sucursal:* ${f.ubicacion}%0A` +
+                `*Le gustaria cambiarlo por:* ${txtDeseado}%0A` +
                 `*Cable original:* ${txtCable}%0A` +
                 `*Caja:* ${txtCaja}%0A` +
                 `*Detalles esteticos:* ${f.detalles}%0A` +
