@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let memoryProducts = [];
     let memorySales = [];
+    let memoryEventos = [];
     const formatMoney = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
 
     async function fetchData() {
@@ -113,6 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const { data: sales } = await _supabase.from('sales').select('*').order('fecha', { ascending: false });
             if (sales) memorySales = sales;
+
+            const { data: eventos, error: eventosError } = await _supabase.from('eventos_analytics').select('*').order('created_at', { ascending: false });
+            if (eventosError) {
+                console.warn('eventos_analytics no disponible todavía (¿falta crear la tabla?):', eventosError.message);
+                memoryEventos = [];
+            } else {
+                memoryEventos = eventos || [];
+            }
         } catch (e) {
             console.error("Error al obtener datos:", e);
         } finally {
@@ -126,7 +135,51 @@ document.addEventListener('DOMContentLoaded', () => {
         renderVentas();
         renderHeroGallery();
         if (typeof renderNosotrosConfig === 'function') renderNosotrosConfig();
+        renderAnalytics();
         calcularKPIs();
+    }
+
+    function renderAnalytics() {
+        const tbody = document.getElementById('tbody-canjes');
+        if (!tbody) return;
+
+        const now = Date.now();
+        const treintaDias = 30 * 24 * 60 * 60 * 1000;
+        const dentroDe30 = (e) => (now - new Date(e.created_at).getTime()) <= treintaDias;
+
+        const visitas30 = memoryEventos.filter(e => e.tipo === 'visita' && dentroDe30(e)).length;
+        const canjes = memoryEventos.filter(e => e.tipo === 'canje');
+        const canjes30 = canjes.filter(dentroDe30).length;
+
+        const kpiVisitas = document.getElementById('kpi-visitas-30');
+        const kpiCanjes30 = document.getElementById('kpi-canjes-30');
+        const kpiCanjesTotal = document.getElementById('kpi-canjes-total');
+        const badgeCanjes = document.getElementById('badge-canjes');
+        if (kpiVisitas) kpiVisitas.textContent = visitas30;
+        if (kpiCanjes30) kpiCanjes30.textContent = canjes30;
+        if (kpiCanjesTotal) kpiCanjesTotal.textContent = canjes.length;
+        if (badgeCanjes) badgeCanjes.textContent = canjes.length;
+
+        tbody.innerHTML = '';
+        const emptyState = document.getElementById('empty-canjes');
+        if (emptyState) emptyState.classList.toggle('hidden', canjes.length > 0);
+
+        canjes.forEach(ev => {
+            const d = ev.datos || {};
+            const deseado = d.deseadoTipo === 'Todavía no sé'
+                ? 'Todavía no sé'
+                : `${d.deseadoTipo || '-'}${d.deseadoModelo ? ' - ' + d.deseadoModelo : ''}`;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(ev.created_at).toLocaleString('es-AR')}</td>
+                <td><strong>${d.modelo || '-'}</strong> ${d.capacidad || ''} ${d.color ? '· ' + d.color : ''}</td>
+                <td>${d.estado || '-'}</td>
+                <td>${d.bateria ? d.bateria + '%' : '-'}</td>
+                <td>${d.ubicacion || '-'}</td>
+                <td>${deseado}</td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
 
     function calcularKPIs() {

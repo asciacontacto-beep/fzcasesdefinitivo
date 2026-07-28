@@ -5,6 +5,16 @@ const _supabase = typeof supabase !== 'undefined' ? supabase.createClient(SUPABA
 
 let products = [];
 
+// Analítica simple: una fila por visita/canje. Si la tabla todavía no existe
+// en la DB (falta correr el CREATE TABLE) esto no debe romper nada del sitio,
+// por eso el catch silencioso.
+function logEvento(tipo, datos = null) {
+    if (!_supabase) return;
+    const pagina = window.location.pathname.split('/').pop() || 'index.html';
+    _supabase.from('eventos_analytics').insert([{ tipo, pagina, datos }]).then(() => {}).catch(() => {});
+}
+logEvento('visita');
+
 // Sin imagen2/imagen3/variantes: son las fotos que más pesan (2-3 fotos extra +
 // una por cada variante de color/almacenamiento) y no hacen falta para pintar
 // la grilla del catálogo, solo cuando se abre el modal de un producto puntual.
@@ -1661,7 +1671,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 `_Solicito tasacion para plan canje_`;
             
             const waURL = `https://wa.me/${phoneNumber}?text=${message}`;
-            
+
+            logEvento('canje', f);
             window.open(waURL, '_blank');
             localStorage.removeItem('fzcases_canje_data'); // clean up after success!
         });
