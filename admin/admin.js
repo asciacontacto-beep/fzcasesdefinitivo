@@ -734,10 +734,12 @@ document.addEventListener('DOMContentLoaded', () => {
         renderStockItems();
     }
 
-    // Redimensiona a max 1200px y comprime a JPEG 0.8 antes de mandar a la DB.
-    // Sin esto, una foto de celular moderno guarda 3-8MB en base64 por producto,
-    // y el catálogo entero (select=* de todos los productos) se vuelve pesadísimo
-    // de bajar -> "tarda en cargar" / "no cargan los productos".
+    // Redimensiona a max 800px y comprime a JPEG 0.72 antes de mandar a la DB.
+    // Sin esto, una foto de celular moderno guarda 3-8MB en base64 por producto.
+    // Incluso comprimidas a ~180KB c/u, con el catálogo creciendo (46 productos
+    // y subiendo) la SUMA total en el fetch liviano del catálogo vuelve a pesar
+    // varios MB -> "no carga el catálogo". Por eso el límite es chico: no es
+    // por una foto sola, es por cuántas se suman.
     //
     // Usa createImageBitmap con imageOrientation:'from-image' cuando está
     // disponible: las fotos de celular llevan un flag EXIF de rotación (el
@@ -745,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // pantalla). Un <img>+canvas normal ignora ese flag y dibuja los píxeles
     // crudos -> fotos que se ven giradas en la web aunque en la galería del
     // celu estén derechas. createImageBitmap sí lo respeta.
-    function compressImageFile(file, callback, maxDim = 1200) {
+    function compressImageFile(file, callback, maxDim = 800) {
         function drawAndCompress(source, srcWidth, srcHeight) {
             const canvas = document.createElement('canvas');
             let width = srcWidth;
@@ -761,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(source, 0, 0, width, height);
-            callback(canvas.toDataURL('image/jpeg', 0.8));
+            callback(canvas.toDataURL('image/jpeg', 0.72));
         }
 
         if (window.createImageBitmap) {
