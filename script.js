@@ -862,7 +862,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (nuevosGrid) {
             nuevosGrid.innerHTML = '';
-            const nuevos = products.filter(p => p.nuevoIngreso).slice(0, 4);
+            // Si nadie marcó ningún producto como "Nuevo Ingreso" desde el panel,
+            // mostramos los primeros del orden actual igual, para que esta sección
+            // (y la home) nunca se vea vacía por falta de tildar un checkbox.
+            let nuevos = products.filter(p => p.nuevoIngreso).slice(0, 4);
+            if (nuevos.length === 0) {
+                nuevos = products.slice(0, 4);
+            }
             if (nuevos.length > 0) {
                 nuevosGrid.parentElement.style.display = 'block';
                 nuevos.forEach(product => {
