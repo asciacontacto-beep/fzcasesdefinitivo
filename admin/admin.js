@@ -297,6 +297,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const ANALYTICS_PAGE_NAMES = {
+        'index.html': 'Homepage',
+        'index': 'Homepage',
+        '': 'Homepage',
+        'catalogo.html': 'Catálogo',
+        'catalogo': 'Catálogo',
+        'nosotros.html': 'Nosotros',
+        'nosotros': 'Nosotros',
+        'garantia.html': 'Garantía',
+        'garantia': 'Garantía',
+        'info-importante.html': 'Info importante',
+        'info-importante': 'Info importante',
+    };
+    function nombreDePagina(pagina) {
+        return ANALYTICS_PAGE_NAMES[pagina] || pagina;
+    }
+
     function renderAnalyticsPaginas(visitas) {
         const container = document.getElementById('analytics-paginas');
         if (!container) return;
@@ -319,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = document.createElement('div');
             row.className = 'analytics-page-row';
             row.innerHTML = `
-                <div class="analytics-page-name">${pagina}</div>
+                <div class="analytics-page-name">${nombreDePagina(pagina)}</div>
                 <div class="analytics-page-bar-track"><div class="analytics-page-bar-fill" style="width:${(count / max) * 100}%;"></div></div>
                 <div class="analytics-page-count">${count}</div>
             `;
