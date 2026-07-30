@@ -386,6 +386,23 @@
 
             <!-- CONTENIDO TAB ANALÍTICAS -->
             <div id="view-analytics" class="tab-content" style="display:none;">
+
+                <!-- Filtro de fecha: escopea todo lo de abajo -->
+                <div class="analytics-daterow">
+                    <div class="analytics-presets" id="analytics-presets">
+                        <button type="button" class="analytics-preset active" data-range="hoy">Hoy</button>
+                        <button type="button" class="analytics-preset" data-range="7">7 días</button>
+                        <button type="button" class="analytics-preset" data-range="30">30 días</button>
+                        <button type="button" class="analytics-preset" data-range="90">90 días</button>
+                        <button type="button" class="analytics-preset" data-range="todo">Todo</button>
+                    </div>
+                    <div class="analytics-custom">
+                        <input type="date" id="analytics-desde" class="tech-input" style="width: auto;">
+                        <span style="color:#8e8e93; font-size:0.85rem;">a</span>
+                        <input type="date" id="analytics-hasta" class="tech-input" style="width: auto;">
+                    </div>
+                </div>
+
                 <div class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-header">
@@ -395,7 +412,7 @@
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                             </div>
-                            <span class="trend-badge positive">30 días</span>
+                            <span class="trend-badge positive" id="kpi-visitas-badge">Hoy</span>
                         </div>
                         <div class="kpi-number" id="kpi-visitas-30">0</div>
                         <div class="kpi-label">Visitas a la web</div>
@@ -408,10 +425,23 @@
                                     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                                 </svg>
                             </div>
-                            <span class="trend-badge positive">30 días</span>
+                            <span class="trend-badge positive" id="kpi-canjes-badge">Hoy</span>
                         </div>
                         <div class="kpi-number" id="kpi-canjes-30">0</div>
                         <div class="kpi-label">Planes canje pedidos</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon icon-profit">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="trend-badge positive" id="kpi-conversion-badge">Hoy</span>
+                        </div>
+                        <div class="kpi-number" id="kpi-conversion">0%</div>
+                        <div class="kpi-label">Visitas → Plan canje</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-header">
@@ -427,6 +457,16 @@
                         <div class="kpi-number" id="kpi-canjes-total">0</div>
                         <div class="kpi-label">Total planes canje</div>
                     </div>
+                </div>
+
+                <div class="tech-card" style="padding: 1.5rem; margin-top: 1.5rem;">
+                    <div class="tech-card-label" style="margin-bottom: 1rem;">VISITAS POR DÍA</div>
+                    <div id="analytics-chart" class="analytics-chart"></div>
+                </div>
+
+                <div class="tech-card" style="padding: 1.5rem; margin-top: 1.5rem;">
+                    <div class="tech-card-label" style="margin-bottom: 1rem;">VISITAS POR PÁGINA</div>
+                    <div id="analytics-paginas"></div>
                 </div>
 
                 <div class="table-header mt-2">

@@ -135,36 +135,109 @@ document.addEventListener('DOMContentLoaded', () => {
         renderVentas();
         renderHeroGallery();
         if (typeof renderNosotrosConfig === 'function') renderNosotrosConfig();
+        setupAnalyticsFilters();
         renderAnalytics();
         calcularKPIs();
+    }
+
+    // Rango de fecha activo en Analíticas. 'hoy' | '7' | '30' | '90' | 'todo' | 'custom'
+    let analyticsRangeKey = 'hoy';
+    let analyticsCustomDesde = null;
+    let analyticsCustomHasta = null;
+    let analyticsFiltersReady = false;
+
+    function setupAnalyticsFilters() {
+        if (analyticsFiltersReady) return;
+        const presets = document.querySelectorAll('.analytics-preset');
+        const inputDesde = document.getElementById('analytics-desde');
+        const inputHasta = document.getElementById('analytics-hasta');
+        if (presets.length === 0) return;
+
+        presets.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presets.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                analyticsRangeKey = btn.dataset.range;
+                if (inputDesde) inputDesde.value = '';
+                if (inputHasta) inputHasta.value = '';
+                renderAnalytics();
+            });
+        });
+
+        const onCustomChange = () => {
+            if (!inputDesde.value) return;
+            presets.forEach(b => b.classList.remove('active'));
+            analyticsRangeKey = 'custom';
+            analyticsCustomDesde = inputDesde.value;
+            analyticsCustomHasta = inputHasta.value || null;
+            renderAnalytics();
+        };
+        if (inputDesde) inputDesde.addEventListener('change', onCustomChange);
+        if (inputHasta) inputHasta.addEventListener('change', onCustomChange);
+
+        analyticsFiltersReady = true;
+    }
+
+    function getAnalyticsRangeBounds() {
+        const now = new Date();
+        const finDeHoy = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+        if (analyticsRangeKey === 'custom' && analyticsCustomDesde) {
+            const desde = new Date(analyticsCustomDesde + 'T00:00:00');
+            const hasta = analyticsCustomHasta ? new Date(analyticsCustomHasta + 'T23:59:59') : finDeHoy;
+            return { desde, hasta };
+        }
+        if (analyticsRangeKey === 'todo') {
+            return { desde: new Date(0), hasta: finDeHoy };
+        }
+        const dias = analyticsRangeKey === 'hoy' ? 0 : Number(analyticsRangeKey);
+        const desde = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dias, 0, 0, 0, 0);
+        return { desde, hasta: finDeHoy };
     }
 
     function renderAnalytics() {
         const tbody = document.getElementById('tbody-canjes');
         if (!tbody) return;
 
-        const now = Date.now();
-        const treintaDias = 30 * 24 * 60 * 60 * 1000;
-        const dentroDe30 = (e) => (now - new Date(e.created_at).getTime()) <= treintaDias;
+        const { desde, hasta } = getAnalyticsRangeBounds();
+        const enRango = (e) => {
+            const t = new Date(e.created_at).getTime();
+            return t >= desde.getTime() && t <= hasta.getTime();
+        };
 
-        const visitas30 = memoryEventos.filter(e => e.tipo === 'visita' && dentroDe30(e)).length;
-        const canjes = memoryEventos.filter(e => e.tipo === 'canje');
-        const canjes30 = canjes.filter(dentroDe30).length;
+        const visitasTodas = memoryEventos.filter(e => e.tipo === 'visita');
+        const canjesTodos = memoryEventos.filter(e => e.tipo === 'canje');
+        const visitasRango = visitasTodas.filter(enRango);
+        const canjesRango = canjesTodos.filter(enRango);
+
+        const rangeLabel = { hoy: 'Hoy', '7': '7 días', '30': '30 días', '90': '90 días', todo: 'Todo', custom: 'Personalizado' }[analyticsRangeKey];
 
         const kpiVisitas = document.getElementById('kpi-visitas-30');
         const kpiCanjes30 = document.getElementById('kpi-canjes-30');
         const kpiCanjesTotal = document.getElementById('kpi-canjes-total');
+        const kpiConversion = document.getElementById('kpi-conversion');
         const badgeCanjes = document.getElementById('badge-canjes');
-        if (kpiVisitas) kpiVisitas.textContent = visitas30;
-        if (kpiCanjes30) kpiCanjes30.textContent = canjes30;
-        if (kpiCanjesTotal) kpiCanjesTotal.textContent = canjes.length;
-        if (badgeCanjes) badgeCanjes.textContent = canjes.length;
+        if (kpiVisitas) kpiVisitas.textContent = visitasRango.length;
+        if (kpiCanjes30) kpiCanjes30.textContent = canjesRango.length;
+        if (kpiCanjesTotal) kpiCanjesTotal.textContent = canjesTodos.length;
+        if (kpiConversion) {
+            const pct = visitasRango.length > 0 ? (canjesRango.length / visitasRango.length) * 100 : 0;
+            kpiConversion.textContent = pct.toFixed(1) + '%';
+        }
+        if (badgeCanjes) badgeCanjes.textContent = canjesTodos.length;
+        ['kpi-visitas-badge', 'kpi-canjes-badge', 'kpi-conversion-badge'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = rangeLabel;
+        });
+
+        renderAnalyticsChart(visitasRango, desde, hasta);
+        renderAnalyticsPaginas(visitasRango);
 
         tbody.innerHTML = '';
         const emptyState = document.getElementById('empty-canjes');
-        if (emptyState) emptyState.classList.toggle('hidden', canjes.length > 0);
+        if (emptyState) emptyState.classList.toggle('hidden', canjesRango.length > 0);
 
-        canjes.forEach(ev => {
+        canjesRango.forEach(ev => {
             const d = ev.datos || {};
             const deseado = d.deseadoTipo === 'Todavía no sé'
                 ? 'Todavía no sé'
@@ -179,6 +252,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${deseado}</td>
             `;
             tbody.appendChild(tr);
+        });
+    }
+
+    // Barras de visitas por día dentro del rango. Máximo 90 barras (el propio
+    // rango más largo disponible) para que nunca quede ilegible.
+    function renderAnalyticsChart(visitas, desde, hasta) {
+        const container = document.getElementById('analytics-chart');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const msPorDia = 24 * 60 * 60 * 1000;
+        const diasTotales = Math.max(1, Math.min(90, Math.round((hasta - desde) / msPorDia) + 1));
+        const inicio = new Date(hasta.getTime() - (diasTotales - 1) * msPorDia);
+        inicio.setHours(0, 0, 0, 0);
+
+        const conteoPorDia = {};
+        visitas.forEach(v => {
+            const d = new Date(v.created_at);
+            const key = d.toISOString().slice(0, 10);
+            conteoPorDia[key] = (conteoPorDia[key] || 0) + 1;
+        });
+
+        const dias = [];
+        for (let i = 0; i < diasTotales; i++) {
+            const d = new Date(inicio.getTime() + i * msPorDia);
+            dias.push({ key: d.toISOString().slice(0, 10), fecha: d, count: conteoPorDia[d.toISOString().slice(0, 10)] || 0 });
+        }
+
+        const max = Math.max(1, ...dias.map(d => d.count));
+        const mostrarLabelCadaN = Math.ceil(dias.length / 8) || 1;
+
+        dias.forEach((d, i) => {
+            const col = document.createElement('div');
+            col.className = 'analytics-bar-col';
+            const alturaPct = (d.count / max) * 100;
+            const fechaTexto = d.fecha.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+            col.innerHTML = `
+                <div class="analytics-bar-tooltip">${d.count} visita${d.count === 1 ? '' : 's'} · ${fechaTexto}</div>
+                <div class="analytics-bar" style="height: ${alturaPct}%;"></div>
+                ${i % mostrarLabelCadaN === 0 ? `<div class="analytics-bar-label">${fechaTexto}</div>` : ''}
+            `;
+            container.appendChild(col);
+        });
+    }
+
+    function renderAnalyticsPaginas(visitas) {
+        const container = document.getElementById('analytics-paginas');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const conteoPorPagina = {};
+        visitas.forEach(v => {
+            const pagina = v.pagina || 'index.html';
+            conteoPorPagina[pagina] = (conteoPorPagina[pagina] || 0) + 1;
+        });
+
+        const entradas = Object.entries(conteoPorPagina).sort((a, b) => b[1] - a[1]);
+        if (entradas.length === 0) {
+            container.innerHTML = '<p style="color:#8e8e93; font-size:0.85rem;">Sin visitas en este rango.</p>';
+            return;
+        }
+        const max = Math.max(...entradas.map(e => e[1]));
+
+        entradas.forEach(([pagina, count]) => {
+            const row = document.createElement('div');
+            row.className = 'analytics-page-row';
+            row.innerHTML = `
+                <div class="analytics-page-name">${pagina}</div>
+                <div class="analytics-page-bar-track"><div class="analytics-page-bar-fill" style="width:${(count / max) * 100}%;"></div></div>
+                <div class="analytics-page-count">${count}</div>
+            `;
+            container.appendChild(row);
         });
     }
 

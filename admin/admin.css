@@ -1898,3 +1898,134 @@ input:checked + .slider:before { transform: translateX(20px); }
     cursor: grabbing;
 }
 
+/* ==========================================================================
+   ANALÍTICAS: filtro de fecha + gráfico de barras
+   ========================================================================== */
+.analytics-daterow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.analytics-presets {
+    display: flex;
+    gap: 6px;
+    background: #f5f5f7;
+    padding: 4px;
+    border-radius: 10px;
+}
+.analytics-preset {
+    border: none;
+    background: transparent;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6e6e73;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.analytics-preset:hover { color: #1d1d1f; }
+.analytics-preset.active {
+    background: #fff;
+    color: #1d1d1f;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.analytics-custom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.analytics-custom input[type="date"] {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+}
+
+.analytics-chart {
+    position: relative;
+    height: 220px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e1e0d9;
+}
+.analytics-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+}
+.analytics-bar {
+    width: 100%;
+    max-width: 24px;
+    background: #2a78d6;
+    border-radius: 4px 4px 0 0;
+    transition: background 0.15s;
+    min-height: 2px;
+}
+.analytics-bar-col:hover .analytics-bar { background: #1c5cab; }
+.analytics-bar-label {
+    position: absolute;
+    bottom: -22px;
+    font-size: 0.65rem;
+    color: #898781;
+    white-space: nowrap;
+}
+.analytics-bar-tooltip {
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: 6px;
+    background: #0b0b0b;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 5;
+}
+.analytics-bar-col:hover .analytics-bar-tooltip { opacity: 1; }
+
+.analytics-page-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.85rem;
+}
+.analytics-page-row:last-child { border-bottom: none; }
+.analytics-page-name {
+    width: 140px;
+    flex-shrink: 0;
+    color: #1d1d1f;
+    font-weight: 600;
+}
+.analytics-page-bar-track {
+    flex: 1;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.analytics-page-bar-fill {
+    height: 100%;
+    background: #2a78d6;
+    border-radius: 4px;
+}
+.analytics-page-count {
+    width: 40px;
+    text-align: right;
+    color: #6e6e73;
+    font-variant-numeric: tabular-nums;
+}
+
