@@ -138,6 +138,11 @@ async function loadProductsFromSupabase() {
                     items.forEach((item) => {
                         if (item.active === false) return; // Skip inactive items
 
+                        // Si por error cargaron el link de la foto en el campo de enlace, lo corregimos al vuelo.
+                        if (/\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(item.url || '')) {
+                            item = { ...item, url: `catalogo.html?cat=${encodeURIComponent(item.name)}` };
+                        }
+
                         let styleImg = '';
                         if (item.name.toLowerCase().includes('macbook')) styleImg = 'style="width:85px;height:auto;"';
                         else if (item.name.toLowerCase().includes('watch')) styleImg = 'style="height:65px;width:auto;"';
@@ -1308,7 +1313,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputColor = document.getElementById('input-color');
         const pillUbicacion = document.querySelectorAll('.pill-ubicacion');
         const pillDeseadoTipo = document.querySelectorAll('.pill-deseado-tipo');
-        const btnDeseadoNoSe = document.getElementById('btn-deseado-no-se');
         const deseadoModeloContainer = document.getElementById('deseado-modelo-container');
         const inputDeseadoModelo = document.getElementById('input-deseado-modelo');
 
@@ -1359,7 +1363,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (canjeData.deseadoTipo) {
                 let foundTipo = Array.from(pillDeseadoTipo).find(btn => btn.dataset.value === canjeData.deseadoTipo);
                 if (foundTipo) foundTipo.classList.add('selected');
-                deseadoModeloContainer.classList.toggle('active', canjeData.deseadoTipo !== 'Todavía no sé');
             }
             if (canjeData.deseadoModelo) inputDeseadoModelo.value = canjeData.deseadoModelo;
 
@@ -1440,13 +1443,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pillDeseadoTipo.forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 canjeData.deseadoTipo = btn.dataset.value;
-                if (btn === btnDeseadoNoSe) {
-                    deseadoModeloContainer.classList.remove('active');
-                    inputDeseadoModelo.value = '';
-                    canjeData.deseadoModelo = '';
-                } else {
-                    deseadoModeloContainer.classList.add('active');
-                }
+                deseadoModeloContainer.classList.add('active');
                 saveData();
                 validateCurrentStep();
             });
@@ -1616,7 +1613,7 @@ document.addEventListener('DOMContentLoaded', () => {
             summaryBox.innerHTML = `
                 <p>📱 <b>Modelo:</b> ${canjeData.modelo} - ${canjeData.capacidad} - ${canjeData.color}</p>
                 <p>📍 <b>Sucursal:</b> ${canjeData.ubicacion}</p>
-                <p>🔄 <b>Le gustaría cambiarlo por:</b> ${canjeData.deseadoTipo === 'Todavía no sé' ? 'Todavía no sé' : (canjeData.deseadoTipo + (canjeData.deseadoModelo ? ' - ' + canjeData.deseadoModelo : ''))}</p>
+                <p>🔄 <b>Le gustaría cambiarlo por:</b> ${canjeData.deseadoTipo}${canjeData.deseadoModelo ? ' - ' + canjeData.deseadoModelo : ''}</p>
                 <p>⭐ <b>Estado:</b> ${canjeData.estado}</p>
                 <p>🔋 <b>Batería:</b> ${canjeData.bateria}% ${canjeData.ciclos ? `(${canjeData.ciclos} ciclos)` : ''}</p>
                 <p>✅ <b>Funcionalidad:</b> ${canjeData.todoFunciona ? 'Funciona todo correctamente' : canjeData.fallas.join(', ')}</p>
@@ -1654,9 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const txtCable = f.cable ? 'Sí' : 'No';
             const txtGarantia = f.garantia ? 'Sí' : 'No';
             const txtCiclos = f.ciclos ? `%0A- *Ciclos:* ${f.ciclos}` : '';
-            const txtDeseado = f.deseadoTipo === 'Todavía no sé'
-                ? 'Todavía no sé'
-                : `${f.deseadoTipo}${f.deseadoModelo ? ' - ' + f.deseadoModelo : ''}`;
+            const txtDeseado = `${f.deseadoTipo}${f.deseadoModelo ? ' - ' + f.deseadoModelo : ''}`;
 
             const message = `*PLAN CANJE - Nueva Consulta*%0A%0A` +
                 `*Modelo:* ${f.modelo}%0A` +

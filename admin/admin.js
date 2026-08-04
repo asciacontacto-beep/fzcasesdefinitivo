@@ -1621,10 +1621,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const iEl = document.getElementById(`cfg-catnav-img-${i}`);
                 const actEl = document.getElementById(`cfg-catnav-active-${i}`);
                 if (nEl && uEl && iEl) {
+                    let url = uEl.value.trim();
+                    let imgUrl = iEl.value.trim();
+                    const esImagen = /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.startsWith('data:image');
+                    if (esImagen) {
+                        // Cargaron el link de la foto en el campo de enlace por error: lo corregimos.
+                        if (!imgUrl) imgUrl = url;
+                        url = `catalogo.html?cat=${encodeURIComponent(nEl.value.trim())}`;
+                    }
                     cfg.categoryNav.items.push({
                         name: nEl.value,
-                        url: uEl.value,
-                        imgUrl: iEl.value,
+                        url,
+                        imgUrl,
                         active: actEl ? actEl.checked : true
                     });
                 }
