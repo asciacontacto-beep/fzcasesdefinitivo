@@ -1898,6 +1898,8 @@ input:checked + .slider:before { transform: translateX(20px); }
     cursor: grabbing;
 }
 
+.canje-foto-thumb { width:36px; height:36px; object-fit:cover; border-radius:6px; border:1px solid #d2d2d7; margin-right:6px; cursor:zoom-in; }
+
 /* ==========================================================================
    ANALÍTICAS: filtro de fecha + gráfico de barras
    ========================================================================== */

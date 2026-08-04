@@ -242,6 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const deseado = d.deseadoTipo === 'Todavía no sé'
                 ? 'Todavía no sé'
                 : `${d.deseadoTipo || '-'}${d.deseadoModelo ? ' - ' + d.deseadoModelo : ''}`;
+            const fotos = [
+                d.fotoBateria ? `<a href="${d.fotoBateria}" target="_blank" title="Batería"><img src="${d.fotoBateria}" class="canje-foto-thumb"></a>` : '',
+                d.fotoInfo ? `<a href="${d.fotoInfo}" target="_blank" title="Ajustes > General > Información"><img src="${d.fotoInfo}" class="canje-foto-thumb"></a>` : '',
+            ].join('');
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${new Date(ev.created_at).toLocaleString('es-AR')}</td>
@@ -250,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${d.bateria ? d.bateria + '%' : '-'}</td>
                 <td>${d.ubicacion || '-'}</td>
                 <td>${deseado}</td>
+                <td>${fotos || '<span style="color:#c7c7cc;">Sin fotos</span>'}</td>
             `;
             tbody.appendChild(tr);
         });

@@ -1286,7 +1286,9 @@ document.addEventListener('DOMContentLoaded', () => {
             garantia: false,
             sim: '',
             antiguedad: '',
-            origen: ''
+            origen: '',
+            fotoBateria: '',
+            fotoInfo: ''
         };
 
         // Try load from local storage
@@ -1329,6 +1331,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const batteryInput = document.getElementById('battery-health');
         const boxCiclos = document.getElementById('box-ciclos');
         const inputCiclos = document.getElementById('input-ciclos');
+        const inputFotoBateria = document.getElementById('input-foto-bateria');
+        const previewFotoBateria = document.getElementById('preview-foto-bateria');
+        const inputFotoInfo = document.getElementById('input-foto-info');
+        const previewFotoInfo = document.getElementById('preview-foto-info');
 
         // Elementos Paso 5
         const checkCable = document.getElementById('check-cable');
@@ -1385,6 +1391,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Step 4
             if (canjeData.bateria) batteryInput.value = canjeData.bateria;
             if (canjeData.ciclos) inputCiclos.value = canjeData.ciclos;
+            if (canjeData.fotoBateria) { previewFotoBateria.src = canjeData.fotoBateria; previewFotoBateria.style.display = 'block'; }
+            if (canjeData.fotoInfo) { previewFotoInfo.src = canjeData.fotoInfo; previewFotoInfo.style.display = 'block'; }
 
             // Step 5
             checkCable.checked = canjeData.cable;
@@ -1444,6 +1452,65 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.add('selected');
                 canjeData.deseadoTipo = btn.dataset.value;
                 deseadoModeloContainer.classList.add('active');
+                saveData();
+                validateCurrentStep();
+            });
+        });
+
+        function compressCanjeFoto(file, callback) {
+            function drawAndCompress(source, srcWidth, srcHeight) {
+                const maxDim = 700;
+                let width = srcWidth, height = srcHeight;
+                if (width > height && width > maxDim) { height *= maxDim / width; width = maxDim; }
+                else if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(source, 0, 0, width, height);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            }
+            if (window.createImageBitmap) {
+                createImageBitmap(file, { imageOrientation: 'from-image' })
+                    .then(bitmap => drawAndCompress(bitmap, bitmap.width, bitmap.height))
+                    .catch(() => {
+                        const reader = new FileReader();
+                        reader.onload = ev => {
+                            const img = new Image();
+                            img.onload = () => drawAndCompress(img, img.width, img.height);
+                            img.src = ev.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+            } else {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const img = new Image();
+                    img.onload = () => drawAndCompress(img, img.width, img.height);
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        inputFotoBateria.addEventListener('change', () => {
+            const file = inputFotoBateria.files[0];
+            if (!file) return;
+            compressCanjeFoto(file, (dataUrl) => {
+                canjeData.fotoBateria = dataUrl;
+                previewFotoBateria.src = dataUrl;
+                previewFotoBateria.style.display = 'block';
+                saveData();
+                validateCurrentStep();
+            });
+        });
+
+        inputFotoInfo.addEventListener('change', () => {
+            const file = inputFotoInfo.files[0];
+            if (!file) return;
+            compressCanjeFoto(file, (dataUrl) => {
+                canjeData.fotoInfo = dataUrl;
+                previewFotoInfo.src = dataUrl;
+                previewFotoInfo.style.display = 'block';
                 saveData();
                 validateCurrentStep();
             });
@@ -1544,14 +1611,15 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (currentStep === 5) {
                 const batteryVal = parseInt(canjeData.bateria);
                 let validBattery = !isNaN(batteryVal) && batteryVal >= 85 && batteryVal <= 100;
+                const hasFotos = canjeData.fotoBateria && canjeData.fotoInfo;
 
                 let requiresCiclos = canjeData.modelo.toLowerCase().includes('15') || canjeData.modelo.toLowerCase().includes('16') || canjeData.modelo.toLowerCase().includes('17');
                 if (requiresCiclos) {
                     boxCiclos.style.display = 'block';
-                    isValid = validBattery && canjeData.ciclos.trim().length > 0;
+                    isValid = validBattery && canjeData.ciclos.trim().length > 0 && hasFotos;
                 } else {
                     boxCiclos.style.display = 'none';
-                    isValid = validBattery;
+                    isValid = validBattery && hasFotos;
                 }
             }
             else if (currentStep === 6) {
@@ -1669,7 +1737,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `*Garantia:* ${txtGarantia}%0A` +
                 `*Sellado/Usado:* ${f.origen}%0A` +
                 `*Chip o eSIM:* ${f.sim}%0A%0A` +
-                `_Solicito tasacion para plan canje_`;
+                `_Solicito tasacion para plan canje. Ya adjunte las capturas de bateria e informacion desde la web._`;
             
             const waURL = `https://wa.me/${phoneNumber}?text=${message}`;
 
