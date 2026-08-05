@@ -962,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="modal-info">
                     <div class="modal-top-meta">
                         <span class="modal-category-tag">${product.category}</span>
-                        ${product.bestseller ? '<span class="badge-premium">��& Más vendido</span>' : ''}
+                        ${product.bestseller ? '<span class="badge-premium">🔥 Más vendido</span>' : ''}
                     </div>
                     <h2>${product.name}</h2>
 
@@ -1071,7 +1071,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.className = 'pill-btn-variant';
                     if (index === 0) btn.classList.add('active');
                     
-                    const batteryText = unit.bateria ? `<span class="variant-battery">�x9 ${unit.bateria}%</span>` : '';
+                    const batteryText = unit.bateria ? `<span class="variant-battery">🔋 ${unit.bateria}%</span>` : '';
                     const storageText = unit.almacenamiento && unit.almacenamiento !== '-' ? unit.almacenamiento : '';
                     const colorText = unit.color || '';
                     const measureText = unit.medida && unit.medida !== '-' ? unit.medida : '';
@@ -1760,22 +1760,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const puedeCompartirFotos = files.length > 0 && navigator.canShare && navigator.canShare({ files });
 
-            // wa.me SIEMPRE primero: es lo único que abre el chat correcto con el número
-            // de FZCASES aunque el cliente no lo tenga agendado. El panel de "Compartir"
-            // de las fotos solo lista contactos/chats existentes de WhatsApp, así que si
-            // se dispara antes (o en vez) de abrir ese chat, el cliente no encuentra a
-            // quién mandárselas cuando el número no está guardado.
+            // wa.me abre el chat correcto con el número de FZCASES aunque el cliente
+            // no lo tenga agendado. navigator.share() para las fotos NO se dispara acá:
+            // al llamarlo justo después de window.open(), el navegador ya cambió de foco
+            // hacia la app de WhatsApp y pierde el "user activation" del click original,
+            // así que el share queda colgado o falla en silencio. En vez de eso mostramos
+            // un botón para que el cliente lo dispare con un toque propio al volver.
             window.open(waURL, '_blank');
-
-            if (puedeCompartirFotos) {
-                // El chat con FZCASES acaba de abrirse, así que ahora aparece como
-                // "reciente" en WhatsApp aunque no esté agendado, y el cliente puede
-                // elegirlo acá para mandar las 2 capturas.
-                navigator.share({ files, title: 'Fotos Plan Canje FZCASES' }).catch(() => {});
-            }
+            pendingShareFiles = puedeCompartirFotos ? files : null;
+            const shareBox = document.getElementById('post-submit-share-box');
+            if (shareBox) shareBox.style.display = puedeCompartirFotos ? 'block' : 'none';
 
             localStorage.removeItem('fzcases_canje_data'); // clean up after success!
         });
+
+        let pendingShareFiles = null;
+        const btnShareFotos = document.getElementById('btn-share-fotos');
+        if (btnShareFotos) {
+            btnShareFotos.addEventListener('click', () => {
+                if (!pendingShareFiles) return;
+                navigator.share({ files: pendingShareFiles, title: 'Fotos Plan Canje FZCASES' }).catch(() => {});
+            });
+        }
 
         // Initialize Wizard
         restoreCachedData();
