@@ -1766,10 +1766,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // hacia la app de WhatsApp y pierde el "user activation" del click original,
             // así que el share queda colgado o falla en silencio. En vez de eso mostramos
             // un botón para que el cliente lo dispare con un toque propio al volver.
-            window.open(waURL, '_blank');
+            //
+            // El cartel se marca visible ANTES de abrir WhatsApp (no después): al llamar
+            // window.open() el celular cambia de app casi al instante y puede cortar la
+            // ejecución del resto del script en esa misma vuelta — si el cartel se mostraba
+            // recién después, esa línea nunca llegaba a correr y el cliente no lo veía al volver.
             pendingShareFiles = puedeCompartirFotos ? files : null;
             const shareBox = document.getElementById('post-submit-share-box');
             if (shareBox) shareBox.style.display = puedeCompartirFotos ? 'block' : 'none';
+
+            window.open(waURL, '_blank');
 
             localStorage.removeItem('fzcases_canje_data'); // clean up after success!
         });
