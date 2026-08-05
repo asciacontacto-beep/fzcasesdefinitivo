@@ -19,6 +19,8 @@
 html {
     scroll-behavior: smooth;
     font-size: 11px; /* Escala global compacta */
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
 body {
