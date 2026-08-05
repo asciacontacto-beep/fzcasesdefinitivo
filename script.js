@@ -1760,21 +1760,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const puedeCompartirFotos = files.length > 0 && navigator.canShare && navigator.canShare({ files });
 
+            // wa.me SIEMPRE primero: es lo único que abre el chat correcto con el número
+            // de FZCASES aunque el cliente no lo tenga agendado. El panel de "Compartir"
+            // de las fotos solo lista contactos/chats existentes de WhatsApp, así que si
+            // se dispara antes (o en vez) de abrir ese chat, el cliente no encuentra a
+            // quién mandárselas cuando el número no está guardado.
+            window.open(waURL, '_blank');
+
             if (puedeCompartirFotos) {
-                // Abre el panel nativo de "Compartir" con el texto y las 2 fotos ya adjuntas;
-                // el cliente elige WhatsApp ahí mismo (el navegador no puede forzar esa app ni el
-                // contacto, es una limitación del sistema operativo, no nuestra).
-                navigator.share({ files, text: plainMessage, title: 'Plan Canje FZCASES' })
-                    .then(() => localStorage.removeItem('fzcases_canje_data'))
-                    .catch(() => {
-                        // Canceló el panel de compartir o el share falló: fallback al link de WhatsApp de siempre (sin fotos, ya quedaron guardadas).
-                        window.open(waURL, '_blank');
-                        localStorage.removeItem('fzcases_canje_data');
-                    });
-            } else {
-                window.open(waURL, '_blank');
-                localStorage.removeItem('fzcases_canje_data'); // clean up after success!
+                // El chat con FZCASES acaba de abrirse, así que ahora aparece como
+                // "reciente" en WhatsApp aunque no esté agendado, y el cliente puede
+                // elegirlo acá para mandar las 2 capturas.
+                navigator.share({ files, title: 'Fotos Plan Canje FZCASES' }).catch(() => {});
             }
+
+            localStorage.removeItem('fzcases_canje_data'); // clean up after success!
         });
 
         // Initialize Wizard
