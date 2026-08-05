@@ -1711,39 +1711,70 @@ document.addEventListener('DOMContentLoaded', () => {
             wizardContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
+        // Convierte un dataURL (base64) a Blob de forma síncrona, sin fetch.
+        // navigator.share() debe llamarse en el mismo tick del click en iOS Safari;
+        // un fetch(dataURL) de por medio puede perder el "user activation" y el share falla en silencio.
+        function dataURLtoBlob(dataUrl) {
+            const [header, b64] = dataUrl.split(',');
+            const mime = header.match(/:(.*?);/)[1];
+            const bin = atob(b64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return new Blob([bytes], { type: mime });
+        }
+
         document.getElementById('btn-submit-wa').addEventListener('click', () => {
             const f = canjeData;
-            
+
             const txtFallas = f.todoFunciona ? 'Funciona todo correctamente' : f.fallas.join(', ');
             const txtCaja = f.caja ? 'Sí' : 'No';
             const txtCable = f.cable ? 'Sí' : 'No';
             const txtGarantia = f.garantia ? 'Sí' : 'No';
-            const txtCiclos = f.ciclos ? `%0A- *Ciclos:* ${f.ciclos}` : '';
             const txtDeseado = `${f.deseadoTipo}${f.deseadoModelo ? ' - ' + f.deseadoModelo : ''}`;
 
-            const message = `*PLAN CANJE - Nueva Consulta*%0A%0A` +
-                `*Modelo:* ${f.modelo}%0A` +
-                `*Capacidad:* ${f.capacidad}%0A` +
-                `*Color:* ${f.color}%0A` +
-                `*Sucursal:* ${f.ubicacion}%0A` +
-                `*Le gustaria cambiarlo por:* ${txtDeseado}%0A` +
-                `*Cable original:* ${txtCable}%0A` +
-                `*Caja:* ${txtCaja}%0A` +
-                `*Detalles esteticos:* ${f.detalles}%0A` +
-                `*Algo no funciona?* ${txtFallas}%0A` +
-                `*Reparaciones:* ${f.reparaciones}%0A` +
-                `*Antiguedad:* ${f.antiguedad}%0A` +
-                `*Bateria:* ${f.bateria}%25${txtCiclos}%0A` +
-                `*Garantia:* ${txtGarantia}%0A` +
-                `*Sellado/Usado:* ${f.origen}%0A` +
-                `*Chip o eSIM:* ${f.sim}%0A%0A` +
-                `_Solicito tasacion para plan canje. Ya adjunte las capturas de bateria e informacion desde la web._`;
-            
-            const waURL = `https://wa.me/${phoneNumber}?text=${message}`;
+            const plainMessage = `PLAN CANJE - Nueva Consulta\n\n` +
+                `Modelo: ${f.modelo}\n` +
+                `Capacidad: ${f.capacidad}\n` +
+                `Color: ${f.color}\n` +
+                `Sucursal: ${f.ubicacion}\n` +
+                `Le gustaria cambiarlo por: ${txtDeseado}\n` +
+                `Cable original: ${txtCable}\n` +
+                `Caja: ${txtCaja}\n` +
+                `Detalles esteticos: ${f.detalles}\n` +
+                `Algo no funciona?: ${txtFallas}\n` +
+                `Reparaciones: ${f.reparaciones}\n` +
+                `Antiguedad: ${f.antiguedad}\n` +
+                `Bateria: ${f.bateria}%${f.ciclos ? ' (' + f.ciclos + ' ciclos)' : ''}\n` +
+                `Garantia: ${txtGarantia}\n` +
+                `Sellado/Usado: ${f.origen}\n` +
+                `Chip o eSIM: ${f.sim}\n\n` +
+                `Solicito tasacion para plan canje.`;
+
+            const waURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(plainMessage)}`;
 
             logEvento('canje', f);
-            window.open(waURL, '_blank');
-            localStorage.removeItem('fzcases_canje_data'); // clean up after success!
+
+            const files = [];
+            if (f.fotoBateria) files.push(new File([dataURLtoBlob(f.fotoBateria)], 'bateria.jpg', { type: 'image/jpeg' }));
+            if (f.fotoInfo) files.push(new File([dataURLtoBlob(f.fotoInfo)], 'informacion.jpg', { type: 'image/jpeg' }));
+
+            const puedeCompartirFotos = files.length > 0 && navigator.canShare && navigator.canShare({ files });
+
+            if (puedeCompartirFotos) {
+                // Abre el panel nativo de "Compartir" con el texto y las 2 fotos ya adjuntas;
+                // el cliente elige WhatsApp ahí mismo (el navegador no puede forzar esa app ni el
+                // contacto, es una limitación del sistema operativo, no nuestra).
+                navigator.share({ files, text: plainMessage, title: 'Plan Canje FZCASES' })
+                    .then(() => localStorage.removeItem('fzcases_canje_data'))
+                    .catch(() => {
+                        // Canceló el panel de compartir o el share falló: fallback al link de WhatsApp de siempre (sin fotos, ya quedaron guardadas).
+                        window.open(waURL, '_blank');
+                        localStorage.removeItem('fzcases_canje_data');
+                    });
+            } else {
+                window.open(waURL, '_blank');
+                localStorage.removeItem('fzcases_canje_data'); // clean up after success!
+            }
         });
 
         // Initialize Wizard
