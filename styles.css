@@ -3713,6 +3713,13 @@ a.contact-item:hover {
     .wizard-controls {
         flex-direction: column-reverse; /* Siguiente arriba */
         gap: 1rem;
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        z-index: 20;
+        margin-top: 1.5rem;
+        padding: 1rem 0 calc(1rem + env(safe-area-inset-bottom));
+        box-shadow: 0 -8px 16px -8px rgba(0,0,0,0.08);
     }
     .btn-prev, .btn-next {
         width: 100%;
