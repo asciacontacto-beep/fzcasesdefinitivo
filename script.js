@@ -22,17 +22,52 @@ logEvento('visita');
 // catálogo tardara en cargar.
 const CATALOG_LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,precio_venta,precio_costo,battery,ubicacion,notas,descripcion,imagen,stock,activo,created_at,orden';
 
-async function loadProductsFromSupabase() {
-    if (!_supabase) return;
-    const { data, error } = await _supabase
-        .from('products')
-        .select(CATALOG_LIST_FIELDS)
-        .order('orden', { ascending: true, nullsFirst: false })
-        .order('created_at', { ascending: false });
+// Las fotos están guardadas en la propia tabla como base64. Bajarlas dentro del
+// JSON del catálogo, en cada visita y en cada página, era lo que disparó el
+// egress de Supabase (13,4 GB sobre una cuota de 5 GB). Ahora el catálogo se
+// pide a /api/catalog (sin fotos adentro) y cada foto se pide a /api/img, que
+// queda cacheada en el CDN de Vercel y en el navegador.
+//
+// _usandoApi queda en false si /api/catalog no responde: en ese caso se vuelve
+// solo al camino viejo contra Supabase y el sitio funciona como antes.
+let _usandoApi = false;
 
-    if (error) {
-        console.error('Error cargando productos:', error);
-        return;
+// Devuelve el src de una foto: la ruta corta si la DB tenía una ruta, el
+// endpoint cacheado si la foto es base64, o el placeholder si no hay nada.
+function srcFoto(row, slot, fallback) {
+    const directo = slot === 1 ? row.imagen : (slot === 2 ? row.imagen2 : row.imagen3);
+    if (directo) return String(directo).replace(/^\/assets\//, 'assets/');
+    const tiene = slot === 1 ? row.has_img : (slot === 2 ? row.has_img2 : row.has_img3);
+    if (tiene && _usandoApi) return `/api/img?id=${encodeURIComponent(row.id)}&slot=${slot}`;
+    return fallback || null;
+}
+
+async function loadProductsFromSupabase() {
+    let data = null;
+
+    // 1) Camino nuevo y barato: JSON liviano cacheado en el CDN.
+    try {
+        const r = await fetch('/api/catalog', { cache: 'no-store' });
+        if (r.ok) {
+            data = await r.json();
+            _usandoApi = true;
+        }
+    } catch (e) { /* sin API disponible, se usa el camino de abajo */ }
+
+    // 2) Fallback: exactamente lo que hacía antes, contra Supabase directo.
+    if (!data) {
+        if (!_supabase) return;
+        const res = await _supabase
+            .from('products')
+            .select(CATALOG_LIST_FIELDS)
+            .order('orden', { ascending: true, nullsFirst: false })
+            .order('created_at', { ascending: false });
+        if (res.error) {
+            console.error('Error cargando productos:', res.error);
+            return;
+        }
+        data = res.data;
+        _usandoApi = false;
     }
     // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
     // SISTEMA DE PORTADA DINÁMICA (CARRUSEL + CONFIG)
@@ -258,7 +293,7 @@ async function loadProductsFromSupabase() {
             heroImages.forEach((h, i) => {
                 const slide = document.createElement('div');
                 slide.className = 'hero-slide' + (i === 0 ? ' active' : '');
-                const imgPath = h.imagen ? h.imagen.replace(/^\/assets\//, 'assets/') : '';
+                const imgPath = srcFoto(h, 1, '') || '';
                 slide.innerHTML = `<img src="${imgPath}" class="hero-slide-img" alt="Portada ${i+1}">`;
                 container.appendChild(slide);
             });
@@ -295,7 +330,7 @@ async function loadProductsFromSupabase() {
             storage: p.almacenamiento,
             color: p.color,
             battery: p.battery,
-            image: (p.imagen || "assets/iphone_case.png").replace(/^\/assets\//, 'assets/'),
+            image: srcFoto(p, 1, 'assets/iphone_case.png'),
             // image2/image3/variantes NO vienen en este fetch (son las fotos que más
             // pesan, x cada producto) — se piden recién al abrir el modal de ESE
             // producto puntual, en openModal(). Ver _detailLoaded más abajo.
@@ -923,15 +958,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Foto 2, Foto 3 y las variantes (con su propia foto c/u) no vinieron en
             // el fetch inicial del catálogo -> se piden acá, una sola vez por producto.
-            if (!product._detailLoaded && _supabase) {
-                const { data: detail } = await _supabase
-                    .from('products')
-                    .select('imagen2,imagen3,variantes')
-                    .eq('id', productId)
-                    .single();
+            if (!product._detailLoaded) {
+                let detail = null;
+
+                // Igual que el catálogo: primero el endpoint cacheado, y si no
+                // está disponible se cae al pedido directo a Supabase.
+                if (_usandoApi) {
+                    try {
+                        const r = await fetch(`/api/detail?id=${encodeURIComponent(productId)}`);
+                        if (r.ok) detail = await r.json();
+                    } catch (e) { /* se intenta abajo */ }
+                }
+                if (!detail && _supabase) {
+                    const res = await _supabase
+                        .from('products')
+                        .select('imagen2,imagen3,variantes')
+                        .eq('id', productId)
+                        .single();
+                    detail = res.data;
+                }
+
                 if (detail) {
-                    product.image2 = detail.imagen2 ? detail.imagen2.replace(/^\/assets\//, 'assets/') : null;
-                    product.image3 = detail.imagen3 ? detail.imagen3.replace(/^\/assets\//, 'assets/') : null;
+                    const row = { id: productId, ...detail };
+                    product.image2 = srcFoto(row, 2, null);
+                    product.image3 = srcFoto(row, 3, null);
                     product.variantes = detail.variantes;
                 }
                 product._detailLoaded = true;

@@ -101,6 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return COLOR_MAP[lower] || (val.charAt(0).toUpperCase() + val.slice(1));
     }
 
+    // Todas las columnas MENOS imagen2/imagen3: son las fotos secundarias, no se
+    // ven en la tabla del panel y sólo hacen falta al abrir "Editar" de UN
+    // producto. fetchData() se vuelve a llamar después de cada guardado, alta,
+    // baja y de cada tilde de activo/inactivo, así que traerlas siempre era
+    // bajar de Supabase ~380 KB de fotos al pedo en cada clic.
+    const ADMIN_LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,'
+        + 'color,battery,precio_venta,precio_costo,stock,ubicacion,activo,orden,'
+        + 'notas,descripcion,imagen,variantes,created_at';
+
     let memoryProducts = [];
     let memorySales = [];
     let memoryEventos = [];
@@ -109,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchData() {
         if (!_supabase) return;
         try {
-            const { data: products } = await _supabase.from('products').select('*').order('orden', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false });
+            const { data: products } = await _supabase.from('products').select(ADMIN_LIST_FIELDS).order('orden', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false });
             if (products) memoryProducts = products;
 
             const { data: sales } = await _supabase.from('sales').select('*').order('fecha', { ascending: false });
@@ -1899,9 +1908,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('sidebar-overlay').classList.remove('show');
     };
 
-    window.editProduct = (id) => {
+    window.editProduct = async (id) => {
         const p = memoryProducts.find(x => x.id === id);
         if (!p) return;
+
+        // imagen2/imagen3 no vienen en el listado (ver ADMIN_LIST_FIELDS): se
+        // piden acá, sólo para el producto que se está por editar, y se guardan
+        // en memoria para no volver a pedirlas.
+        if (!p._fotosExtraCargadas && _supabase) {
+            const { data: extra } = await _supabase
+                .from('products')
+                .select('imagen2,imagen3')
+                .eq('id', id)
+                .single();
+            if (extra) {
+                p.imagen2 = extra.imagen2;
+                p.imagen3 = extra.imagen3;
+            }
+            p._fotosExtraCargadas = true;
+        }
         document.getElementById('prod-id').value = p.id;
         document.getElementById('modal-prod-title').textContent = 'Editar Producto';
         document.getElementById('prod-sell').value = p.precio_venta;
