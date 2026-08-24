@@ -4,6 +4,8 @@
 // y 3 y las variantes (cada variante tiene su propia foto). Igual que en
 // /api/catalog, las fotos pesadas no viajan acá: viaja el flag y el navegador
 // las pide a /api/img, que sí queda cacheado.
+const fs = require('fs');
+const path = require('path');
 const { rest, isDataUrl } = require('./_supa');
 
 module.exports = async (req, res) => {
@@ -36,6 +38,16 @@ module.exports = async (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.status(200).send(JSON.stringify(out));
   } catch (err) {
+    // Igual que /api/catalog: se cae a la copia de /snapshot.
+    try {
+      const copia = fs.readFileSync(
+        path.join(process.cwd(), 'snapshot', 'detail', `${id}.json`), 'utf8');
+      res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=60');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('X-Fz-Fuente', 'snapshot');
+      return res.status(200).send(copia);
+    } catch (e) { /* sin snapshot: error de abajo */ }
+
     res.setHeader('Cache-Control', 'no-store');
     res.status(502).json({ error: String(err && err.message || err) });
   }

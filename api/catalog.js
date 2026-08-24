@@ -10,6 +10,8 @@
 // de Supabase pasada de cuota. Esta respuesta pesa ~35 KB y además queda
 // cacheada, así que Supabase la sirve unas pocas veces por hora, no una vez por
 // visitante.
+const fs = require('fs');
+const path = require('path');
 const { rest, isDataUrl } = require('./_supa');
 
 // Mismos campos que usaba CATALOG_LIST_FIELDS en script.js, salvo precio_costo:
@@ -46,8 +48,19 @@ module.exports = async (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.status(200).send(JSON.stringify(data));
   } catch (err) {
-    // Si esto falla, script.js vuelve solo al camino viejo (Supabase directo),
-    // así que el sitio sigue funcionando igual.
+    // Supabase no contestó (402 por cuota, caída, lo que sea): se sirve la
+    // copia de /snapshot para que la tienda se siga viendo. Puede estar
+    // desactualizada, pero es mejor que un catálogo vacío.
+    // Regenerar con: node scripts/snapshot-catalog.js
+    try {
+      const copia = fs.readFileSync(
+        path.join(process.cwd(), 'snapshot', 'catalog.json'), 'utf8');
+      res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=60');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('X-Fz-Fuente', 'snapshot');
+      return res.status(200).send(copia);
+    } catch (e) { /* sin snapshot tampoco: se devuelve el error de abajo */ }
+
     res.setHeader('Cache-Control', 'no-store');
     res.status(502).json({ error: String(err && err.message || err) });
   }

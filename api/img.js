@@ -6,9 +6,28 @@
 //   2) Cache-Control largo: el CDN de Vercel y el navegador se la guardan, así
 //      que Supabase sirve cada foto unas pocas veces en total en vez de una vez
 //      por visitante por página.
+const fs = require('fs');
+const path = require('path');
 const { rest, isDataUrl } = require('./_supa');
 
 const SLOTS = { 1: 'imagen', 2: 'imagen2', 3: 'imagen3' };
+
+// Si Supabase no contesta, la foto se busca en la copia de /snapshot.
+// Devuelve true si logró servirla.
+function servirDesdeSnapshot(res, id, slot) {
+  try {
+    const dir = path.join(process.cwd(), 'snapshot');
+    const index = JSON.parse(fs.readFileSync(path.join(dir, 'index.json'), 'utf8'));
+    const file = index[`${id}-${slot}`];
+    if (!file) return false;
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
+    res.setHeader('X-Fz-Fuente', 'snapshot');
+    res.redirect(302, `/snapshot/img/${file}`);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 module.exports = async (req, res) => {
   const { id, slot = '1' } = req.query || {};
@@ -50,6 +69,7 @@ module.exports = async (req, res) => {
     res.setHeader('Content-Length', String(buf.length));
     res.status(200).send(buf);
   } catch (err) {
+    if (servirDesdeSnapshot(res, id, slot)) return;
     res.setHeader('Cache-Control', 'no-store');
     res.status(502).json({ error: String(err && err.message || err) });
   }
