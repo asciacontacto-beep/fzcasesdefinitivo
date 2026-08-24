@@ -20,7 +20,9 @@ logEvento('visita');
 // la grilla del catálogo, solo cuando se abre el modal de un producto puntual.
 // Bajarlas todas de una para TODOS los productos era el motivo real de que el
 // catálogo tardara en cargar.
-const CATALOG_LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,precio_venta,precio_costo,battery,ubicacion,notas,descripcion,imagen,stock,activo,created_at,orden';
+// Sin precio_costo: el sitio público nunca lo usa y no tiene por qué viajar al
+// navegador de un visitante.
+const CATALOG_LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,precio_venta,battery,ubicacion,notas,descripcion,imagen,stock,activo,created_at,orden';
 
 // Las fotos están guardadas en la propia tabla como base64. Bajarlas dentro del
 // JSON del catálogo, en cada visita y en cada página, era lo que disparó el

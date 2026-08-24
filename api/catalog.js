@@ -12,9 +12,10 @@
 // visitante.
 const { rest, isDataUrl } = require('./_supa');
 
-// Mismos campos que usaba CATALOG_LIST_FIELDS en script.js.
+// Mismos campos que usaba CATALOG_LIST_FIELDS en script.js, salvo precio_costo:
+// el sitio público nunca lo usaba y no corresponde mandarlo al navegador.
 const LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,'
-  + 'precio_venta,precio_costo,battery,ubicacion,notas,descripcion,imagen,'
+  + 'precio_venta,battery,ubicacion,notas,descripcion,imagen,'
   + 'stock,activo,created_at,orden';
 
 module.exports = async (req, res) => {
