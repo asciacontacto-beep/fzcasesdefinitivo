@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let memoryProducts = [];
     let memorySales = [];
     let memoryEventos = [];
+    let memoryTurnos = [];
     const formatMoney = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
 
     async function fetchData() {
@@ -123,6 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const { data: sales } = await _supabase.from('sales').select('*').order('fecha', { ascending: false });
             if (sales) memorySales = sales;
+
+            const { data: turnos, error: turnosError } = await _supabase.from('turnos').select('*').order('fecha', { ascending: true }).order('hora', { ascending: true });
+            if (turnosError) {
+                console.warn('turnos no disponible todavía (¿corriste sql/turnos.sql y agregaste la policy de authenticated?):', turnosError.message);
+                memoryTurnos = [];
+            } else {
+                memoryTurnos = turnos || [];
+            }
 
             const { data: eventos, error: eventosError } = await _supabase.from('eventos_analytics').select('*').order('created_at', { ascending: false });
             if (eventosError) {
@@ -142,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof updateAdminModelFilter === 'function') updateAdminModelFilter();
         renderProductos();
         renderVentas();
+        renderTurnos();
         renderHeroGallery();
         if (typeof renderNosotrosConfig === 'function') renderNosotrosConfig();
         setupAnalyticsFilters();
@@ -567,6 +577,118 @@ document.addEventListener('DOMContentLoaded', () => {
             tbody.appendChild(tr);
         });
     }
+
+    // ============== TURNOS ==============
+    const ESTADO_LABEL = { pendiente: 'Pendiente', confirmado: 'Confirmado', completado: 'Completado', cancelado: 'Cancelado' };
+    const ESTADO_BADGE = { pendiente: 'badge-warning', confirmado: 'badge-info', completado: 'badge-active', cancelado: 'badge-inactive' };
+    let turnosFiltersReady = false;
+
+    function setupTurnosFilters() {
+        if (turnosFiltersReady) return;
+        const selEstado = document.getElementById('turnos-filter-estado');
+        const selSucursal = document.getElementById('turnos-filter-sucursal');
+        const chkPasados = document.getElementById('turnos-filter-pasados');
+        if (!selEstado) return;
+        [selEstado, selSucursal].forEach(el => el.addEventListener('change', renderTurnos));
+        chkPasados.addEventListener('change', renderTurnos);
+        turnosFiltersReady = true;
+    }
+
+    function renderTurnos() {
+        setupTurnosFilters();
+        const tbody = document.getElementById('tbody-turnos');
+        if (!tbody) return;
+
+        const hoyISO = new Date().toISOString().slice(0, 10);
+        const selEstado = document.getElementById('turnos-filter-estado');
+        const selSucursal = document.getElementById('turnos-filter-sucursal');
+        const chkPasados = document.getElementById('turnos-filter-pasados');
+        const fEstado = selEstado ? selEstado.value : '';
+        const fSucursal = selSucursal ? selSucursal.value : '';
+        const verPasados = chkPasados ? chkPasados.checked : false;
+
+        const visibles = memoryTurnos.filter(t => {
+            if (fEstado && t.estado !== fEstado) return false;
+            if (fSucursal && t.sucursal !== fSucursal) return false;
+            if (!verPasados && t.fecha < hoyISO && t.estado !== 'pendiente' && t.estado !== 'confirmado') return false;
+            return true;
+        });
+
+        tbody.innerHTML = '';
+        visibles.forEach(t => {
+            const tr = document.createElement('tr');
+            const waMsg = encodeURIComponent(`Hola ${t.nombre}! Te escribo de FZCASES por tu turno del ${t.fecha} a las ${t.hora}hs.`);
+            const waHref = `https://wa.me/${String(t.telefono).replace(/\D/g, '')}?text=${waMsg}`;
+            tr.innerHTML = `
+                <td>${t.fecha}</td>
+                <td><strong>${t.hora}</strong></td>
+                <td>${t.nombre}</td>
+                <td><a href="${waHref}" target="_blank" style="color:#3b82f6; text-decoration:underline;">${t.telefono}</a></td>
+                <td>${t.motivo || '-'}</td>
+                <td>${t.sucursal}</td>
+                <td><span class="pill-badge ${ESTADO_BADGE[t.estado] || 'badge-info'}">${ESTADO_LABEL[t.estado] || t.estado}</span></td>
+                <td class="turnos-actions">
+                    ${t.estado === 'pendiente' ? `<button class="action-btn" title="Confirmar" onclick="window.setTurnoEstado(${t.id},'confirmado')">✓</button>` : ''}
+                    ${(t.estado === 'pendiente' || t.estado === 'confirmado') ? `<button class="action-btn" title="Marcar completado" onclick="window.setTurnoEstado(${t.id},'completado')">✔✔</button>` : ''}
+                    ${t.estado !== 'cancelado' ? `<button class="action-btn delete" title="Cancelar" onclick="window.setTurnoEstado(${t.id},'cancelado')">✕</button>` : ''}
+                    <button class="action-btn" title="Editar" onclick="window.editTurno(${t.id})">✎</button>
+                    <button class="action-btn delete" title="Borrar" onclick="window.deleteTurno(${t.id})">🗑</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        const emptyState = document.getElementById('empty-turnos');
+        if (emptyState) emptyState.classList.toggle('hidden', visibles.length > 0);
+
+        const badgeTurnos = document.getElementById('badge-turnos');
+        const pendientesTotal = memoryTurnos.filter(t => t.estado === 'pendiente').length;
+        if (badgeTurnos) badgeTurnos.textContent = pendientesTotal;
+
+        const kpiHoy = document.getElementById('turnos-kpi-hoy');
+        const kpiPendientes = document.getElementById('turnos-kpi-pendientes');
+        const kpiSemana = document.getElementById('turnos-kpi-semana');
+        if (kpiHoy) kpiHoy.textContent = memoryTurnos.filter(t => t.fecha === hoyISO && t.estado !== 'cancelado').length;
+        if (kpiPendientes) kpiPendientes.textContent = pendientesTotal;
+        if (kpiSemana) {
+            const en7dias = new Date();
+            en7dias.setDate(en7dias.getDate() + 7);
+            const limite = en7dias.toISOString().slice(0, 10);
+            kpiSemana.textContent = memoryTurnos.filter(t => t.fecha >= hoyISO && t.fecha <= limite && t.estado !== 'cancelado').length;
+        }
+    }
+
+    window.setTurnoEstado = async (id, estado) => {
+        const { error } = await _supabase.from('turnos').update({ estado }).eq('id', id);
+        if (!error) {
+            showToast(`Turno ${ESTADO_LABEL[estado].toLowerCase()}`);
+            fetchData();
+        } else {
+            alert('Error al actualizar el turno: ' + error.message);
+        }
+    };
+
+    window.deleteTurno = async (id) => {
+        if (!confirm('¿Borrar este turno? No se puede deshacer.')) return;
+        const { error } = await _supabase.from('turnos').delete().eq('id', id);
+        if (!error) { showToast('Turno borrado'); fetchData(); }
+    };
+
+    window.editTurno = (id) => {
+        const t = memoryTurnos.find(x => x.id === id);
+        if (!t) return;
+        document.getElementById('modal-turno-title').textContent = 'Editar Turno';
+        document.getElementById('turno-id').value = t.id;
+        document.getElementById('turno-nombre').value = t.nombre;
+        document.getElementById('turno-telefono').value = t.telefono;
+        document.getElementById('turno-fecha').value = t.fecha;
+        document.getElementById('turno-hora').value = t.hora;
+        document.getElementById('turno-sucursal').value = t.sucursal;
+        document.getElementById('turno-estado').value = t.estado;
+        document.getElementById('turno-motivo').value = t.motivo || 'Ver producto en persona';
+        document.getElementById('turno-notas').value = t.notas || '';
+        document.getElementById('modal-turno').classList.remove('hidden');
+    };
 
     // ==============================================================================
     // 4. FUNCIONES GLOBALES (CRUD)
@@ -1756,6 +1878,19 @@ document.addEventListener('DOMContentLoaded', () => {
         modalSale.classList.remove('hidden');
     };
 
+    const modalTurno = document.getElementById('modal-turno');
+    const formTurno = document.getElementById('form-turno');
+    const btnAddTurno = document.getElementById('btn-add-turno');
+    if (btnAddTurno) {
+        btnAddTurno.onclick = () => {
+            formTurno.reset();
+            document.getElementById('turno-id').value = '';
+            document.getElementById('modal-turno-title').textContent = 'Cargar Turno';
+            document.getElementById('turno-fecha').value = new Date().toISOString().slice(0, 10);
+            modalTurno.classList.remove('hidden');
+        };
+    }
+
     // -- Handlers de EnvÃ­o --
     formProduct.onsubmit = async (e) => {
         e.preventDefault();
@@ -1845,6 +1980,40 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error al registrar venta: " + error.message);
         }
     };
+
+    if (formTurno) {
+        formTurno.onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('turno-id').value;
+            const turnoData = {
+                nombre: document.getElementById('turno-nombre').value.trim(),
+                telefono: document.getElementById('turno-telefono').value.trim(),
+                fecha: document.getElementById('turno-fecha').value,
+                hora: document.getElementById('turno-hora').value.slice(0, 5),
+                sucursal: document.getElementById('turno-sucursal').value,
+                estado: document.getElementById('turno-estado').value,
+                motivo: document.getElementById('turno-motivo').value,
+                notas: document.getElementById('turno-notas').value.trim() || null,
+            };
+
+            const { error } = id
+                ? await _supabase.from('turnos').update(turnoData).eq('id', id)
+                : await _supabase.from('turnos').insert([turnoData]);
+
+            if (!error) {
+                modalTurno.classList.add('hidden');
+                showToast(id ? 'Turno actualizado' : 'Turno cargado');
+                fetchData();
+            } else {
+                console.error('Error BD Turnos:', error);
+                if (String(error.code) === '23505') {
+                    alert('Ya hay un turno cargado en esa fecha, hora y sucursal.');
+                } else {
+                    alert('Error al guardar el turno: ' + error.message);
+                }
+            }
+        };
+    }
 
     // -- Inicializadores de Formulario --
     initChipSelectors();
