@@ -2093,10 +2093,10 @@ document.addEventListener('DOMContentLoaded', () => {
         div.style = 'position:relative; background:#f5f5f7; padding:10px; border-radius:8px; border:1px solid #e5e5ea;';
         div.innerHTML = `
             <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <input type="text" class="admin-input gal-url" placeholder="URL Imagen" value="${url}" style="width:100%;" onchange="this.parentElement.nextElementSibling.src=this.value || 'assets/placeholder.jpg'">
+                <input type="text" class="admin-input gal-url" placeholder="URL Imagen" value="${url}" style="width:100%;" onchange="this.parentElement.nextElementSibling.src=this.value || '/assets/iphone_case.png'">
                 <button class="btn btn-secondary" onclick="window.uploadAndCompressImage((base64) => { this.previousElementSibling.value = base64; this.parentElement.nextElementSibling.src = base64; })" style="padding: 0 12px; white-space: nowrap;">Subir</button>
             </div>
-            <img src="${url || 'assets/placeholder.jpg'}" style="width:100%; height:120px; object-fit:cover; border-radius:4px;" onerror="this.src='assets/placeholder.jpg'">
+            <img src="${url || '/assets/iphone_case.png'}" style="width:100%; height:120px; object-fit:cover; border-radius:4px;" onerror="this.onerror=null; this.src='/assets/iphone_case.png'">
             <button class="btn btn-secondary" style="position:absolute; top:-10px; right:-10px; background:#ffebee; color:#d32f2f; border-radius:50%; width:30px; height:30px; padding:0; line-height:30px; text-align:center;" onclick="this.parentElement.remove()">X</button>
         `;
         document.getElementById('nosotros-gallery-container').appendChild(div);
