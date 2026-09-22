@@ -572,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>x${sale.cantidad}</td>
                 <td>${formatMoney(sale.precio_final)}</td>
                 <td>${sale.metodo_pago}</td>
-                <td><button class="action-btn delete" onclick="window.deleteSale(${sale.id})">X</button></td>
+                <td><button class="action-btn delete" title="Borrar venta" onclick="window.deleteSale(${sale.id})">${ICON_TRASH}</button></td>
             `;
             tbody.appendChild(tr);
         });
@@ -581,6 +581,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============== TURNOS ==============
     const ESTADO_LABEL = { pendiente: 'Pendiente', confirmado: 'Confirmado', completado: 'Completado', cancelado: 'Cancelado' };
     const ESTADO_BADGE = { pendiente: 'badge-warning', confirmado: 'badge-info', completado: 'badge-active', cancelado: 'badge-inactive' };
+
+    // Iconos SVG para los botones de acción de tablas (sin emojis).
+    const ICON_CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    const ICON_CHECK_CIRCLE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+    const ICON_X = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+    const ICON_EDIT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
+    const ICON_TRASH = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>';
     let turnosFiltersReady = false;
 
     function setupTurnosFilters() {
@@ -628,11 +635,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${t.sucursal}</td>
                 <td><span class="pill-badge ${ESTADO_BADGE[t.estado] || 'badge-info'}">${ESTADO_LABEL[t.estado] || t.estado}</span></td>
                 <td class="turnos-actions">
-                    ${t.estado === 'pendiente' ? `<button class="action-btn" title="Confirmar" onclick="window.setTurnoEstado(${t.id},'confirmado')">✓</button>` : ''}
-                    ${(t.estado === 'pendiente' || t.estado === 'confirmado') ? `<button class="action-btn" title="Marcar completado" onclick="window.setTurnoEstado(${t.id},'completado')">✔✔</button>` : ''}
-                    ${t.estado !== 'cancelado' ? `<button class="action-btn delete" title="Cancelar" onclick="window.setTurnoEstado(${t.id},'cancelado')">✕</button>` : ''}
-                    <button class="action-btn" title="Editar" onclick="window.editTurno(${t.id})">✎</button>
-                    <button class="action-btn delete" title="Borrar" onclick="window.deleteTurno(${t.id})">🗑</button>
+                    ${t.estado === 'pendiente' ? `<button class="action-btn" title="Confirmar" onclick="window.setTurnoEstado(${t.id},'confirmado')">${ICON_CHECK}</button>` : ''}
+                    ${(t.estado === 'pendiente' || t.estado === 'confirmado') ? `<button class="action-btn" title="Marcar completado" onclick="window.setTurnoEstado(${t.id},'completado')">${ICON_CHECK_CIRCLE}</button>` : ''}
+                    ${t.estado !== 'cancelado' ? `<button class="action-btn delete" title="Cancelar" onclick="window.setTurnoEstado(${t.id},'cancelado')">${ICON_X}</button>` : ''}
+                    <button class="action-btn" title="Editar" onclick="window.editTurno(${t.id})">${ICON_EDIT}</button>
+                    <button class="action-btn delete" title="Borrar" onclick="window.deleteTurno(${t.id})">${ICON_TRASH}</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -2251,7 +2258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <input type="text" class="admin-input tl-year" placeholder="AÃ±o" value="${year}" style="width:80px;">
             <input type="text" class="admin-input tl-title" placeholder="TÃ­tulo" value="${title}" style="width:150px;">
             <textarea class="admin-input tl-desc" placeholder="DescripciÃ³n" style="flex:1; height:40px; resize:vertical;">${desc}</textarea>
-            <button class="btn btn-secondary" style="background:#ffebee; color:#d32f2f; height: 40px;" onclick="this.parentElement.remove()">X</button>
+            <button class="btn btn-secondary" style="background:#ffebee; color:#d32f2f; height: 40px; width: 40px; padding: 0;" title="Quitar" onclick="this.parentElement.remove()">${ICON_TRASH}</button>
         `;
         document.getElementById('nosotros-timeline-container').appendChild(div);
     };
@@ -2266,7 +2273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="btn btn-secondary" onclick="window.uploadAndCompressImage((base64) => { this.previousElementSibling.value = base64; this.parentElement.nextElementSibling.src = base64; })" style="padding: 0 12px; white-space: nowrap;">Subir</button>
             </div>
             <img src="${url || '/assets/iphone_case.png'}" style="width:100%; height:120px; object-fit:cover; border-radius:4px;" onerror="this.onerror=null; this.src='/assets/iphone_case.png'">
-            <button class="btn btn-secondary" style="position:absolute; top:-10px; right:-10px; background:#ffebee; color:#d32f2f; border-radius:50%; width:30px; height:30px; padding:0; line-height:30px; text-align:center;" onclick="this.parentElement.remove()">X</button>
+            <button class="btn btn-secondary" style="position:absolute; top:-10px; right:-10px; background:#ffebee; color:#d32f2f; border-radius:50%; width:30px; height:30px; padding:0; display:flex; align-items:center; justify-content:center;" title="Quitar" onclick="this.parentElement.remove()">${ICON_X}</button>
         `;
         document.getElementById('nosotros-gallery-container').appendChild(div);
     };
