@@ -1,6 +1,20 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ---------------------------------------------------------------------------
+# Secretos: NUNCA se suben. Las claves van en Vercel → Environment Variables
+# o en un .env.local en tu compu. Ver .env.example para la lista.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+credentials*.json
+supabase/.temp/
+supabase/.branches/
 
-# dependencies
+# dependencias
 /node_modules
 /.pnp
 .pnp.*
@@ -10,37 +24,33 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# next.js / build
 /.next/
 /out/
-
-# production
 /build
+*.tsbuildinfo
+next-env.d.ts
 
-# misc
-.DS_Store
-*.pem
+# vercel
+.vercel
 
-# debug
+# tests
+/coverage
+
+# logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-!.env.example
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# sistema y editores
 .DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
 
 # Skill de diseño de terceros instalado localmente (no se versiona)
 /.agents/
