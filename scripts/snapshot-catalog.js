@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { rest, isDataUrl } = require('../api/_supa');
 
-const OUT = path.join(__dirname, '..', 'snapshot');
+const OUT = path.join(__dirname, '..', 'public', 'snapshot');
 const LIST_FIELDS = 'id,nombre,categoria,subcategoria,almacenamiento,color,'
   + 'precio_venta,battery,ubicacion,notas,descripcion,imagen,'
   + 'stock,activo,created_at,orden';
@@ -84,7 +84,7 @@ function guardarFoto(dataUrl, id, slot) {
 
   fs.writeFileSync(path.join(OUT, 'index.json'), JSON.stringify(index));
 
-  console.log(`snapshot listo en /snapshot`);
+  console.log(`snapshot listo en /public/snapshot`);
   console.log(`  productos:   ${catalogo.length}`);
   console.log(`  detalles:    ${detalles.length}`);
   console.log(`  fotos:       ${Object.keys(index).length} (${(totalBytes / 1048576).toFixed(2)} MB)`);
